@@ -1,5 +1,5 @@
 """Identity surface damage — regression tests from the
-ontology scale-test pilot (2026-10-29, 60 docs, Cindy seat).
+ontology scale-test pilot (2026-10-29, 60 docs, manual seat).
 
 The pilot's largest single loss class was not the schema:
 15 of 284 kept candidates (5.3%) carried endpoints the
