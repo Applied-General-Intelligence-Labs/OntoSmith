@@ -1308,7 +1308,8 @@ def _identity_tokens(norm: str) -> set:
 
 def _resolve_endpoint(ep_norm: str, index: tuple,
                       anchor_norm: str | None = None,
-                      ep_initialism: bool = False
+                      ep_initialism: bool = False,
+                      seat=None
                       ) -> tuple[str | None, list[str]]:
     """Resolve one proposed endpoint (norm_ws form) to
     the document's canonical surface for the entity it
@@ -1414,6 +1415,51 @@ def _resolve_endpoint(ep_norm: str, index: tuple,
             and etoks < _identity_tokens(anchor_norm):
         return by_norm[anchor_norm]["surface"], []
     toks = {n: _identity_tokens(n) for n in by_norm}
+    if seat is not None:
+        # The identity seat (identity-surgery program,
+        # 2026-10-30): an injected judge replaces rule
+        # 4's filter chain and structural vetoes for
+        # subset candidates. The seat is consulted per
+        # candidate with the code-computed feature
+        # envelope and answers True (complete) or False
+        # (stand); it can only choose among census
+        # surfaces, never invent one. The contested-
+        # field rule is unchanged: more than one
+        # approved candidate is ambiguity, reported,
+        # never guessed. Everything else in this
+        # function (rules 1-3) and in the caller (the
+        # invariants) applies exactly as without a seat.
+        ep_seq_s = _seq_of(ep_norm)
+        approved = []
+        for m in maximals:
+            if not (etoks < toks[m]
+                    or (etoks == toks[m] and ep_norm != m)):
+                continue
+            cand_seq_s = _seq_of(m)
+            al_s = _align(ep_seq_s, cand_seq_s)
+            feats = {
+                "fragment_surface": (
+                    by_norm[ep_norm]["surface"]
+                    if ep_norm in by_norm else ep_norm),
+                "candidate_surface": by_norm[m]["surface"],
+                "outside": _outside_count(bridged, ep_norm, m),
+                "cand_attest": len(_phrase_spans(bridged, m)),
+                "evidence": _rewrite_evidence(
+                    ep_seq_s, m, index),
+                "anchored": _anchored(
+                    ep_norm, ep_seq_s, m, cand_seq_s, index),
+                "align": (
+                    {"prepend": al_s[0], "infix": al_s[1],
+                     "trailing": al_s[2]} if al_s else None),
+            }
+            if seat(ep_norm, m, feats):
+                approved.append(m)
+        if len(approved) > 1:
+            return None, sorted(
+                by_norm[m]["surface"] for m in approved)
+        if len(approved) == 1:
+            return by_norm[approved[0]]["surface"], []
+        return None, []
     # A coordination surface ("Vietnam and Cambodia") is
     # not an entity and never a resolution target: a
     # fragment naming one side of it must not be
@@ -2053,13 +2099,22 @@ def guard_triples(items: list[dict], doc_text: str,
                   theme_attest_key: str | None = None,
                   quote_punct_insensitive: bool = False,
                   theme_attest_chunk: bool = False,
-                  mentions: bool = False
+                  mentions: bool = False,
+                  identity_seat=None
                   ) -> tuple[list[dict], list[dict]]:
     """Apply G1 + L0 attestation + role-word + theme guards.
 
     Returns (kept, blocked). Kept items gain `attest` (the level at
     which both endpoints are attested: quote | chunk | document).
     Blocked items gain `reason` (see module docstring).
+
+    `identity_seat` is an optional injected judge for
+    rule 4 of identity resolution (see _resolve_endpoint):
+    a callable (fragment_norm, candidate_norm, features)
+    -> bool deciding, per subset candidate, whether the
+    fragment completes to the candidate (True) or stands
+    (False). None (the default) keeps the deterministic
+    rule chain; behavior is unchanged.
 
     `role_words` is the role-word guard's vocabulary — the
     normalized role nouns, supplied as pack data and resolved
@@ -2263,7 +2318,8 @@ def guard_triples(items: list[dict], doc_text: str,
                     anchor_norm=it.get("anchor_norm"),
                     ep_initialism=bool(re.fullmatch(
                         r"[A-Z][A-Z0-9]{1,5}",
-                        base[ep].strip())))
+                        base[ep].strip())),
+                    seat=identity_seat)
                 if res is not None and res != base[ep]:
                     canon[ep] = [base[ep], res]
                     eff[ep] = res

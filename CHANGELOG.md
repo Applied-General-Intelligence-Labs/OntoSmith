@@ -7,6 +7,24 @@ and the project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- **Identity seat seam** — `guard_triples` accepts an
+  optional `identity_seat`: an injected judge that
+  decides rule 4's completion question (whether a
+  fragment mention completes to a longer census name)
+  per candidate, from a code-computed feature envelope.
+  The default is None — the deterministic rule chain,
+  unchanged. The seam is the measured outcome of the
+  identity-surgery program (2026-10-30): on a frozen
+  245-point gold the seat matched the rules' accuracy
+  with zero referent-changing completions (the rules
+  made two), and on fresh documents it completed the
+  legitimate full names the rule chain refused (4/4
+  against 0/4) at the cost of one title misnaming.
+  Wiring a live model seat into the batch path remains
+  a separate, profile-level decision.
+
 ### Changed
 
 - **Upstream attestation program** — the candidate
