@@ -142,6 +142,15 @@ CONSUMED_KEYS: dict[str, str] = {
                                "accepts punctuation-spacing-"
                                "equivalent quotes (stage_candidates "
                                "guards)",
+    "identity_seat_decisions": "CANDIDATES identity seat "
+                               "decisions file: path (batch-root "
+                               "relative or absolute) of the frozen "
+                               "JSONL verdicts an offline judge "
+                               "produced for rule 4 of identity "
+                               "resolution (stage_candidates -> "
+                               "proposer.guard_triples "
+                               "identity_seat); absent = the "
+                               "deterministic rule chain alone",
     "theme_attest_chunk": "CANDIDATES theme-presence guard "
                           "accepts a verb+preposition relation's "
                           "object attested anywhere in the "

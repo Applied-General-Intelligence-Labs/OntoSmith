@@ -129,6 +129,89 @@ class TestIdentitySeat(unittest.TestCase):
         self.assertEqual(kept[0]["subject"],
                          "Paul Desmarais")
 
+    def test_seat_no_opinion_defers_to_rules(self):
+        # A seat returning None has no opinion: the
+        # rule chain's outcome stands in both
+        # directions (the veto's refusal and the
+        # suffix completion alike).
+        def no_opinion(ep, cand, feats):
+            return None
+        kept, _ = proposer.guard_triples(
+            [dict(HAMASAKI_ITEM)], HAMASAKI_DOC,
+            identity_seat=no_opinion)
+        self.assertEqual(kept[0]["object"], "Hamasaki")
+        kept, _ = proposer.guard_triples(
+            [dict(DESMARAIS_ITEM)], DESMARAIS_DOC,
+            identity_seat=no_opinion)
+        self.assertEqual(kept[0]["subject"],
+                         "Paul Desmarais Jr")
+
+    def test_decisions_file_seat(self):
+        # The operating form of the seat: verdicts an
+        # offline judge froze into a file, keyed by
+        # document hash. Judged points follow the
+        # file (complete AND stand); unjudged points
+        # defer to the rules.
+        import json
+        import tempfile
+        from pathlib import Path
+        records = [
+            {"doc": proposer.identity_doc_key(HAMASAKI_DOC),
+             "ep": "hamasaki", "cand": "ayumi hamasaki",
+             "decision": "complete"},
+            {"doc": proposer.identity_doc_key(DESMARAIS_DOC),
+             "ep": "paul desmarais",
+             "cand": "paul desmarais jr",
+             "decision": "stand"},
+        ]
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "decisions.jsonl"
+            path.write_text(
+                "".join(json.dumps(r) + "\n" for r in records),
+                encoding="utf-8")
+            decisions = proposer.load_identity_decisions(path)
+        stats = {"consulted": 0, "opinions": 0}
+        seat = proposer.identity_seat_for_doc(
+            decisions, proposer.identity_doc_key(HAMASAKI_DOC),
+            stats=stats)
+        kept, _ = proposer.guard_triples(
+            [dict(HAMASAKI_ITEM)], HAMASAKI_DOC,
+            identity_seat=seat)
+        self.assertEqual(kept[0]["object"], "Ayumi Hamasaki")
+        self.assertGreater(stats["opinions"], 0)
+        seat = proposer.identity_seat_for_doc(
+            decisions, proposer.identity_doc_key(DESMARAIS_DOC))
+        kept, _ = proposer.guard_triples(
+            [dict(DESMARAIS_ITEM)], DESMARAIS_DOC,
+            identity_seat=seat)
+        self.assertEqual(kept[0]["subject"], "Paul Desmarais")
+        # A document the file never judged: rules decide.
+        seat = proposer.identity_seat_for_doc(decisions, "0" * 16)
+        kept, _ = proposer.guard_triples(
+            [dict(DESMARAIS_ITEM)], DESMARAIS_DOC,
+            identity_seat=seat)
+        self.assertEqual(kept[0]["subject"],
+                         "Paul Desmarais Jr")
+
+    def test_decisions_file_malformed_fails_closed(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "bad.jsonl"
+            path.write_text('{"doc": "x"}\n', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                proposer.load_identity_decisions(path)
+            path.write_text(
+                '{"doc": "d", "ep": "e", "cand": "c", '
+                '"decision": "shrug"}\n', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                proposer.load_identity_decisions(path)
+
+    def test_profile_key_registered(self):
+        from pipeline import profile_config
+        self.assertIn("identity_seat_decisions",
+                      profile_config.CONSUMED_KEYS)
+
     def test_seat_approving_a_field_is_ambiguity(self):
         # The contested-field rule survives the seat:
         # approving several candidates reports

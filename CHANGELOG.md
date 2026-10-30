@@ -14,16 +14,25 @@ and the project adheres to
   decides rule 4's completion question (whether a
   fragment mention completes to a longer census name)
   per candidate, from a code-computed feature envelope.
-  The default is None — the deterministic rule chain,
-  unchanged. The seam is the measured outcome of the
-  identity-surgery program (2026-10-30): on a frozen
-  245-point gold the seat matched the rules' accuracy
-  with zero referent-changing completions (the rules
-  made two), and on fresh documents it completed the
-  legitimate full names the rule chain refused (4/4
-  against 0/4) at the cost of one title misnaming.
-  Wiring a live model seat into the batch path remains
-  a separate, profile-level decision.
+  The seat answers complete / stand / no opinion; no
+  opinion defers that candidate to the rule chain. The
+  default is no seat — the deterministic rule chain,
+  unchanged. The batch path wires the seat from a
+  profile key, `identity_seat_decisions`: a frozen
+  JSONL file of verdicts an offline judge produced for
+  the corpus, keyed by document hash. A declared file
+  that cannot be loaded fails the stage closed, and
+  the run metrics record the file's hash and how often
+  the seat was consulted and ruled. The seam is the
+  measured outcome of the identity-surgery program
+  (2026-10-30): on a frozen 245-point gold the seat
+  matched the rules' accuracy with zero
+  referent-changing completions (the rules made two),
+  and on fresh documents it completed the legitimate
+  full names the rule chain refused (4/4 against 0/4)
+  at the cost of one title misnaming. The probe replay
+  through this wiring reproduces the measured seat
+  outcomes byte for byte.
 
 ### Changed
 

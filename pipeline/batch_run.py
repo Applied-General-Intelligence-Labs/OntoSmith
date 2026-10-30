@@ -400,6 +400,50 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     # profile/pack-selected, absent = the quote-only test.
     theme_attest_chunk = bool((setup_cfg or {}).get(
         "theme_attest_chunk"))
+    # Identity seat (identity-surgery program,
+    # 2026-10-30): the profile may name a frozen
+    # decisions file carrying an offline judge's
+    # verdicts for rule 4 of identity resolution.
+    # Declared -> loaded once here and consulted per
+    # document in the guard calls below; a point the
+    # file never judged defers to the rule chain.
+    # Absent = no seat: the deterministic chain alone,
+    # byte-identical. A declared file that cannot be
+    # loaded fails the stage closed.
+    identity_decisions = None
+    identity_seat_src = None
+    identity_seat_stats = {"consulted": 0, "opinions": 0}
+    _seat_decl = (setup_cfg or {}).get(
+        "identity_seat_decisions")
+    if _seat_decl is not None:
+        if not (isinstance(_seat_decl, str)
+                and _seat_decl.strip()):
+            raise ValueError(
+                "identity_seat_decisions must name a "
+                "decisions file (fail closed)")
+        from . import proposer as _prop
+        _seat_path = Path(_seat_decl)
+        if not _seat_path.is_absolute():
+            _seat_path = root / _seat_path
+        try:
+            identity_decisions = \
+                _prop.load_identity_decisions(_seat_path)
+        except Exception as e:
+            raise ValueError(
+                f"identity seat decisions {_seat_path} "
+                f"are unreadable or malformed: {e} "
+                "(fail closed)") from e
+        identity_seat_src = {
+            "path": _seat_decl,
+            "sha256": hashlib.sha256(
+                _seat_path.read_bytes()).hexdigest(),
+            "n_decisions": len(identity_decisions)}
+        _log(b.batch_id,
+             f"CANDIDATES: identity seat ON "
+             f"({identity_seat_src['n_decisions']} frozen "
+             f"verdicts from {_seat_decl}, sha256 "
+             f"{identity_seat_src['sha256'][:12]}…; "
+             "unjudged points defer to the rule chain)")
     # Pair-judge variant: profile-selected;
     # absent = the default judge (sentence x standard).
     pair_judge_context = (setup_cfg or {}).get(
@@ -514,7 +558,15 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                       "mention_candidates": 0,
                       "mention_resolutions": 0,
                       "mention_fallback_subject": 0,
-                      "mention_fallback_object": 0}
+                      "mention_fallback_object": 0,
+                      "identity_seat_consulted": 0,
+                      "identity_seat_opinions": 0}
+
+    def _sync_identity_seat_stats():
+        proposer_stats["identity_seat_consulted"] = \
+            identity_seat_stats["consulted"]
+        proposer_stats["identity_seat_opinions"] = \
+            identity_seat_stats["opinions"]
     pair_stats = {"enumerated": 0, "answered": 0, "calls": 0,
                   "outcomes": {}, "alias_emitted": 0}
     # Entity-sweep accounting (issue #58), checkpointed
@@ -603,6 +655,17 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
             continue
         text = texts[doc_id]
         doc_blocked = []
+        # The per-document identity seat over the frozen
+        # decisions (None when the profile declares no
+        # seat file): verdicts keyed by the document's
+        # bridged-form hash, unjudged points defer.
+        doc_seat = None
+        if identity_decisions is not None:
+            from . import proposer as _prop
+            doc_seat = _prop.identity_seat_for_doc(
+                identity_decisions,
+                _prop.identity_doc_key(text),
+                stats=identity_seat_stats)
         # LLM proposer — free triples + clause slots.
         # Proposals pass the deterministic guards in pipeline/proposer.py;
         # survivors become candidates judged by Jev at GATES (no score
@@ -657,7 +720,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 entity_types=endpoint_types or None,
                 theme_attest_key=("evidence_sentence"
                                   if pair_theme_attest else None),
-                quote_punct_insensitive=quote_punct_insensitive)
+                quote_punct_insensitive=quote_punct_insensitive,
+                identity_seat=doc_seat)
             for it in kept:
                 rec = {"doc_id": doc_id, "subject": it["subject"],
                        "relation": it["relation"],
@@ -713,7 +777,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 entity_types=endpoint_types or None,
                 quote_punct_insensitive=quote_punct_insensitive,
                 theme_attest_chunk=theme_attest_chunk,
-                mentions=mention_on)
+                mentions=mention_on,
+                identity_seat=doc_seat)
             proposer_stats["typed_kept"] += sum(
                 1 for it in kept
                 if it.get("subject_type") or it.get("object_type"))
@@ -856,7 +921,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                             quote_punct_insensitive=
                             quote_punct_insensitive,
                             theme_attest_chunk=theme_attest_chunk,
-                            mentions=mention_on)
+                            mentions=mention_on,
+                            identity_seat=doc_seat)
                         skept.extend(gk)
                         sblocked.extend(gb)
                     for it in skept:
@@ -960,6 +1026,7 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 with open(d / "pair_verdicts.jsonl", "w") as f:
                     for v in pair_verdicts:
                         f.write(json.dumps(v) + "\n")
+            _sync_identity_seat_stats()
             ckpt_path.write_text(json.dumps({
                 "done_docs": sorted(done_docs),
                 "proposer_cost_usd": _round_cost(proposer_cost),
@@ -1014,6 +1081,7 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     for bl in blocked_all:
         blocked_reasons[bl.get("reason", "?")] = \
             blocked_reasons.get(bl.get("reason", "?"), 0) + 1
+    _sync_identity_seat_stats()
     b.metrics["candidates"] = {
         "total": len(candidates),
         "by_method": by_method,
@@ -1023,6 +1091,11 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                      "model": b.config.llm_model}}
     if ckpt_reset is not None:
         b.metrics["candidates"]["checkpoint_reset"] = ckpt_reset
+    if identity_seat_src is not None:
+        b.metrics["candidates"]["identity_seat"] = {
+            **identity_seat_src,
+            "consulted": identity_seat_stats["consulted"],
+            "opinions": identity_seat_stats["opinions"]}
     if pair_enum:
         b.metrics["candidates"]["pair_enum"] = {
             **pair_stats, "window": pair_window,

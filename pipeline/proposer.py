@@ -156,6 +156,7 @@ discipline (a parse-required quote, guard-verified).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from collections.abc import Iterable
@@ -1415,51 +1416,6 @@ def _resolve_endpoint(ep_norm: str, index: tuple,
             and etoks < _identity_tokens(anchor_norm):
         return by_norm[anchor_norm]["surface"], []
     toks = {n: _identity_tokens(n) for n in by_norm}
-    if seat is not None:
-        # The identity seat (identity-surgery program,
-        # 2026-10-30): an injected judge replaces rule
-        # 4's filter chain and structural vetoes for
-        # subset candidates. The seat is consulted per
-        # candidate with the code-computed feature
-        # envelope and answers True (complete) or False
-        # (stand); it can only choose among census
-        # surfaces, never invent one. The contested-
-        # field rule is unchanged: more than one
-        # approved candidate is ambiguity, reported,
-        # never guessed. Everything else in this
-        # function (rules 1-3) and in the caller (the
-        # invariants) applies exactly as without a seat.
-        ep_seq_s = _seq_of(ep_norm)
-        approved = []
-        for m in maximals:
-            if not (etoks < toks[m]
-                    or (etoks == toks[m] and ep_norm != m)):
-                continue
-            cand_seq_s = _seq_of(m)
-            al_s = _align(ep_seq_s, cand_seq_s)
-            feats = {
-                "fragment_surface": (
-                    by_norm[ep_norm]["surface"]
-                    if ep_norm in by_norm else ep_norm),
-                "candidate_surface": by_norm[m]["surface"],
-                "outside": _outside_count(bridged, ep_norm, m),
-                "cand_attest": len(_phrase_spans(bridged, m)),
-                "evidence": _rewrite_evidence(
-                    ep_seq_s, m, index),
-                "anchored": _anchored(
-                    ep_norm, ep_seq_s, m, cand_seq_s, index),
-                "align": (
-                    {"prepend": al_s[0], "infix": al_s[1],
-                     "trailing": al_s[2]} if al_s else None),
-            }
-            if seat(ep_norm, m, feats):
-                approved.append(m)
-        if len(approved) > 1:
-            return None, sorted(
-                by_norm[m]["surface"] for m in approved)
-        if len(approved) == 1:
-            return by_norm[approved[0]]["surface"], []
-        return None, []
     # A coordination surface ("Vietnam and Cambodia") is
     # not an entity and never a resolution target: a
     # fragment naming one side of it must not be
@@ -1505,21 +1461,84 @@ def _resolve_endpoint(ep_norm: str, index: tuple,
                      by_norm[m]["surface"]):
             continue
         cand_norms.append(m)
+    # The rule chain's own outcome. Ambiguity is a
+    # property of the document, not of the veto set:
+    # the structural gates may only refuse a UNIQUE
+    # candidate, never prune a contested field into a
+    # false unique answer \u2014 a vetoed rival must not
+    # hand the endpoint to the one bad candidate that
+    # remains. So the veto runs only on a unique
+    # survivor, and a contested field is reported, not
+    # decided.
+    rule_complete = None
+    rule_ambiguous: list[str] = []
     if len(cand_norms) > 1:
-        # Ambiguity is a property of the document, not
-        # of the veto set: the structural gates may only
-        # refuse a UNIQUE candidate, never prune a
-        # contested field into a false unique answer —
-        # a vetoed rival must not hand the endpoint to
-        # the one bad candidate that remains.
-        return None, sorted(
-            by_norm[m]["surface"] for m in cand_norms)
-    if len(cand_norms) == 1:
+        rule_ambiguous = cand_norms
+    elif len(cand_norms) == 1:
         m = cand_norms[0]
-        if _absorption_veto(ep_norm, m, index,
-                            ep_initialism):
-            return None, []
-        return by_norm[m]["surface"], []
+        if not _absorption_veto(ep_norm, m, index,
+                                ep_initialism):
+            rule_complete = m
+    if seat is None:
+        if rule_ambiguous:
+            return None, sorted(
+                by_norm[m]["surface"]
+                for m in rule_ambiguous)
+        if rule_complete is not None:
+            return by_norm[rule_complete]["surface"], []
+        return None, []
+    # The identity seat (identity-surgery program,
+    # 2026-10-30): an injected judge consulted per
+    # subset candidate with the code-computed feature
+    # envelope. The seat answers True (complete),
+    # False (stand), or None (no opinion \u2014 the rule
+    # chain's outcome stands for that candidate). A
+    # seat with an opinion on every candidate
+    # therefore decides rule 4 outright; a seat
+    # carrying frozen verdicts for judged points only
+    # (the decisions-file seat) overrides exactly
+    # those points and defers the rest. The seat can
+    # only choose among census surfaces, never invent
+    # one. The contested-field rule is unchanged:
+    # more than one approved candidate is ambiguity,
+    # reported, never guessed. Everything else in
+    # this function (rules 1-3) and in the caller
+    # (the invariants) applies exactly as without a
+    # seat.
+    ep_seq_s = _seq_of(ep_norm)
+    approved = []
+    for m in maximals:
+        if not (etoks < toks[m]
+                or (etoks == toks[m] and ep_norm != m)):
+            continue
+        cand_seq_s = _seq_of(m)
+        al_s = _align(ep_seq_s, cand_seq_s)
+        feats = {
+            "fragment_surface": (
+                by_norm[ep_norm]["surface"]
+                if ep_norm in by_norm else ep_norm),
+            "candidate_surface": by_norm[m]["surface"],
+            "outside": _outside_count(bridged, ep_norm, m),
+            "cand_attest": len(_phrase_spans(bridged, m)),
+            "evidence": _rewrite_evidence(
+                ep_seq_s, m, index),
+            "anchored": _anchored(
+                ep_norm, ep_seq_s, m, cand_seq_s, index),
+            "align": (
+                {"prepend": al_s[0], "infix": al_s[1],
+                 "trailing": al_s[2]} if al_s else None),
+        }
+        verdict = seat(ep_norm, m, feats)
+        if verdict is None:
+            if m == rule_complete:
+                approved.append(m)
+        elif verdict:
+            approved.append(m)
+    if len(approved) > 1:
+        return None, sorted(
+            by_norm[m]["surface"] for m in approved)
+    if len(approved) == 1:
+        return by_norm[approved[0]]["surface"], []
     return None, []
 
 
@@ -2093,6 +2112,72 @@ def _document_registry(doc_text: str) -> tuple[dict, set]:
     return canonical_of, defined
 
 
+def identity_doc_key(text: str) -> str:
+    """The decisions-file key for a document: the first
+    16 hex chars of the sha256 of its bridged form —
+    the keying the identity-surgery measurement files
+    (and the frozen seat verdicts they carry) use."""
+    return hashlib.sha256(
+        _bridged_form(text).encode("utf-8")).hexdigest()[:16]
+
+
+def load_identity_decisions(path) -> dict:
+    """Load a frozen identity-seat decisions file:
+    JSONL records {"doc", "ep", "cand", "decision"}
+    with decision "complete" | "stand", keyed by
+    identity_doc_key. Returns {(doc, ep, cand): bool}.
+    Any malformed record raises ValueError — a
+    declared seat file fails closed, never silently
+    judges nothing."""
+    decisions: dict[tuple[str, str, str], bool] = {}
+    with open(path, encoding="utf-8") as f:
+        for lineno, line in enumerate(f, 1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+                doc = rec["doc"]
+                ep = rec["ep"]
+                cand = rec["cand"]
+                decision = rec["decision"]
+            except Exception as e:
+                raise ValueError(
+                    f"identity decisions {path}:{lineno}: "
+                    f"malformed record: {e}") from e
+            if not all(isinstance(v, str) and v
+                       for v in (doc, ep, cand)) \
+                    or decision not in ("complete", "stand"):
+                raise ValueError(
+                    f"identity decisions {path}:{lineno}: "
+                    "doc/ep/cand must be non-empty strings "
+                    "and decision 'complete' or 'stand'")
+            decisions[(doc, ep, cand)] = (
+                decision == "complete")
+    return decisions
+
+
+def identity_seat_for_doc(decisions: dict, doc_key: str,
+                          stats: dict | None = None):
+    """The per-document seat over a decisions lookup:
+    the frozen verdict for (doc_key, fragment,
+    candidate), or None — no opinion, rule 4's chain
+    decides — when the point was never judged. When
+    `stats` is given it counts consultations and
+    opinions under "consulted" / "opinions"."""
+    def seat(ep_norm, cand_norm, feats):
+        if stats is not None:
+            stats["consulted"] = \
+                stats.get("consulted", 0) + 1
+        verdict = decisions.get(
+            (doc_key, ep_norm, cand_norm))
+        if verdict is not None and stats is not None:
+            stats["opinions"] = \
+                stats.get("opinions", 0) + 1
+        return verdict
+    return seat
+
+
 def guard_triples(items: list[dict], doc_text: str,
                   role_words: Iterable[str] | None = None,
                   entity_types: set[str] | None = None,
@@ -2111,9 +2196,10 @@ def guard_triples(items: list[dict], doc_text: str,
     `identity_seat` is an optional injected judge for
     rule 4 of identity resolution (see _resolve_endpoint):
     a callable (fragment_norm, candidate_norm, features)
-    -> bool deciding, per subset candidate, whether the
-    fragment completes to the candidate (True) or stands
-    (False). None (the default) keeps the deterministic
+    -> bool | None deciding, per subset candidate,
+    whether the fragment completes to the candidate
+    (True), stands (False), or defers to the rule chain
+    (None). No seat (the default) keeps the deterministic
     rule chain; behavior is unchanged.
 
     `role_words` is the role-word guard's vocabulary — the
