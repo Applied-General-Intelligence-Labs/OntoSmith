@@ -175,16 +175,32 @@ def cmd_create(args) -> None:
             sys.exit(1)
         prov = pack_provenance(pack_dir)
     elif profile_family:
-        # No binding pack: the legacy fail-closed validation of
-        # the family's profile setup_config file — every key must
-        # have a registered consumer; an unconsumed key is a
-        # silent no-op otherwise. The batch is NOT created when
-        # validation fails, and the offending key is named.
+        # No binding pack: the core baseline still applies by
+        # default (PACK_DESIGN §1.3 — the hands-on Track 1
+        # promise), with the family's profile setup_config
+        # layered over it: profile keys govern where declared,
+        # baseline declarations govern the rest, and the merged
+        # config is frozen into the batch exactly as the pack
+        # path freezes its resolution. (Before this, a packless
+        # family froze nothing and the run read the profile file
+        # alone, so baseline declarations — the identity seat's
+        # live default among them — silently never reached it.)
+        # Both layers are validated fail-closed first: every
+        # profile key must have a registered consumer, the
+        # batch is NOT created when validation fails, and the
+        # offending key is named.
         from .profile_config import (
             profile_setup_config_path,
             setup_config_errors,
         )
-        sc_path = profile_setup_config_path(ROOT, profile_family)
+        # The family's layer, in the run step's own candidate
+        # order: the generated profile's file in the state
+        # root first, then the pack-layout profile.
+        legacy_sc = state_root() / "profiles" / profile_family \
+            / "setup_config.json"
+        sc_path = legacy_sc if legacy_sc.exists() else \
+            profile_setup_config_path(ROOT, profile_family)
+        scfg = None
         if sc_path is not None:
             try:
                 scfg = json.loads(sc_path.read_text())
@@ -193,6 +209,20 @@ def cmd_create(args) -> None:
                       f"JSON: {e}", file=sys.stderr)
                 sys.exit(1)
             errs = setup_config_errors(scfg)
+            if errs:
+                for e in errs:
+                    print(f"setup_config validation failed: {e}",
+                          file=sys.stderr)
+                sys.exit(1)
+        try:
+            resolved_cfg = resolve_setup_config(ROOT, None)
+        except ValueError as e:
+            print(f"setup_config resolution failed: {e}",
+                  file=sys.stderr)
+            sys.exit(1)
+        if scfg is not None:
+            resolved_cfg = {**resolved_cfg, **scfg}
+            errs = setup_config_errors(resolved_cfg, merged=True)
             if errs:
                 for e in errs:
                     print(f"setup_config validation failed: {e}",
@@ -291,8 +321,10 @@ def cmd_create(args) -> None:
         # run step reads this file, not the pack files.
         (d / "setup_config.resolved.json").write_text(
             json.dumps(resolved_cfg, indent=1, sort_keys=True))
+        _over = prov['pack_id'] if prov else \
+            f"profile '{profile_family}'"
         print(f"setup_config: resolved (core baseline + "
-              f"{prov['pack_id']}, {len(resolved_cfg)} keys) -> "
+              f"{_over}, {len(resolved_cfg)} keys) -> "
               f"setup_config.resolved.json")
     print(f"created batch {batch_id} with {len(paths)} docs")
     print(f"run: python -m pipeline batch run {batch_id}")
