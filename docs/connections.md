@@ -256,6 +256,40 @@ one configuration are statements about that
 configuration, and a custom binding's numbers are its
 owner's to measure.
 
+## The identity seat (optional)
+
+One question inside the build is not a gate: when a
+document mentions a name in a shortened form, does it
+complete to a longer name in the same document, or
+stand as written? A deterministic rule chain answers
+most of these. A profile can declare an **identity
+seat** to have the contested remainder judged — two
+forms, never both:
+
+- `identity_seat_live` in `[connections]`, bound to
+  the Jev decisions route: a frozen completion
+  process judges in-run. For each contested pair the
+  pipeline assembles an evidence dossier from the
+  document — the fragment's sentences, the longer
+  name's definition and mentions, sibling names —
+  scores one fixed claim against it, and combines
+  the score with the rule chain: a high score
+  sustains a completion the rules reached, a low
+  score holds the fragment as written, and the band
+  between defers to the rule chain.
+- `identity_seat_decisions`: a frozen JSONL file of
+  verdicts produced offline for the corpus.
+
+Every live verdict is recorded in the batch's
+`identity_verdicts.jsonl`, keyed by the dossier's
+fingerprint and the process's calibration id, and a
+re-run reads the ledger instead of re-judging — a
+rebuild reproduces the same completions even though
+the scores themselves are not bit-stable. Declaring
+both forms, or a live seat whose key is missing when
+a point is scored, fails the stage closed. With no
+declaration, the rule chain alone decides, unchanged.
+
 ## Recommended models
 
 The recommended binding for each seat — for the
