@@ -165,6 +165,30 @@ class TestVerdictMap(unittest.TestCase):
             self.assertEqual(stats2["ledger_hits"], 2)
             self.assertEqual(calls2, [])
 
+    def test_binding_failure_fails_closed_not_demoted(self):
+        # BindingKeyError (a RuntimeError subclass) means
+        # the seat is misconfigured: it must propagate, not
+        # demote every point to a silent review.
+        from pipeline.connections import BindingKeyError
+        with tempfile.TemporaryDirectory() as td:
+            ledger = VerdictLedger(Path(td) / "ledger.jsonl")
+            points = [("Agency Agreement",
+                       "Advertising Sale Agency Agreement")]
+            dossiers = assemble_dossiers(DOC, points)
+
+            def broken_score(dossier, frag, cand):
+                raise BindingKeyError("judge seat: key unset")
+
+            orig = identity_seat.score_dossier
+            identity_seat.score_dossier = broken_score
+            try:
+                with self.assertRaises(BindingKeyError):
+                    identity_seat.build_verdict_map(
+                        "doc1", points, dossiers,
+                        {points[0]: True}, ledger)
+            finally:
+                identity_seat.score_dossier = orig
+
     def test_point_failure_demotes_to_review(self):
         with tempfile.TemporaryDirectory() as td:
             ledger = VerdictLedger(Path(td) / "ledger.jsonl")

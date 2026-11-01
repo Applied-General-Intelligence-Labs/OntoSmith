@@ -33,6 +33,7 @@ import hashlib
 from concurrent.futures import ThreadPoolExecutor
 
 from . import decisions
+from .connections import BindingKeyError
 from .identity_dossier import DOSSIER_ASSEMBLY_VERSION
 from .reference_profile import (
     IDENTITY_CLAIM_VERSION,
@@ -124,6 +125,14 @@ def build_verdict_map(doc_key, points, dossiers, rules_completed,
         frag, cand = pair
         try:
             p, usage = score_dossier(dossiers[pair], frag, cand)
+        except BindingKeyError:
+            # A binding failure is not a per-point failure:
+            # the seat is misconfigured, and quietly
+            # deferring every point would hide it. Fail
+            # closed. (BindingKeyError is a RuntimeError
+            # subclass, so it is re-raised before the
+            # catch below.)
+            raise
         except RuntimeError:
             return pair, None, None
         return pair, p, usage
