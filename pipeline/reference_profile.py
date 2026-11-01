@@ -62,10 +62,18 @@ JUDGE_MODEL = "typesafe/jev-1.13"
 #: measurement's wording (the b1 fit's contract leg had
 #: been scored under a shorter paraphrase; the W4
 #: equivalence run caught it and the claim was unified
-#: before any release carried it).
+#: before any release carried it). Under the unified
+#: claim the score distribution shifts down, so TAU_LO
+#: was re-anchored at the boundary the unified FIT
+#: scores support (0.10 -> 0.05; decision B, 2026-11-01):
+#: TAU_HI stays at its fitted 0.79, which under the
+#: stricter claim is strictly more conservative than in
+#: the regime it was fitted in. On the unified EVAL
+#: split the pair gives damage 0, review 27.6%, locked
+#: loss 0 (w4_report.md in the lab record).
 IDENTITY_CLAIM_VERSION = "completion-b2"
 IDENTITY_TAU_HI = 0.79
-IDENTITY_TAU_LO = 0.10
+IDENTITY_TAU_LO = 0.05
 #: Escalation tier: adjudication escalation for shaky-band
 #: items and the gate-evaluation judges. The lab's measured
 #: escalation record ran on this seat (merge-adjudication

@@ -89,9 +89,9 @@ class TestZoneVerdict(unittest.TestCase):
         self.assertIsNone(identity_seat.zone_verdict(0.78, True))
 
     def test_auto_stand_at_low_score(self):
-        self.assertIs(identity_seat.zone_verdict(0.10, False), False)
+        self.assertIs(identity_seat.zone_verdict(0.05, False), False)
         self.assertIs(identity_seat.zone_verdict(0.0, True), False)
-        self.assertIsNone(identity_seat.zone_verdict(0.11, False))
+        self.assertIsNone(identity_seat.zone_verdict(0.06, False))
 
     def test_review_band_between(self):
         self.assertIsNone(identity_seat.zone_verdict(0.5, True))
