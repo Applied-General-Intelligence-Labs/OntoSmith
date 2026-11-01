@@ -43,10 +43,20 @@ from .reference_profile import (
 )
 
 #: The frozen completion claim (wording version
-#: IDENTITY_CLAIM_VERSION in the reference profile).
+#: IDENTITY_CLAIM_VERSION in the reference profile). This
+#: is the claim the dossier measurement was made with;
+#: the lab's contract-leg process script used a shorter
+#: paraphrase, and the W4 equivalence run caught the
+#: divergence (novel-leg zone agreement 51% under the
+#: paraphrase, 97.5% on the leg whose claim matched).
+#: The claim is unified on this text; the wording is
+#: pinned verbatim by the test suite.
 INSTR_B = ("Is '{b}' the complete, full name of the same entity that the "
-           "fragment '{a}' refers to, so that '{a}' can be completed to "
-           "'{b}' without changing who or what is being referred to?")
+           "mention '{a}' refers to in the text? Answer true only if the "
+           "text shows that '{a}' is a shortened or partial form of "
+           "exactly this entity whose full name is '{b}'. If '{b}' is "
+           "itself a shortened, generic, or partial form, or the "
+           "mentions refer to different entities, answer false.")
 
 
 def calibration_id() -> str:

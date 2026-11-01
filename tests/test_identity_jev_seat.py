@@ -60,6 +60,26 @@ class TestDossierAssembly(unittest.TestCase):
         self.assertEqual(len(assemble_dossiers(DOC, pairs)), 1)
 
 
+class TestFrozenClaim(unittest.TestCase):
+    def test_claim_wording_is_pinned_verbatim(self):
+        # The claim is half the measured instrument: any
+        # wording drift silently changes every score (the
+        # W4 equivalence run caught a paraphrase doing
+        # exactly that). Pin the text character for
+        # character; changing it is a recalibration, not
+        # an edit.
+        self.assertEqual(
+            identity_seat.INSTR_B,
+            "Is '{b}' the complete, full name of the same "
+            "entity that the mention '{a}' refers to in the "
+            "text? Answer true only if the text shows that "
+            "'{a}' is a shortened or partial form of exactly "
+            "this entity whose full name is '{b}'. If '{b}' "
+            "is itself a shortened, generic, or partial "
+            "form, or the mentions refer to different "
+            "entities, answer false.")
+
+
 class TestZoneVerdict(unittest.TestCase):
     def test_auto_complete_needs_rules_and_high_score(self):
         self.assertIs(identity_seat.zone_verdict(0.79, True), True)

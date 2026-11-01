@@ -58,7 +58,12 @@ JUDGE_MODEL = "typesafe/jev-1.13"
 #: p <= TAU_LO auto-stands; between them is the review band.
 #: Fitted on the frozen calibration split; like JUDGE_MODEL,
 #: these change only with a re-measured pack release.
-IDENTITY_CLAIM_VERSION = "completion-b1"
+#: b2 = b1 with the claim unified on the dossier
+#: measurement's wording (the b1 fit's contract leg had
+#: been scored under a shorter paraphrase; the W4
+#: equivalence run caught it and the claim was unified
+#: before any release carried it).
+IDENTITY_CLAIM_VERSION = "completion-b2"
 IDENTITY_TAU_HI = 0.79
 IDENTITY_TAU_LO = 0.10
 #: Escalation tier: adjudication escalation for shaky-band
