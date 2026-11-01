@@ -149,17 +149,21 @@ CONSUMED_KEYS: dict[str, str] = {
                                "produced for rule 4 of identity "
                                "resolution (stage_candidates -> "
                                "proposer.guard_triples "
-                               "identity_seat); absent = the "
-                               "deterministic rule chain alone",
+                               "identity_seat); declaring it "
+                               "supersedes the live default — the "
+                               "corpus-bound form beats the general "
+                               "one",
     "identity_seat_live": "CANDIDATES identity seat judged "
                           "live in-run by the frozen completion "
                           "process (rules + decision model over "
                           "assembled evidence dossiers), with "
                           "verdicts recorded in the batch's "
-                          "identity_verdicts.jsonl ledger; "
-                          "mutually exclusive with "
-                          "identity_seat_decisions; absent = no "
-                          "live seat",
+                          "identity_verdicts.jsonl ledger; the "
+                          "core baseline declares it on — a pack "
+                          "may declare it false to run the "
+                          "deterministic rule chain alone, or "
+                          "declare identity_seat_decisions "
+                          "instead (the frozen file supersedes)",
     "theme_attest_chunk": "CANDIDATES theme-presence guard "
                           "accepts a verb+preposition relation's "
                           "object attested anywhere in the "
@@ -267,12 +271,16 @@ def _is_registered(key: str) -> bool:
             or key.endswith("_note"))
 
 
-def setup_config_errors(cfg: dict) -> list[str]:
+def setup_config_errors(cfg: dict, *, merged: bool = False) -> list[str]:
     """Fail-closed validation of one setup_config dict.
 
     Returns a list of human-readable errors (empty = valid). Every
     unregistered key is named — an unconsumed key is exactly the
     silent-no-op failure these keys were declared for.
+
+    ``merged`` marks a post-resolution dict (core baseline overlaid
+    by a pack): checks that only make sense within a single
+    authored layer are skipped there.
     """
     errors: list[str] = []
     if not isinstance(cfg, dict):
@@ -289,6 +297,24 @@ def setup_config_errors(cfg: dict) -> list[str]:
     if g is not None and not isinstance(g, str):
         errors.append("setup_config key 'proposer_guidance' must be "
                       "a string")
+    isl = cfg.get("identity_seat_live")
+    if isl is not None and not isinstance(isl, bool):
+        errors.append("setup_config key 'identity_seat_live' must be "
+                      "a boolean")
+    if not merged and isl is True \
+            and cfg.get("identity_seat_decisions") is not None:
+        # One payload, two seat forms is an authoring
+        # ambiguity: refuse it here. Across layers the
+        # merge is NOT an error — the core baseline's
+        # live default under a domain pack's decisions
+        # file is the normal supersede (the stage honors
+        # the file form).
+        errors.append("setup_config declares both identity seat "
+                      "forms (identity_seat_live and "
+                      "identity_seat_decisions); declare one — "
+                      "the decisions file, or the live seat "
+                      "(identity_seat_live false + a decisions "
+                      "file is the explicit file form)")
     sf = cfg.get("schema_front")
     if sf is not None and not isinstance(sf, dict):
         errors.append("setup_config key 'schema_front' must be an "
@@ -932,7 +958,7 @@ def resolve_setup_config(root, pack_dir=None) -> dict:
                 "and a declared guard never runs empty")
         resolved["role_words"] = sorted(vocab)
     if specified:
-        errs = setup_config_errors(resolved)
+        errs = setup_config_errors(resolved, merged=True)
         if errs:
             raise ValueError(
                 "resolved setup_config (core baseline + "

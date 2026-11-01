@@ -1,0 +1,27 @@
+{
+  "batch_cost_cap_usd": 10.0,
+  "chunk_min_chars": 100,
+  "chunk_window_chars": 1000,
+  "consumption_note": "Core/default pack payload (issue #71, Phase A2): the domain-neutral baseline setup_config. It declares only core defaults \u2014 gate/ER threshold declarations, the neutral proposer/slot framing, and the D5 enumeration window default. It declares no schema, inventory, label category, merge prohibition, fitted artefact, model name, endpoint, or secret: domain content arrives only when a specified domain pack overrides these keys per key (pipeline.profile_config.resolve_setup_config). Model bindings live in the connection layer's reference profile (D9 / R14), never in this payload.",
+  "er_alias_sources": "text_attested_only",
+  "er_auto_merge": "form_variants_only",
+  "er_cross_doc_min_p_same": 0.85,
+  "er_threshold": 0.4,
+  "family": "core",
+  "pack_id": "core",
+  "pack_version": "0.2.0",
+  "pair_judge_context": "sentence",
+  "pair_judge_instruction": "standard",
+  "pair_judge_note": "F1 fitted pair-judge configuration (sentence context x standard instruction; docs/REDOCRED_JF_F1_DESIGN.md). The JF-F1 direction slot is a core mechanism adopted by that measurement (eta 0.1124 -> 0.2596; flips 131 -> 7; candidate precision 0.3464 -> 0.8381); this baseline deliberately does not activate it \u2014 activation is a domain pack's declaration (pair_judge_format 'jf1' + its pinned pair_judge_symmetric_source artefact), because the symmetric set is inventory data the core pack does not own. Fail-closed: 'jf1' without the source does not validate.",
+  "pair_window": "adjacent",
+  "pair_window_note": "D5 (2026-10-21): shipped enumeration operating point = max_dist=1 + REC. 'adjacent' is the setup_config spelling of max_dist=1; it takes effect when a run or pack selects pair enumeration \u2014 this baseline does not force pair_enumeration on (packs that omit the switch keep the core free-proposal path, and a pack declaring its own pair_window overrides this default). REC (deterministic roster surface recovery, docs/REDOCRED_ENUMERATION_DESIGN.md \u00a73) is core mechanism with no setup_config key. Measured basis (500-document Re-DocRED corpus): 52,463 candidate pairs, projected judging $35.06, estimated ceiling-adjusted recall 0.1884 \u2014 vs sentence-only 26,938 pairs at \u2248$18.68 realized ledger, estimated recall 0.1346.",
+  "profile_version": 1,
+  "proposer_framing": "Extract factual relations from the excerpt below.",
+  "review_band": [
+    0.25,
+    0.5
+  ],
+  "slot_framing": "You extract clause facts from the excerpt below.",
+  "slot_rules": "- \"value\": the shortest complete value, as written in the\n  excerpt. For dates, as written.\n- \"quote\": copy the EXACT verbatim text from the excerpt that states\n  the fact (a phrase or one sentence). It must match the excerpt\n  character-for-character. Never paraphrase the quote.",
+  "triple_threshold": 0.25
+}

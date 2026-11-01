@@ -447,17 +447,18 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     # Live identity seat: the frozen completion process
     # judged in-run (pipeline/identity_live_seat.py), with
     # verdicts recorded in the batch's verdict ledger.
-    # Declared -> the seat is live for CANDIDATES; absent =
-    # no live seat. Declaring both seat forms is ambiguous
-    # and fails the stage closed.
+    # The core baseline declares it on — judging is the
+    # product's mechanism, not an opt-in — and a pack may
+    # declare it false to run the rule chain alone. The
+    # frozen decisions file is the alternative form: a
+    # config that declares it supersedes the live default
+    # (the corpus-bound form beats the general one). A
+    # single payload declaring both forms is refused at
+    # validation (profile_config.setup_config_errors).
     live_seat = None
     identity_seat_src_live = None
-    if (setup_cfg or {}).get("identity_seat_live"):
-        if identity_decisions is not None:
-            raise ValueError(
-                "identity_seat_live and "
-                "identity_seat_decisions are mutually "
-                "exclusive (fail closed)")
+    if (setup_cfg or {}).get("identity_seat_live") \
+            and identity_decisions is None:
         from .identity_live_seat import LiveIdentitySeat
         from .identity_seat import calibration_id
         live_seat = LiveIdentitySeat(

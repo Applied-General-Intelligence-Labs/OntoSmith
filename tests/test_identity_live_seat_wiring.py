@@ -143,16 +143,63 @@ class TestLiveIdentitySeatWiring(unittest.TestCase):
         self.assertEqual(seat_metrics["judge_calls"], 0)
         self.assertGreaterEqual(seat_metrics["ledger_hits"], 1)
 
-    def test_both_seat_forms_declared_fails_closed(self):
+    def test_decisions_file_supersedes_the_live_default(self):
+        # A resolved config carrying both forms is the
+        # normal post-merge shape (core live default +
+        # a pack's decisions file): the file form governs
+        # and no live judging happens.
         (self.root / "seat_decisions.jsonl").write_text("")
-        with self.assertRaises(ValueError) as cm:
-            _run_stage(
-                self.root, "live-both",
-                {"identity_seat_live": True,
-                 "identity_seat_decisions":
-                 "seat_decisions.jsonl"},
-                score=0.5)
-        self.assertIn("mutually exclusive", str(cm.exception))
+        b, d, calls = _run_stage(
+            self.root, "live-both",
+            {"identity_seat_live": True,
+             "identity_seat_decisions": "seat_decisions.jsonl"},
+            score=0.5)
+        seat_metrics = b.metrics["candidates"]["identity_seat"]
+        self.assertIn("path", seat_metrics)
+        self.assertNotEqual(seat_metrics.get("mode"), "live")
+        self.assertFalse(calls)
+        self.assertFalse((d / "identity_verdicts.jsonl").exists())
+
+    def test_live_seat_is_the_core_pack_default(self):
+        # The default lives in pack data: resolving the
+        # core baseline yields the live seat on, and a
+        # stage run under that config judges live.
+        from pipeline.profile_config import resolve_setup_config
+        root = Path(__file__).resolve().parents[1]
+        cfg = resolve_setup_config(root)
+        self.assertIs(cfg.get("identity_seat_live"), True)
+        b, _d, calls = _run_stage(
+            self.root, "live-default", cfg, score=0.02)
+        seat_metrics = b.metrics["candidates"]["identity_seat"]
+        self.assertEqual(seat_metrics["mode"], "live")
+        self.assertTrue(calls)
+
+
+class TestSeatFormValidation(unittest.TestCase):
+    """One authored layer declaring both seat forms is
+    refused; the merged shape is not."""
+
+    def test_single_layer_both_forms_is_an_error(self):
+        from pipeline.profile_config import setup_config_errors
+        errs = setup_config_errors(
+            {"identity_seat_live": True,
+             "identity_seat_decisions": "x.jsonl"})
+        self.assertTrue(any("both identity seat forms" in e
+                            for e in errs), errs)
+
+    def test_merged_both_forms_is_the_normal_supersede(self):
+        from pipeline.profile_config import setup_config_errors
+        errs = setup_config_errors(
+            {"identity_seat_live": True,
+             "identity_seat_decisions": "x.jsonl"}, merged=True)
+        self.assertFalse(any("both identity seat forms" in e
+                             for e in errs), errs)
+
+    def test_live_flag_must_be_boolean(self):
+        from pipeline.profile_config import setup_config_errors
+        errs = setup_config_errors({"identity_seat_live": "yes"})
+        self.assertTrue(any("must be a boolean" in e
+                            for e in errs), errs)
 
 
 if __name__ == "__main__":
