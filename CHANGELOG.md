@@ -7,6 +7,10 @@ and the project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Missing input files are no longer reported as "is not valid JSON" — the JSON loaders (builder, BYO-schema import, pack payload and role-words artefacts) now distinguish not found / cannot be read / not valid JSON (#49).
+
 ## [0.1.2] - 2026-10-30
 
 ### Added

@@ -714,7 +714,12 @@ def pack_setup_config(pack_dir) -> dict:
             f"but {ppath} hashes to sha256:{digest[:16]}…; a "
             f"changed payload is a new pack version, not an edit")
     try:
-        cfg = json.loads(ppath.read_text())
+        payload_text = ppath.read_text()
+    except FileNotFoundError as e:
+        raise ValueError(f"pack {manifest['pack_id']!r}: payload "
+                         f"file not found: {ppath}") from e
+    try:
+        cfg = json.loads(payload_text)
     except Exception as e:
         raise ValueError(f"pack {manifest['pack_id']!r}: payload "
                          f"{ppath} is not valid JSON: {e}") from e
@@ -760,7 +765,13 @@ def pack_role_words(pack_dir) -> frozenset | None:
                 f"sha256:{art['sha256'][:16]}… but {apath} "
                 f"hashes to sha256:{digest[:16]}…")
         try:
-            data = json.loads(apath.read_text())
+            artefact_text = apath.read_text()
+        except FileNotFoundError as e:
+            raise ValueError(
+                f"pack {manifest['pack_id']!r}: role_words "
+                f"artefact not found: {apath}") from e
+        try:
+            data = json.loads(artefact_text)
         except Exception as e:
             raise ValueError(
                 f"pack {manifest['pack_id']!r}: role_words "
