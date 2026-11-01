@@ -30,7 +30,7 @@ class TestPyproject(unittest.TestCase):
     def test_identity(self):
         proj = _pyproject()["project"]
         self.assertEqual(proj["name"], "ontosmith")
-        self.assertEqual(proj["version"], "0.1.1")
+        self.assertEqual(proj["version"], "0.1.2")
         self.assertEqual(proj["license"], "MIT")
         self.assertEqual(proj["requires-python"], ">=3.11")
         self.assertEqual(proj["authors"],

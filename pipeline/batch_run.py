@@ -609,10 +609,15 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     # the loop below before any guard call happens.
     def _guard(items, text, **guard_kwargs):
         from . import proposer as _prop
+        # Call sites pass the per-document seat explicitly
+        # (the main lineage's convention); the wrapper owns
+        # the routing, so the passed seat is the fallback,
+        # never a second identity_seat argument.
+        seat = guard_kwargs.pop("identity_seat", doc_seat)
         if live_seat is not None:
             return live_seat.guard(items, text, **guard_kwargs)
         return _prop.guard_triples(
-            items, text, identity_seat=doc_seat, **guard_kwargs)
+            items, text, identity_seat=seat, **guard_kwargs)
 
     # Live-seat spend folded into the proposer ledger: the
     # delta since the last fold, applied per document just
@@ -788,7 +793,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 entity_types=endpoint_types or None,
                 theme_attest_key=("evidence_sentence"
                                   if pair_theme_attest else None),
-                quote_punct_insensitive=quote_punct_insensitive)
+                quote_punct_insensitive=quote_punct_insensitive,
+                identity_seat=doc_seat)
             for it in kept:
                 rec = {"doc_id": doc_id, "subject": it["subject"],
                        "relation": it["relation"],
@@ -844,7 +850,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 entity_types=endpoint_types or None,
                 quote_punct_insensitive=quote_punct_insensitive,
                 theme_attest_chunk=theme_attest_chunk,
-                mentions=mention_on)
+                mentions=mention_on,
+                identity_seat=doc_seat)
             proposer_stats["typed_kept"] += sum(
                 1 for it in kept
                 if it.get("subject_type") or it.get("object_type"))

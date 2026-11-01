@@ -7,6 +7,43 @@ and the project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Missing input files are no longer reported as "is not valid JSON" — the JSON loaders (builder, BYO-schema import, pack payload and role-words artefacts) now distinguish not found / cannot be read / not valid JSON (#49).
+
+### Added
+
+- **Live identity seat (on by default)** — the core
+  baseline declares `identity_seat_live`, so rule 4's
+  completion question is judged in-run by the frozen
+  completion process unless a pack declares it off or
+  substitutes the frozen decisions file (which
+  supersedes the live default). For each contested
+  candidate the pipeline assembles an evidence dossier
+  from the document deterministically (the fragment's
+  sentences, the candidate's definition and mentions,
+  sibling names), scores one fixed claim against it
+  with the pinned Jev decision model, and combines
+  the score with the rule chain by fixed zones: a
+  high score sustains a completion the rules reached,
+  a low score holds the fragment as written, and the
+  band between defers to the rule chain. Every
+  verdict is recorded in the batch's
+  `identity_verdicts.jsonl` ledger, keyed by the
+  dossier fingerprint and the process's calibration
+  id (claim version, thresholds, dossier assembly
+  version); a re-run reads the ledger instead of
+  re-judging, so a rebuild reproduces the same
+  completions even though the underlying scores are
+  not bit-stable. A single payload declaring both
+  seat forms is refused at validation, and a seat
+  whose key is missing when a point is scored fails
+  the stage closed. Seat costs fold into the stage's
+  cost accounting, and the run metrics record the
+  calibration and how often the seat was consulted.
+
+## [0.1.2] - 2026-10-30
+
 ### Added
 
 - **Identity seat seam** — `guard_triples` accepts an
@@ -33,34 +70,6 @@ and the project adheres to
   at the cost of one title misnaming. The probe replay
   through this wiring reproduces the measured seat
   outcomes byte for byte.
-
-- **Live identity seat (on by default)** — the core
-  baseline declares `identity_seat_live`, so rule 4's
-  completion question is judged in-run by the frozen
-  completion process unless a pack declares it off or
-  substitutes the frozen decisions file above (which
-  supersedes the live default). For each contested candidate the
-  pipeline assembles an evidence dossier from the
-  document deterministically (the fragment's sentences,
-  the candidate's definition and mentions, sibling
-  names), scores one fixed claim against it with the
-  pinned Jev decision model, and combines the score
-  with the rule chain by fixed zones: a high score
-  sustains a completion the rules reached, a low score
-  holds the fragment as written, and the band between
-  defers to the rule chain. Every verdict is recorded
-  in the batch's `identity_verdicts.jsonl` ledger,
-  keyed by the dossier fingerprint and the process's
-  calibration id (claim version, thresholds, dossier
-  assembly version); a re-run reads the ledger instead
-  of re-judging, so a rebuild reproduces the same
-  completions even though the underlying scores are
-  not bit-stable. A single payload declaring both
-  seat forms is refused at validation, and a seat
-  whose key is missing when a point is scored fails
-  the stage closed. Seat costs fold into the
-  stage's cost accounting, and the run metrics record
-  the calibration and how often the seat was consulted.
 
 ### Changed
 
@@ -237,6 +246,32 @@ and the project adheres to
   issue #58.
 
 ### Fixed
+
+- **Identity completion damaged attested names the
+  word list did not know.** The candidate guard's
+  completion step rewrites a fragment mention to the
+  longer census name that contains it; a curated list
+  of generic elements decided which containing phrases
+  were safe to absorb into. The list missed glued
+  surfaces in other shapes — verb and prose glue,
+  demonym prepends, a show title wrapped around a
+  country — and a per-language list cannot travel to
+  the next genre or language anyway. The list is
+  deleted. A subset rewrite of a mention now requires
+  document-supplied identity evidence for the added
+  material, whatever the mention's length; the one
+  exception is an infix completion (middle-name
+  material) of a mention that occurs nowhere outside
+  the candidate, where refusing would protect no
+  competing name and cost the fact. Leading
+  completions (glue, specifiers) and trailing
+  completions (derived entities) always need
+  evidence. A mention with its own textual life in
+  the document and no evidence for the longer form
+  stands as proposed — the triple is kept, the name
+  uncompleted — instead of being rewritten. The
+  regression record is
+  `tests/test_identity_surface_damage.py`.
 
 - **The cost-cap preflight checked the wrong stage set.**
   `_preflight_cost_cap` selected its seats by testing

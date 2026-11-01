@@ -465,5 +465,27 @@ class TestCli(unittest.TestCase):
         self.assertEqual(rc, 1)
 
 
+class LoadJsonErrorWordingTests(unittest.TestCase):
+    """Issue #49: a missing input file reports as not found; only
+    an unparsable file is "not valid JSON"."""
+
+    def test_missing_file_reports_not_found(self):
+        with tempfile.TemporaryDirectory() as td:
+            missing = os.path.join(td, "nope.json")
+            with self.assertRaises(ValueError) as cm:
+                ob._load_json(missing)
+            self.assertIn("not found", str(cm.exception))
+            self.assertNotIn("not valid JSON", str(cm.exception))
+
+    def test_malformed_file_reports_not_valid_json(self):
+        with tempfile.TemporaryDirectory() as td:
+            bad = os.path.join(td, "bad.json")
+            with open(bad, "w") as f:
+                f.write("{not json")
+            with self.assertRaises(ValueError) as cm:
+                ob._load_json(bad)
+            self.assertIn("is not valid JSON", str(cm.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -437,6 +437,12 @@ def build_import(spec: dict, inventories: list[dict]) -> tuple[dict, dict]:
 
 def load_json_file(path) -> object:
     try:
-        return json.loads(Path(path).read_text())
-    except Exception as e:
+        text = Path(path).read_text()
+    except FileNotFoundError as e:
+        raise ValueError(f"{path} not found: {e}") from e
+    except OSError as e:
+        raise ValueError(f"{path} cannot be read: {e}") from e
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
         raise ValueError(f"{path} is not valid JSON: {e}") from e

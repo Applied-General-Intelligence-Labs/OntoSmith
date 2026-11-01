@@ -117,6 +117,10 @@ class LiveIdentitySeat:
         """guard_triples with the live seat (main channels):
         collecting pass on a deep copy, verdict build, then
         the apply pass on the caller's items."""
+        # The seat's own collecting/verdict seats are
+        # authoritative inside; a caller-passed seat is
+        # routing information for the caller, not for here.
+        guard_kwargs.pop("identity_seat", None)
         if self._doc_key != _prop.identity_doc_key(text):
             self.begin_doc(text)
 

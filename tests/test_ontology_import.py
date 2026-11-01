@@ -7,6 +7,8 @@ shape: a scoped module file (classes, object properties, one
 datatype property, a party-role class, a droppable class) and
 a reference file drawn on for exactly one concept.
 """
+import os
+import tempfile
 import unittest
 
 from pipeline import ontology_builder as ob
@@ -305,6 +307,28 @@ class TestBuildImport(unittest.TestCase):
             defects = pack_schema.validate_pack_dir(
                 Path(td) / "packs" / "mini-contracts")
             self.assertEqual(defects, [])
+
+
+class LoadJsonFileErrorWordingTests(unittest.TestCase):
+    """Issue #49: a missing input file reports as not found; only
+    an unparsable file is "not valid JSON"."""
+
+    def test_missing_file_reports_not_found(self):
+        with tempfile.TemporaryDirectory() as td:
+            missing = os.path.join(td, "nope.json")
+            with self.assertRaises(ValueError) as cm:
+                oi.load_json_file(missing)
+            self.assertIn("not found", str(cm.exception))
+            self.assertNotIn("not valid JSON", str(cm.exception))
+
+    def test_malformed_file_reports_not_valid_json(self):
+        with tempfile.TemporaryDirectory() as td:
+            bad = os.path.join(td, "bad.json")
+            with open(bad, "w") as f:
+                f.write("{not json")
+            with self.assertRaises(ValueError) as cm:
+                oi.load_json_file(bad)
+            self.assertIn("is not valid JSON", str(cm.exception))
 
 
 if __name__ == "__main__":

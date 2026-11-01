@@ -948,8 +948,14 @@ def emit_pack(draft: dict, approval: dict | None, out_root,
 
 def _load_json(path) -> dict:
     try:
-        data = json.loads(Path(path).read_text())
-    except Exception as e:
+        text = Path(path).read_text()
+    except FileNotFoundError as e:
+        raise ValueError(f"{path} not found: {e}") from e
+    except OSError as e:
+        raise ValueError(f"{path} cannot be read: {e}") from e
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError as e:
         raise ValueError(f"{path} is not valid JSON: {e}") from e
     if not isinstance(data, dict):
         raise ValueError(f"{path} is not a JSON object")
