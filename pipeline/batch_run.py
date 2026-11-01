@@ -444,6 +444,33 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
              f"verdicts from {_seat_decl}, sha256 "
              f"{identity_seat_src['sha256'][:12]}…; "
              "unjudged points defer to the rule chain)")
+    # Live identity seat: the frozen completion process
+    # judged in-run (pipeline/identity_live_seat.py), with
+    # verdicts recorded in the batch's verdict ledger.
+    # Declared -> the seat is live for CANDIDATES; absent =
+    # no live seat. Declaring both seat forms is ambiguous
+    # and fails the stage closed.
+    live_seat = None
+    identity_seat_src_live = None
+    if (setup_cfg or {}).get("identity_seat_live"):
+        if identity_decisions is not None:
+            raise ValueError(
+                "identity_seat_live and "
+                "identity_seat_decisions are mutually "
+                "exclusive (fail closed)")
+        from .identity_live_seat import LiveIdentitySeat
+        from .identity_seat import calibration_id
+        live_seat = LiveIdentitySeat(
+            d / "identity_verdicts.jsonl")
+        identity_seat_src_live = {
+            "mode": "live",
+            "ledger": "identity_verdicts.jsonl",
+            "calibration": calibration_id()}
+        _log(b.batch_id,
+             "CANDIDATES: identity seat ON (live Jev "
+             "completion process; verdicts recorded in "
+             "identity_verdicts.jsonl; review-band points "
+             "defer to the rule chain)")
     # Pair-judge variant: profile-selected;
     # absent = the default judge (sentence x standard).
     pair_judge_context = (setup_cfg or {}).get(
@@ -563,10 +590,44 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                       "identity_seat_opinions": 0}
 
     def _sync_identity_seat_stats():
+        if live_seat is not None:
+            identity_seat_stats["consulted"] = \
+                live_seat.stats["consulted"]
+            identity_seat_stats["opinions"] = \
+                live_seat.stats["opinions"]
         proposer_stats["identity_seat_consulted"] = \
             identity_seat_stats["consulted"]
         proposer_stats["identity_seat_opinions"] = \
             identity_seat_stats["opinions"]
+
+    # The guard entry point for the two main channels: with
+    # a live seat, the seat orchestrates (collect -> judge ->
+    # apply); without one, the guard runs directly with the
+    # per-document seat (frozen file seat or None). `doc_seat`
+    # is read at call time — it is (re)bound per document in
+    # the loop below before any guard call happens.
+    def _guard(items, text, **guard_kwargs):
+        from . import proposer as _prop
+        if live_seat is not None:
+            return live_seat.guard(items, text, **guard_kwargs)
+        return _prop.guard_triples(
+            items, text, identity_seat=doc_seat, **guard_kwargs)
+
+    # Live-seat spend folded into the proposer ledger: the
+    # delta since the last fold, applied per document just
+    # before the checkpoint write, so a resumed stage keeps
+    # the true total (verdicts bought once are never
+    # re-bought — the ledger answers for them).
+    _seat_cost_folded = [0.0]
+
+    def _fold_live_seat_cost():
+        nonlocal proposer_cost
+        if live_seat is None:
+            return
+        delta = live_seat.stats["cost_usd"] - _seat_cost_folded[0]
+        if delta:
+            proposer_cost = _conn_add_cost(proposer_cost, delta)
+            _seat_cost_folded[0] = live_seat.stats["cost_usd"]
     pair_stats = {"enumerated": 0, "answered": 0, "calls": 0,
                   "outcomes": {}, "alias_emitted": 0}
     # Entity-sweep accounting (issue #58), checkpointed
@@ -666,6 +727,12 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 identity_decisions,
                 _prop.identity_doc_key(text),
                 stats=identity_seat_stats)
+        if live_seat is not None:
+            # The sweep channel guards through this seat; the
+            # main channels go through _guard, which runs the
+            # seat's collect/judge/apply flow.
+            live_seat.begin_doc(text)
+            doc_seat = live_seat.seat
         # LLM proposer — free triples + clause slots.
         # Proposals pass the deterministic guards in pipeline/proposer.py;
         # survivors become candidates judged by Jev at GATES (no score
@@ -715,13 +782,12 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 1 for it in res["items"]
                 if it["subject"] != it["subject_canonical"]
                 or it["object"] != it["object_canonical"])
-            kept, blocked = _prop.guard_triples(
+            kept, blocked = _guard(
                 res["items"], text, role_words=role_words,
                 entity_types=endpoint_types or None,
                 theme_attest_key=("evidence_sentence"
                                   if pair_theme_attest else None),
-                quote_punct_insensitive=quote_punct_insensitive,
-                identity_seat=doc_seat)
+                quote_punct_insensitive=quote_punct_insensitive)
             for it in kept:
                 rec = {"doc_id": doc_id, "subject": it["subject"],
                        "relation": it["relation"],
@@ -772,13 +838,12 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                     if isinstance(it.get(tk), str)
                     and it[tk].strip()
                     and it[tk].strip() not in endpoint_types)
-            kept, blocked = _prop.guard_triples(
+            kept, blocked = _guard(
                 res["items"], text, role_words=role_words,
                 entity_types=endpoint_types or None,
                 quote_punct_insensitive=quote_punct_insensitive,
                 theme_attest_chunk=theme_attest_chunk,
-                mentions=mention_on,
-                identity_seat=doc_seat)
+                mentions=mention_on)
             proposer_stats["typed_kept"] += sum(
                 1 for it in kept
                 if it.get("subject_type") or it.get("object_type"))
@@ -1026,6 +1091,7 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 with open(d / "pair_verdicts.jsonl", "w") as f:
                     for v in pair_verdicts:
                         f.write(json.dumps(v) + "\n")
+            _fold_live_seat_cost()
             _sync_identity_seat_stats()
             ckpt_path.write_text(json.dumps({
                 "done_docs": sorted(done_docs),
@@ -1096,6 +1162,16 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
             **identity_seat_src,
             "consulted": identity_seat_stats["consulted"],
             "opinions": identity_seat_stats["opinions"]}
+    if identity_seat_src_live is not None:
+        b.metrics["candidates"]["identity_seat"] = {
+            **identity_seat_src_live,
+            "consulted": identity_seat_stats["consulted"],
+            "opinions": identity_seat_stats["opinions"],
+            "judge_calls": live_seat.stats["judge_calls"],
+            "ledger_hits": live_seat.stats["ledger_hits"],
+            "judge_errors": live_seat.stats["judge_errors"],
+            "judge_cost_usd": _round_cost(
+                live_seat.stats["cost_usd"])}
     if pair_enum:
         b.metrics["candidates"]["pair_enum"] = {
             **pair_stats, "window": pair_window,

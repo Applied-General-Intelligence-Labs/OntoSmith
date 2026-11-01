@@ -151,6 +151,15 @@ CONSUMED_KEYS: dict[str, str] = {
                                "proposer.guard_triples "
                                "identity_seat); absent = the "
                                "deterministic rule chain alone",
+    "identity_seat_live": "CANDIDATES identity seat judged "
+                          "live in-run by the frozen completion "
+                          "process (rules + decision model over "
+                          "assembled evidence dossiers), with "
+                          "verdicts recorded in the batch's "
+                          "identity_verdicts.jsonl ledger; "
+                          "mutually exclusive with "
+                          "identity_seat_decisions; absent = no "
+                          "live seat",
     "theme_attest_chunk": "CANDIDATES theme-presence guard "
                           "accepts a verb+preposition relation's "
                           "object attested anywhere in the "
