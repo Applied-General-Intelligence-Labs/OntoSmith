@@ -51,6 +51,29 @@ PROVIDER_SORT = "throughput"
 PROPOSER_MODEL = "anthropic/claude-haiku-5.5"
 #: Judge tier: the Jev decision gate (pinned; see module docstring).
 JUDGE_MODEL = "typesafe/jev-1.13"
+#: Identity-seat calibration (the frozen completion process,
+#: pipeline/identity_seat.py): the completion-claim wording
+#: version and the fitted zone thresholds — auto-complete
+#: requires the rule chain's completion AND p >= TAU_HI;
+#: p <= TAU_LO auto-stands; between them is the review band.
+#: Fitted on the frozen calibration split; like JUDGE_MODEL,
+#: these change only with a re-measured pack release.
+#: b2 = b1 with the claim unified on the dossier
+#: measurement's wording (the b1 fit's contract leg had
+#: been scored under a shorter paraphrase; the W4
+#: equivalence run caught it and the claim was unified
+#: before any release carried it). Under the unified
+#: claim the score distribution shifts down, so TAU_LO
+#: was re-anchored at the boundary the unified FIT
+#: scores support (0.10 -> 0.05; decision B, 2026-11-01):
+#: TAU_HI stays at its fitted 0.79, which under the
+#: stricter claim is strictly more conservative than in
+#: the regime it was fitted in. On the unified EVAL
+#: split the pair gives damage 0, review 27.6%, locked
+#: loss 0 (w4_report.md in the lab record).
+IDENTITY_CLAIM_VERSION = "completion-b2"
+IDENTITY_TAU_HI = 0.79
+IDENTITY_TAU_LO = 0.05
 #: Escalation tier: adjudication escalation for shaky-band
 #: items and the gate-evaluation judges. The lab's measured
 #: escalation record ran on this seat (merge-adjudication

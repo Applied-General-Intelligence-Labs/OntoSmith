@@ -11,6 +11,37 @@ and the project adheres to
 
 - Missing input files are no longer reported as "is not valid JSON" — the JSON loaders (builder, BYO-schema import, pack payload and role-words artefacts) now distinguish not found / cannot be read / not valid JSON (#49).
 
+### Added
+
+- **Live identity seat (on by default)** — the core
+  baseline declares `identity_seat_live`, so rule 4's
+  completion question is judged in-run by the frozen
+  completion process unless a pack declares it off or
+  substitutes the frozen decisions file (which
+  supersedes the live default). For each contested
+  candidate the pipeline assembles an evidence dossier
+  from the document deterministically (the fragment's
+  sentences, the candidate's definition and mentions,
+  sibling names), scores one fixed claim against it
+  with the pinned Jev decision model, and combines
+  the score with the rule chain by fixed zones: a
+  high score sustains a completion the rules reached,
+  a low score holds the fragment as written, and the
+  band between defers to the rule chain. Every
+  verdict is recorded in the batch's
+  `identity_verdicts.jsonl` ledger, keyed by the
+  dossier fingerprint and the process's calibration
+  id (claim version, thresholds, dossier assembly
+  version); a re-run reads the ledger instead of
+  re-judging, so a rebuild reproduces the same
+  completions even though the underlying scores are
+  not bit-stable. A single payload declaring both
+  seat forms is refused at validation, and a seat
+  whose key is missing when a point is scored fails
+  the stage closed. Seat costs fold into the stage's
+  cost accounting, and the run metrics record the
+  calibration and how often the seat was consulted.
+
 ## [0.1.2] - 2026-10-30
 
 ### Added

@@ -137,6 +137,14 @@ class TestCoreDefaults(unittest.TestCase):
         self.assertEqual(self.cfg["pair_window"], "adjacent")
         self.assertNotIn("pair_enumeration", self.cfg)
 
+    def test_identity_seat_live_by_default(self):
+        # Judging is the product's mechanism, not an
+        # opt-in: the baseline declares the live identity
+        # seat on. A domain pack may declare it false
+        # (rule chain alone) or declare the frozen
+        # decisions file instead.
+        self.assertIs(self.cfg["identity_seat_live"], True)
+
     def test_jf1_not_activated_without_inventory(self):
         # JF-F1 is an adopted core mechanism, but its symmetric
         # set is domain-pack data: the core payload declares
