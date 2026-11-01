@@ -51,6 +51,11 @@ COMMANDS: dict[str, tuple[str, str, str, tuple[str, ...]]] = {
     "configure": ("pipeline.configure", "Pipeline",
                   "Declare provider bindings for the seats "
                   "(interactive)", ()),
+    "identity-freeze": ("pipeline.identity_freeze",
+                        "Pipeline",
+                        "Freeze per-point identity-seat "
+                        "decisions into a global decisions "
+                        "file", ()),
     "batch": ("pipeline.batch_cli", "Pipeline",
               "Batch pipeline: create/run/status/rollback "
               "+ ER settlement", ()),

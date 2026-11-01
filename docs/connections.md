@@ -296,6 +296,21 @@ both forms is refused at validation, and a live seat
 whose key is missing when a point is scored fails
 the stage closed.
 
+The frozen file has a second, corpus-level form:
+`identity_seat_decisions_global` names a global
+freeze, produced from per-point verdicts by
+`ontosmith identity-freeze`. The freeze keys each
+verdict by the (fragment, candidate) pair instead of
+by document — one verdict for the pair everywhere —
+and promotes pairs the offline judge decided
+differently in different documents to ambiguous
+records. An ambiguous pair carries no verdict: the
+seat defers to the rule chain, and the batch lists
+the ambiguous pairs it actually met in its
+`identity_ambiguous.jsonl` for the review band.
+Declaring both file forms is refused; a declared
+freeze that cannot be loaded fails the stage closed.
+
 ## Recommended models
 
 The recommended binding for each seat — for the

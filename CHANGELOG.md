@@ -7,6 +7,23 @@ and the project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- **Global identity freeze** — the identity seat's
+  frozen decisions now have a corpus-level form.
+  `ontosmith identity-freeze` groups per-point
+  verdicts by the (fragment, candidate) pair: a
+  unanimous pair freezes to one verdict everywhere,
+  and a pair decided differently across documents is
+  promoted to an ambiguous record instead of being
+  silently overwritten. A profile declares the
+  freeze as `identity_seat_decisions_global`;
+  ambiguous pairs defer to the rule chain and are
+  surfaced in the batch's `identity_ambiguous.jsonl`
+  for the review band. Declaring both decisions
+  file forms is refused, and a malformed freeze
+  fails the stage closed.
+
 ## [0.1.3] - 2026-11-01
 
 ### Fixed

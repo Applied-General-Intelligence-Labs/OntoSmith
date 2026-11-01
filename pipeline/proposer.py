@@ -2178,6 +2178,142 @@ def identity_seat_for_doc(decisions: dict, doc_key: str,
     return seat
 
 
+def freeze_identity_decisions(rows) -> tuple[list, list]:
+    """Corpus-level freeze of per-point identity-seat
+    decisions (identity redesign D2/D3): group the
+    per-point rows ({"doc", "ep", "cand", "decision"}
+    with decision "complete" | "stand" | None) by the
+    GLOBAL pair (ep, cand). A pair with one unanimous
+    verdict freezes to it corpus-wide; a pair the seat
+    abstained on everywhere freezes as an explicit
+    no-opinion record; a pair whose points DISAGREE is
+    promoted to a first-class ambiguous record — both
+    surfaces are kept and the pair routes to the review
+    band instead of being forced to a verdict.
+    Returns (frozen, ambiguous) record lists in the
+    global freeze file's shapes."""
+    by_pair: dict[tuple[str, str], list] = {}
+    for r in rows:
+        by_pair.setdefault((r["ep"], r["cand"]), []).append(r)
+    frozen, ambiguous = [], []
+    for (ep, cand), rs in sorted(by_pair.items()):
+        decided = {r.get("decision") for r in rs
+                   if r.get("decision")}
+        if len(decided) == 1:
+            frozen.append({"ep": ep, "cand": cand,
+                           "decision": decided.pop(),
+                           "points": len(rs)})
+        elif not decided:
+            frozen.append({"ep": ep, "cand": cand,
+                           "decision": None,
+                           "points": len(rs)})
+        else:
+            ambiguous.append({
+                "ep": ep, "cand": cand,
+                "identity_ambiguous": True,
+                "keep": "both_surfaces",
+                "route": "review_band",
+                "conflicting": [
+                    {"doc": r.get("doc"),
+                     "decision": r["decision"]}
+                    for r in rs if r.get("decision")],
+                "points": len(rs)})
+    return frozen, ambiguous
+
+
+def load_identity_decisions_global(path):
+    """Load a global identity-seat freeze file (see
+    freeze_identity_decisions): JSONL records
+    {"ep", "cand", "decision"} with decision
+    "complete" | "stand" | null, plus ambiguous records
+    {"ep", "cand", "identity_ambiguous": true}.
+    Returns (decisions, ambiguous): decisions maps
+    (ep, cand) -> bool; ambiguous is the set of pairs
+    promoted to contested. A pair recorded twice, or
+    both decided and ambiguous, raises ValueError — a
+    declared freeze file fails closed, exactly like the
+    per-document form."""
+    decisions: dict[tuple[str, str], bool] = {}
+    ambiguous: set[tuple[str, str]] = set()
+    seen: set[tuple[str, str]] = set()
+    with open(path, encoding="utf-8") as f:
+        for lineno, line in enumerate(f, 1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+                ep = rec["ep"]
+                cand = rec["cand"]
+            except Exception as e:
+                raise ValueError(
+                    f"identity freeze {path}:{lineno}: "
+                    f"malformed record: {e}") from e
+            if not all(isinstance(v, str) and v
+                       for v in (ep, cand)):
+                raise ValueError(
+                    f"identity freeze {path}:{lineno}: "
+                    "ep/cand must be non-empty strings")
+            pair = (ep, cand)
+            if pair in seen:
+                raise ValueError(
+                    f"identity freeze {path}:{lineno}: "
+                    f"pair {pair!r} recorded twice — a "
+                    "freeze file is produced by the freeze "
+                    "step, never hand-assembled")
+            seen.add(pair)
+            if rec.get("identity_ambiguous") is True:
+                if rec.get("decision") is not None:
+                    raise ValueError(
+                        f"identity freeze {path}:{lineno}: "
+                        "an ambiguous record carries no "
+                        "decision")
+                ambiguous.add(pair)
+                continue
+            decision = rec.get("decision")
+            if decision not in ("complete", "stand", None):
+                raise ValueError(
+                    f"identity freeze {path}:{lineno}: "
+                    "decision must be 'complete', 'stand' "
+                    "or null")
+            if decision is not None:
+                decisions[pair] = (decision == "complete")
+    return decisions, ambiguous
+
+
+def identity_seat_global(decisions: dict, ambiguous: set,
+                         stats: dict | None = None,
+                         contested_log: dict | None = None):
+    """The corpus-level seat over a global freeze: the
+    frozen verdict for (fragment, candidate) regardless
+    of document. An ambiguous pair returns None — no
+    opinion, rule 4's chain decides — and is counted
+    under stats["contested"] and in `contested_log`
+    (pair -> consultations) so the batch can surface
+    the contested pairs it actually met. A pair absent
+    from the freeze defers, as in the per-document
+    form."""
+    def seat(ep_norm, cand_norm, feats):
+        if stats is not None:
+            stats["consulted"] = \
+                stats.get("consulted", 0) + 1
+        pair = (ep_norm, cand_norm)
+        if pair in ambiguous:
+            if stats is not None:
+                stats["contested"] = \
+                    stats.get("contested", 0) + 1
+            if contested_log is not None:
+                contested_log[pair] = \
+                    contested_log.get(pair, 0) + 1
+            return None
+        verdict = decisions.get(pair)
+        if verdict is not None and stats is not None:
+            stats["opinions"] = \
+                stats.get("opinions", 0) + 1
+        return verdict
+    return seat
+
+
 def guard_triples(items: list[dict], doc_text: str,
                   role_words: Iterable[str] | None = None,
                   entity_types: set[str] | None = None,

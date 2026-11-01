@@ -153,6 +153,25 @@ CONSUMED_KEYS: dict[str, str] = {
                                "supersedes the live default — the "
                                "corpus-bound form beats the general "
                                "one",
+    "identity_seat_decisions_global": "CANDIDATES identity "
+                               "seat decisions file, global "
+                               "form: path (batch-root "
+                               "relative or absolute) of a "
+                               "corpus-level freeze (produced "
+                               "by `ontosmith identity-freeze`) "
+                               "keying verdicts by the "
+                               "(fragment, candidate) pair "
+                               "instead of by document; pairs "
+                               "the freeze promoted to "
+                               "ambiguous defer to the rule "
+                               "chain and are surfaced in the "
+                               "batch's identity_ambiguous.jsonl "
+                               "(stage_candidates -> "
+                               "proposer.guard_triples "
+                               "identity_seat); declaring it "
+                               "supersedes the live default, "
+                               "and declaring both file forms "
+                               "is refused",
     "identity_seat_live": "CANDIDATES identity seat judged "
                           "live in-run by the frozen completion "
                           "process (rules + decision model over "
@@ -315,6 +334,30 @@ def setup_config_errors(cfg: dict, *, merged: bool = False) -> list[str]:
                       "the decisions file, or the live seat "
                       "(identity_seat_live false + a decisions "
                       "file is the explicit file form)")
+    isdg = cfg.get("identity_seat_decisions_global")
+    if isdg is not None and not isinstance(isdg, str):
+        errors.append("setup_config key "
+                      "'identity_seat_decisions_global' must be "
+                      "a string (the freeze file's path)")
+    if not merged and isdg is not None \
+            and cfg.get("identity_seat_decisions") is not None:
+        # Two file forms in one payload: the per-document
+        # file and the global freeze key the same verdicts
+        # differently, so which one governs is an authoring
+        # ambiguity — refuse it, as with the live form.
+        errors.append("setup_config declares both identity "
+                      "decisions file forms "
+                      "(identity_seat_decisions and "
+                      "identity_seat_decisions_global); declare "
+                      "one — the per-document file, or the "
+                      "global freeze")
+    if not merged and isl is True and isdg is not None:
+        errors.append("setup_config declares both identity seat "
+                      "forms (identity_seat_live and "
+                      "identity_seat_decisions_global); declare "
+                      "one — the global freeze file, or the "
+                      "live seat (identity_seat_live false + a "
+                      "freeze file is the explicit file form)")
     sf = cfg.get("schema_front")
     if sf is not None and not isinstance(sf, dict):
         errors.append("setup_config key 'schema_front' must be an "

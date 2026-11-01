@@ -412,9 +412,25 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     # loaded fails the stage closed.
     identity_decisions = None
     identity_seat_src = None
+    identity_decisions_global = None
+    identity_ambiguous_pairs = None
+    identity_seat_src_global = None
+    identity_contested_log: dict = {}
     identity_seat_stats = {"consulted": 0, "opinions": 0}
     _seat_decl = (setup_cfg or {}).get(
         "identity_seat_decisions")
+    _seat_decl_global = (setup_cfg or {}).get(
+        "identity_seat_decisions_global")
+    if _seat_decl is not None and _seat_decl_global is not None:
+        # Two file forms after the merge: unlike the live
+        # default, neither file form supersedes the other
+        # — they key the same verdicts differently, so a
+        # config carrying both is refused (fail closed).
+        raise ValueError(
+            "setup_config declares both identity decisions "
+            "file forms (identity_seat_decisions and "
+            "identity_seat_decisions_global); declare one "
+            "(fail closed)")
     if _seat_decl is not None:
         if not (isinstance(_seat_decl, str)
                 and _seat_decl.strip()):
@@ -444,6 +460,48 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
              f"verdicts from {_seat_decl}, sha256 "
              f"{identity_seat_src['sha256'][:12]}…; "
              "unjudged points defer to the rule chain)")
+    if _seat_decl_global is not None:
+        # Global freeze form (identity redesign D2/D3):
+        # verdicts keyed by the (fragment, candidate)
+        # pair corpus-wide, produced by the freeze step
+        # (`ontosmith identity-freeze`). Pairs the freeze
+        # promoted to ambiguous carry no verdict: the
+        # seat defers on them and the batch surfaces the
+        # ones it actually met in identity_ambiguous.jsonl.
+        if not (isinstance(_seat_decl_global, str)
+                and _seat_decl_global.strip()):
+            raise ValueError(
+                "identity_seat_decisions_global must name "
+                "a freeze file (fail closed)")
+        from . import proposer as _prop
+        _g_path = Path(_seat_decl_global)
+        if not _g_path.is_absolute():
+            _g_path = root / _g_path
+        try:
+            identity_decisions_global, \
+                identity_ambiguous_pairs = \
+                _prop.load_identity_decisions_global(_g_path)
+        except Exception as e:
+            raise ValueError(
+                f"identity seat freeze {_g_path} is "
+                f"unreadable or malformed: {e} "
+                "(fail closed)") from e
+        identity_seat_src_global = {
+            "path": _seat_decl_global,
+            "sha256": hashlib.sha256(
+                _g_path.read_bytes()).hexdigest(),
+            "n_decisions": len(identity_decisions_global),
+            "n_ambiguous": len(identity_ambiguous_pairs)}
+        _log(b.batch_id,
+             f"CANDIDATES: identity seat ON (global "
+             f"freeze: {identity_seat_src_global['n_decisions']} "
+             f"frozen verdicts, "
+             f"{identity_seat_src_global['n_ambiguous']} "
+             f"ambiguous pairs from {_seat_decl_global}, "
+             f"sha256 "
+             f"{identity_seat_src_global['sha256'][:12]}…; "
+             "ambiguous and unjudged pairs defer to the "
+             "rule chain)")
     # Live identity seat: the frozen completion process
     # judged in-run (pipeline/identity_live_seat.py), with
     # verdicts recorded in the batch's verdict ledger.
@@ -458,7 +516,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     live_seat = None
     identity_seat_src_live = None
     if (setup_cfg or {}).get("identity_seat_live") \
-            and identity_decisions is None:
+            and identity_decisions is None \
+            and identity_decisions_global is None:
         from .identity_live_seat import LiveIdentitySeat
         from .identity_seat import calibration_id
         live_seat = LiveIdentitySeat(
@@ -733,6 +792,13 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 identity_decisions,
                 _prop.identity_doc_key(text),
                 stats=identity_seat_stats)
+        if identity_decisions_global is not None:
+            from . import proposer as _prop
+            doc_seat = _prop.identity_seat_global(
+                identity_decisions_global,
+                identity_ambiguous_pairs,
+                stats=identity_seat_stats,
+                contested_log=identity_contested_log)
         if live_seat is not None:
             # The sweep channel guards through this seat; the
             # main channels go through _guard, which runs the
@@ -1180,6 +1246,34 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
             "judge_errors": live_seat.stats["judge_errors"],
             "judge_cost_usd": _round_cost(
                 live_seat.stats["cost_usd"])}
+    if identity_seat_src_global is not None:
+        b.metrics["candidates"]["identity_seat"] = {
+            **identity_seat_src_global,
+            "mode": "global_freeze",
+            "consulted": identity_seat_stats["consulted"],
+            "opinions": identity_seat_stats["opinions"],
+            "contested": identity_seat_stats.get(
+                "contested", 0)}
+        # D3 surfacing: the ambiguous pairs this run
+        # actually met, with their consultation counts —
+        # the review band's input, written whenever the
+        # global form is declared (empty when none met).
+        with open(d / "identity_ambiguous.jsonl", "w") as f:
+            for (ep, cand), n in sorted(
+                    identity_contested_log.items()):
+                f.write(json.dumps(
+                    {"ep": ep, "cand": cand,
+                     "identity_ambiguous": True,
+                     "keep": "both_surfaces",
+                     "route": "review_band",
+                     "consultations": n},
+                    ensure_ascii=False) + "\n")
+        if identity_contested_log:
+            _log(b.batch_id,
+                 f"CANDIDATES: identity seat contested "
+                 f"{len(identity_contested_log)} ambiguous "
+                 f"pairs met (deferred to the rule chain; "
+                 f"see identity_ambiguous.jsonl)")
     if pair_enum:
         b.metrics["candidates"]["pair_enum"] = {
             **pair_stats, "window": pair_window,
