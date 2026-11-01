@@ -20,8 +20,7 @@ from pathlib import Path
 from unittest import mock
 
 from pipeline import batch_run, identity_freeze, proposer
-from pipeline.batch import (
-    Batch, BatchConfig, BatchStatus, batch_dir, save_batch)
+from pipeline.batch import Batch, BatchConfig, BatchStatus, batch_dir, save_batch
 from pipeline.profile_config import setup_config_errors
 
 DOC = (
