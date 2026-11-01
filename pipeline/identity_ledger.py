@@ -18,9 +18,8 @@ read must never silently judge nothing.
 """
 from __future__ import annotations
 
-import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .identity_seat import calibration_id, dossier_hash
@@ -85,7 +84,7 @@ class VerdictLedger:
             "model": JUDGE_MODEL,
             "p": p,
             "verdict": verdict,
-            "judged_at": datetime.now(timezone.utc).isoformat(),
+            "judged_at": datetime.now(UTC).isoformat(),
         }
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.path, "a", encoding="utf-8") as f:

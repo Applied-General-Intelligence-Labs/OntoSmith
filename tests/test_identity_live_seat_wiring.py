@@ -25,8 +25,7 @@ from pathlib import Path
 from unittest import mock
 
 from pipeline import batch_run, identity_seat, proposer
-from pipeline.batch import (Batch, BatchConfig, BatchStatus,
-                            batch_dir, save_batch)
+from pipeline.batch import Batch, BatchConfig, BatchStatus, batch_dir, save_batch
 
 DOC = (
     "The Advertising Sale Agency Agreement was signed in "
@@ -115,7 +114,7 @@ class TestLiveIdentitySeatWiring(unittest.TestCase):
         self.assertIs(target[0]["verdict"], False)
 
     def test_high_score_keeps_the_rules_completion(self):
-        b, d, calls = _run_stage(
+        _b, d, _calls = _run_stage(
             self.root, "live-high", {"identity_seat_live": True},
             score=0.95)
         cands = self._candidates(d)

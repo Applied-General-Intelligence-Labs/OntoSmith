@@ -34,6 +34,31 @@ and the project adheres to
   through this wiring reproduces the measured seat
   outcomes byte for byte.
 
+- **Live identity seat** — a profile may instead
+  declare `identity_seat_live`: rule 4's completion
+  question is then judged in-run by the frozen
+  completion process. For each contested candidate the
+  pipeline assembles an evidence dossier from the
+  document deterministically (the fragment's sentences,
+  the candidate's definition and mentions, sibling
+  names), scores one fixed claim against it with the
+  pinned Jev decision model, and combines the score
+  with the rule chain by fixed zones: a high score
+  sustains a completion the rules reached, a low score
+  holds the fragment as written, and the band between
+  defers to the rule chain. Every verdict is recorded
+  in the batch's `identity_verdicts.jsonl` ledger,
+  keyed by the dossier fingerprint and the process's
+  calibration id (claim version, thresholds, dossier
+  assembly version); a re-run reads the ledger instead
+  of re-judging, so a rebuild reproduces the same
+  completions even though the underlying scores are
+  not bit-stable. Declaring both seat forms fails the
+  stage closed, as does a seat whose key is missing
+  when a point is scored. Seat costs fold into the
+  stage's cost accounting, and the run metrics record
+  the calibration and how often the seat was consulted.
+
 ### Changed
 
 - **Upstream attestation program** — the candidate

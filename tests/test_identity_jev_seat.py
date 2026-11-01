@@ -11,7 +11,6 @@ review band (None). A judged point stays judged — the
 ledger answers for it, because the decision model's score
 is not bit-stable across calls.
 """
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -170,7 +169,7 @@ class TestVerdictMap(unittest.TestCase):
             scores = {("Agency Agreement",
                        "Advertising Sale Agency Agreement"): 0.9,
                       ("Smith", "John Smith"): 0.02}
-            verdicts, stats, calls = self._run(ledger, scores, rules)
+            verdicts, stats, _calls = self._run(ledger, scores, rules)
             self.assertIs(
                 verdicts[("Agency Agreement",
                           "Advertising Sale Agency Agreement")], True)
