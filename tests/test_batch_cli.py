@@ -98,6 +98,45 @@ class TestCmdCreateProfileWiring(unittest.TestCase):
         self.assertTrue((batch_dir(self.tmp, "testpack1")
                          / "setup_config.resolved.json").exists())
 
+    def _create_packless(self, batch_id, profile_cfg):
+        """A family no pack binds (the hands-on Track 1 shape):
+        profiles/<family>/setup_config.json is the only family
+        layer; the core baseline must still apply under it."""
+        prof_dir = self.tmp / "profiles" / "demo"
+        prof_dir.mkdir(parents=True)
+        (prof_dir / "setup_config.json").write_text(
+            json.dumps(profile_cfg))
+        (self.tmp / "profile.json").write_text(json.dumps({
+            "family": "demo", "profile_hash": "testhash"}))
+        args = argparse.Namespace(
+            source="src", collection="coll",
+            docs=[str(self.tmp / "docs" / "*.txt")],
+            profile=str(self.tmp / "profile.json"),
+            batch_id=batch_id)
+        with mock.patch.object(batch_cli, "ROOT", self.tmp):
+            batch_cli.cmd_create(args)
+        from pipeline.batch import batch_dir
+        frozen = batch_dir(self.tmp, batch_id) \
+            / "setup_config.resolved.json"
+        self.assertTrue(frozen.exists())
+        return json.loads(frozen.read_text())
+
+    def test_packless_family_baseline_applies_by_default(self):
+        resolved = self._create_packless("testnopack1", {
+            "family": "demo", "er_threshold": 0.42})
+        # baseline declarations reach the frozen config…
+        self.assertIs(resolved["identity_seat_live"], True)
+        # …and the profile layer governs where it declares
+        self.assertEqual(resolved["er_threshold"], 0.42)
+
+    def test_packless_family_decisions_file_supersedes(self):
+        resolved = self._create_packless("testnopack2", {
+            "family": "demo",
+            "identity_seat_decisions": "decisions.jsonl"})
+        self.assertEqual(resolved["identity_seat_decisions"],
+                         "decisions.jsonl")
+        self.assertIs(resolved["identity_seat_live"], True)
+
     def test_pack_profile_family_mismatch_refused(self):
         (self.tmp / "profile.json").write_text(json.dumps({
             "family": "docred", "profile_hash": "testhash"}))

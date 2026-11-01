@@ -7,8 +7,18 @@ and the project adheres to
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-01
+
 ### Fixed
 
+- Batch creation for a family no pack binds (the
+  hands-on Track 1 shape) now resolves the core
+  baseline under the family's profile setup_config and
+  freezes the merged config into the batch, as
+  PACK_DESIGN §1.3 specifies. Before this, such a batch
+  froze nothing and ran on the profile file alone, so
+  baseline declarations — the identity seat's live
+  default among them — silently never reached the run.
 - Missing input files are no longer reported as "is not valid JSON" — the JSON loaders (builder, BYO-schema import, pack payload and role-words artefacts) now distinguish not found / cannot be read / not valid JSON (#49).
 
 ### Added
