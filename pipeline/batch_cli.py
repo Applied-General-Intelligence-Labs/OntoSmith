@@ -44,7 +44,7 @@ from .batch import (
     new_run_id,
     save_batch,
 )
-from .batch_run import run_batch
+from .batch_run import _er_terminal_account, run_batch
 from .neo4j_store import Neo4jEntityRegistry, Neo4jGraphStore
 from .reference_profile import JUDGE_MODEL
 from .reference_profile import SYSTEMONE_URL as SYSTEMONE_URL
@@ -540,17 +540,76 @@ def cmd_run(args) -> None:
               keep_run_id=args.reuse_run)
 
 
+def _status_metrics(b: Batch, sroot: Path) -> dict:
+    """The metrics `batch status` presents: as stored, except
+    the finish ER account, which is recomputed from the
+    decisions ledger at read time.
+
+    metrics.finish.er in batch.json is the account as it
+    stood when the run finished (written by the finish
+    summary). ER settlement is a post-finish act by design:
+    er-decide appends the settlement to the registry's
+    er_decisions ledger and nothing rewrites the stored
+    snapshot, so presenting the snapshot as current froze
+    the finish-time counts forever — status reported 11
+    unactioned after er-review showed all 11 settled
+    (0.1.4 hands-on gate). Status is a read of current
+    state, so the ER account is derived from the same
+    ledger er-review reads, with the same counting
+    (_er_terminal_account).
+
+    The stored batch.json is NOT rewritten: its finish
+    block stays the at-finish record for every other
+    reader; only this presentation is refreshed. Falls
+    back to the stored metrics when the ledger cannot
+    account — the legacy backend keeps no decision store,
+    or the registry file is absent (in which case opening
+    it would manufacture an empty ledger whose zero counts
+    would clobber a real snapshot)."""
+    backend = os.environ.get("JEV_REGISTRY", "sqlite").lower()
+    if backend != "sqlite":
+        return b.metrics
+    db_path = Path(os.environ.get(
+        "JEV_REGISTRY_DB", sroot / "data" / "registry.db"))
+    if not db_path.exists():
+        return b.metrics
+    account = None
+    registry = None
+    try:
+        registry, _label = _open_registry(sroot)
+        account = _er_terminal_account(registry, b.batch_id)
+    except Exception:
+        account = None
+    finally:
+        close = getattr(registry, "close", None)
+        if close is not None:
+            close()
+    if account is None:
+        return b.metrics
+    metrics = dict(b.metrics)
+    finish = dict(metrics.get("finish") or {})
+    finish["er"] = account
+    metrics["finish"] = finish
+    return metrics
+
+
 def cmd_status(args) -> None:
-    """Print a batch's status, stage state, and metrics."""
-    b = _load_batch_or_exit(state_root(), args.batch_id)
-    d = batch_dir(state_root(), b.batch_id)
+    """Print a batch's status, stage state, and metrics.
+
+    The metrics are the stored record, with one refresh:
+    the finish ER account is recomputed from the decisions
+    ledger (see _status_metrics), because settlements
+    postdate the finish that snapshotted it."""
+    sroot = state_root()
+    b = _load_batch_or_exit(sroot, args.batch_id)
+    d = batch_dir(sroot, b.batch_id)
     state_p = d / "state.json"
     state = json.loads(state_p.read_text()) if state_p.exists() else {}
     print(json.dumps({
         "batch_id": b.batch_id, "run_id": b.run_id,
         "status": b.status.value,
         "stages_completed": state.get("stages_completed", []),
-        "metrics": b.metrics,
+        "metrics": _status_metrics(b, sroot),
         "last_error": state.get("last_error"),
     }, indent=1))
 
