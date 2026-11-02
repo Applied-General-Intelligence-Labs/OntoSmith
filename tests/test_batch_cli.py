@@ -10,6 +10,8 @@ staging layout; the batch engine itself is unchanged shipped
 code.
 """
 import argparse
+import contextlib
+import io
 import json
 import os
 import shutil
@@ -82,6 +84,80 @@ class TestCmdCreateProfileWiring(unittest.TestCase):
         from pipeline.batch_run import _load_setup_config
         self.assertEqual(_load_setup_config(batch, self.tmp),
                          resolved)
+
+    def _create_with_generated_profile(self, batch_id,
+                                       generated_cfg):
+        """The pack path with a generated profile present in
+        the state root (profiles/<family>/setup_config.json)
+        — the shape `ontosmith profile` leaves behind for a
+        user's own corpus."""
+        prof_dir = self.tmp / "profiles" / "biored"
+        prof_dir.mkdir(parents=True)
+        (prof_dir / "setup_config.json").write_text(
+            generated_cfg if isinstance(generated_cfg, str)
+            else json.dumps(generated_cfg))
+        (self.tmp / "profile.json").write_text(json.dumps({
+            "family": "biored", "profile_hash": "testhash"}))
+        args = argparse.Namespace(
+            source="src", collection="coll",
+            docs=[str(self.tmp / "docs" / "*.txt")],
+            profile=str(self.tmp / "profile.json"),
+            batch_id=batch_id)
+        out = io.StringIO()
+        with mock.patch.object(batch_cli, "ROOT", self.tmp):
+            with contextlib.redirect_stdout(out):
+                batch_cli.cmd_create(args)
+        from pipeline.batch import batch_dir
+        frozen = batch_dir(self.tmp, batch_id) \
+            / "setup_config.resolved.json"
+        return json.loads(frozen.read_text()), out.getvalue()
+
+    def test_profile_framing_overrides_pack_framing(self):
+        novel = ("Extract factual relations from this "
+                 "excerpt of a novel: the characters, their "
+                 "family and social relations, the places, "
+                 "and what happens.")
+        resolved, out = self._create_with_generated_profile(
+            "testframing1", {
+                "family": "biored",
+                "proposer_framing": novel,
+                "er_threshold": 0.99})
+        from pipeline.profile_config import resolve_setup_config
+        expected = resolve_setup_config(
+            self.tmp, self.tmp / "packs" / "bio-medical")
+        # the profile's framing governs…
+        self.assertEqual(resolved["proposer_framing"], novel)
+        # …and ONLY the framing crosses: the profile's
+        # threshold does not overlay the pack's resolution
+        self.assertEqual(resolved["er_threshold"],
+                         expected["er_threshold"])
+        self.assertEqual(
+            {k: v for k, v in resolved.items()
+             if k != "proposer_framing"},
+            {k: v for k, v in expected.items()
+             if k != "proposer_framing"})
+        # the effective framing is printed before any spend
+        self.assertIn(f"proposer_framing: {novel}", out)
+
+    def test_profile_without_framing_keeps_pack_resolution(
+            self):
+        resolved, out = self._create_with_generated_profile(
+            "testframing2", {"family": "biored"})
+        from pipeline.profile_config import resolve_setup_config
+        expected = resolve_setup_config(
+            self.tmp, self.tmp / "packs" / "bio-medical")
+        # no framing declared, no overlay: the frozen
+        # resolution is the pack's, byte-identical — the
+        # measured path is untouched
+        self.assertEqual(resolved, expected)
+        self.assertIn(
+            "proposer_framing: Extract factual relations "
+            "from the excerpt below.", out)
+
+    def test_unreadable_generated_profile_refuses_create(self):
+        with self.assertRaises(SystemExit):
+            self._create_with_generated_profile(
+                "testframing3", "{not json")
 
     def test_explicit_pack_without_profile(self):
         args = argparse.Namespace(

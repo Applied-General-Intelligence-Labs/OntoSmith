@@ -17,6 +17,11 @@ sweep:
 3. Key-doc presence — the docs that teach binding setup
    must mention `configure`, the declaration front door
    (DS-2/DS-3's class).
+4. Packaging coverage — every file under packs/ in the
+   source tree must be covered by the pyproject data-files
+   declaration, so it ships in the wheel (the 0.1.4
+   omission class: relation_declarations.json never
+   reached wheel installs).
 
 Prose-claim consistency and stale numbers are judgment
 work; they stay with the per-feature doc-sync sweep.
@@ -140,6 +145,55 @@ def test_binding_docs_mention_configure() -> None:
         assert "ontosmith configure" in text, (
             f"{rel} teaches binding setup but never mentions "
             "`ontosmith configure`")
+
+
+def _declared_pack_files() -> set[str]:
+    """Source-relative paths the pyproject data-files
+    declaration ships for the packs tree: every pattern
+    under a share/ontosmith/packs* target, glob-expanded
+    against the source tree (the same expansion the
+    build performs)."""
+    import glob as glob_module
+    import tomllib
+
+    with open(ROOT / "pyproject.toml", "rb") as fh:
+        pyproject = tomllib.load(fh)
+    data_files = pyproject["tool"]["setuptools"]["data-files"]
+    shipped: set[str] = set()
+    for target, patterns in data_files.items():
+        if not target.startswith("share/ontosmith/packs"):
+            continue
+        for pattern in patterns:
+            shipped.update(glob_module.glob(pattern,
+                                            root_dir=ROOT))
+    return shipped
+
+
+def test_pack_data_files_cover_the_pack_tree() -> None:
+    """Packaging guard: a pack file the declaration does
+    not cover would be missing from the wheel.
+
+    The 0.1.4 wheel silently omitted
+    packs/open-domain/relation_declarations.json — the
+    packaging kept an explicit per-file list and nobody
+    extended it when the artefact landed — so every wheel
+    install's open-domain batch failed closed at WRITE.
+    The declaration is per-directory globs now; this test
+    evaluates them, so a future pack file no pattern
+    covers fails here, in the suite, instead of in a
+    user's first build."""
+    shipped = _declared_pack_files()
+    missing = []
+    for path in sorted((ROOT / "packs").rglob("*")):
+        if not path.is_file() or "__pycache__" in path.parts:
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        if rel not in shipped:
+            missing.append(rel)
+    assert not missing, (
+        "pack files the packaging declaration does not "
+        "ship (they would be missing from the wheel): "
+        + ", ".join(missing))
 
 
 # The settled store story (RR program): the pre-BO story —

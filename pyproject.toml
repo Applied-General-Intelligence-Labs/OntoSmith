@@ -7,8 +7,12 @@
 # them by path (sysconfig 'data' path + share/ontosmith/packs),
 # and the pack loader (pipeline.profile_config) takes the
 # pack directory by path, as it does in the source tree.
-# The file lists below are explicit on purpose: a pack file
-# that is not listed here does not ship.
+# The app/example lists below are explicit. The PACK lists
+# are per-directory glob patterns on purpose: a new pack
+# file ships automatically when it lands in a pack
+# directory, and tests/test_doc_guards.py evaluates these
+# patterns against the source tree — a pack file no
+# pattern covers fails the suite, never a user's build.
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -119,56 +123,38 @@ pipeline = ["bindings-template.env"]
     "examples/corpus/alder-finch-workshops.txt",
 ]
 "share/ontosmith/packs" = [
-    "packs/conformance.schema.json",
-    "packs/fetch_btt.py",
-    "packs/fetch_gutenberg.py",
-    "packs/pack.schema.json",
+    "packs/*.json",
+    "packs/*.py",
 ]
 "share/ontosmith/packs/bio-medical" = [
-    "packs/bio-medical/conformance.json",
-    "packs/bio-medical/fitted_qualifiers.json",
-    "packs/bio-medical/pack.json",
+    "packs/bio-medical/*.json",
 ]
 "share/ontosmith/packs/bio-medical/profile" = [
-    "packs/bio-medical/profile/CENSUS.md",
-    "packs/bio-medical/profile/profile.json",
-    "packs/bio-medical/profile/profile_v2.json",
-    "packs/bio-medical/profile/setup_config.json",
-    "packs/bio-medical/profile/setup_config_v3.json",
-    "packs/bio-medical/profile/setup_config_v4.json",
+    "packs/bio-medical/profile/*.json",
+    "packs/bio-medical/profile/*.md",
 ]
 "share/ontosmith/packs/core" = [
-    "packs/core/conformance.json",
-    "packs/core/pack.json",
+    "packs/core/*.json",
 ]
 "share/ontosmith/packs/core/profile" = [
-    "packs/core/profile/setup_config.json",
+    "packs/core/profile/*.json",
 ]
 "share/ontosmith/packs/open-domain" = [
-    "packs/open-domain/conformance.json",
-    "packs/open-domain/direction_declarations.json",
-    "packs/open-domain/pack.json",
-    "packs/open-domain/tn_table.json",
+    "packs/open-domain/*.json",
 ]
 "share/ontosmith/packs/open-domain/profile" = [
-    "packs/open-domain/profile/profile.json",
-    "packs/open-domain/profile/setup_config.json",
-    "packs/open-domain/profile/setup_config_v2.json",
+    "packs/open-domain/profile/*.json",
 ]
 "share/ontosmith/packs/legal-contract" = [
-    "packs/legal-contract/conformance.json",
-    "packs/legal-contract/pack.json",
-    "packs/legal-contract/role_words.json",
+    "packs/legal-contract/*.json",
 ]
 "share/ontosmith/packs/legal-contract/profile" = [
-    "packs/legal-contract/profile/profile.json",
-    "packs/legal-contract/profile/profile.md",
-    "packs/legal-contract/profile/setup_config.json",
+    "packs/legal-contract/profile/*.json",
+    "packs/legal-contract/profile/*.md",
 ]
 "share/ontosmith/packs/fibo-contracts" = [
-    "packs/fibo-contracts/conformance.json",
-    "packs/fibo-contracts/pack.json",
+    "packs/fibo-contracts/*.json",
 ]
 "share/ontosmith/packs/fibo-contracts/profile" = [
-    "packs/fibo-contracts/profile/setup_config.json",
+    "packs/fibo-contracts/profile/*.json",
 ]
