@@ -52,7 +52,7 @@ class TestQuickstartPreflight(unittest.TestCase):
     def test_registered_in_cli(self):
         from pipeline.__main__ import COMMANDS
         self.assertIn("quickstart", COMMANDS)
-        module, group, _desc, _fixed = COMMANDS["quickstart"]
+        module, _group, _desc, _fixed = COMMANDS["quickstart"]
         self.assertEqual(module, "pipeline.quickstart")
 
 
