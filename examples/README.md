@@ -1,3 +1,27 @@
+# The shipped demo build
+
+`triples.jsonl` in this directory is the graph
+`ontosmith serve` opens when no source is named: a real
+pipeline build of **Pride and Prejudice** (Jane Austen,
+Project Gutenberg 1342), all 58 chapters, built with the
+open-domain pack (0.8.0) under the reference profile —
+737 Tier-1 triples over 303 entities, every triple
+carrying its evidence quote, batch VERIFIED (all
+consistency checks passed), build cost $0.22. Two
+records quoting the edition's own 1894 illustration
+apparatus were dropped at freeze time; nothing else was
+edited. Serve it with no key and no database:
+
+```console
+$ ontosmith serve
+```
+
+and for your own document:
+
+```console
+$ ontosmith quickstart your-file.txt
+```
+
 # Worked example — profile, build, inspect
 
 A tiny end-to-end pass over a four-document corpus, in the
@@ -67,7 +91,7 @@ build used the **reference profile**
 `anthropic/claude-haiku-5.5`, Jev gate `typesafe/jev-1.13`,
 embedder `openai/text-embedding-3-large`, via OpenRouter).
 
-**Recorded output:** `triples.jsonl` in this directory is
+**Recorded output:** `alder-finch/triples.jsonl` in this directory is
 the build artefact for this corpus — seven Tier-1 triples
 in the pipeline's judged-record shape, each carrying its
 evidence quote and gate provenance — shipped so step 3
@@ -78,8 +102,8 @@ directory (`routed.jsonl`).
 ## Step 3 — Inspect a triple (offline)
 
 ```console
-$ ontosmith inspect examples/triples.jsonl
-Triple  (1 of 7 in examples/triples.jsonl)
+$ ontosmith inspect examples/alder-finch/triples.jsonl
+Triple  (1 of 7 in examples/alder-finch/triples.jsonl)
   subject   Alder & Finch
   relation  founded by
   object    Mara Alder
@@ -94,8 +118,8 @@ Provenance
 Select by content instead of position:
 
 ```console
-$ ontosmith inspect examples/triples.jsonl --subject "Priya Nair"
-Triple  (6 of 7 in examples/triples.jsonl)
+$ ontosmith inspect examples/alder-finch/triples.jsonl --subject "Priya Nair"
+Triple  (6 of 7 in examples/alder-finch/triples.jsonl)
   subject   Priya Nair
   relation  joined
   object    Alder & Finch

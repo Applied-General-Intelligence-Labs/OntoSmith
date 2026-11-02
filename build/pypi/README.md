@@ -104,8 +104,8 @@ Corpus profile
   spend           $0.0000
   written         profiles/demo (profile.json, setup_config.json, profile.md)
 
-$ ontosmith inspect examples/triples.jsonl
-Triple  (1 of 7 in examples/triples.jsonl)
+$ ontosmith inspect examples/alder-finch/triples.jsonl
+Triple  (1 of 7 in examples/alder-finch/triples.jsonl)
   subject   Alder & Finch
   relation  founded by
   object    Mara Alder

@@ -37,12 +37,32 @@ ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
 
 
+def _worked_example_dir() -> Path:
+    """The worked example as one self-contained records
+    directory: its recorded triples beside its corpus. (The
+    shipped examples/ tree now pairs the demo build's
+    records at its root with the worked example under
+    alder-finch/; the serving contracts stay pinned against
+    the worked example, so assemble its records-dir form.)"""
+    import shutil
+    import tempfile
+
+    d = Path(tempfile.mkdtemp(prefix="af-example-"))
+    shutil.copy(EXAMPLES / "alder-finch" / "triples.jsonl",
+                d / "triples.jsonl")
+    shutil.copytree(EXAMPLES / "corpus", d / "corpus")
+    return d
+
+
+WORKED = _worked_example_dir()
+
+
 def _example_store() -> search.FileServingStore:
-    return search.FileServingStore(EXAMPLES, root=ROOT)
+    return search.FileServingStore(WORKED, root=ROOT)
 
 
 class TestFileStoreExample(unittest.TestCase):
-    """The records form over the shipped example build."""
+    """The records form over the worked example build."""
 
     @classmethod
     def setUpClass(cls):
@@ -455,7 +475,7 @@ class TestStoreParity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.file = _example_store()
-        cls.double = _DoubleStore(EXAMPLES)
+        cls.double = _DoubleStore(WORKED)
 
     def test_entities_parity(self):
         self.assertEqual(self.file.entities(),
@@ -510,11 +530,11 @@ class TestCliAndSelection(unittest.TestCase):
     def test_cli_card(self):
         buf = io.StringIO()
         with redirect_stdout(buf):
-            rc = search.main(["Who founded Alder & Finch?"])
+            rc = search.main(["What is Mr. Darcy's income?"])
         self.assertEqual(rc, 0)
         out = buf.getvalue()
-        self.assertIn("founded by", out)
-        self.assertIn("alder-finch-history", out)
+        self.assertIn("ten thousand per annum", out)
+        self.assertIn("ch-14", out)
 
     def test_cli_json(self):
         buf = io.StringIO()
@@ -557,7 +577,7 @@ class TestCliAndSelection(unittest.TestCase):
     def test_open_store_defaults_to_example(self):
         store = search.open_store(env={})
         self.assertEqual(store.kind, "file")
-        self.assertEqual(store.describe()["triples"], 7)
+        self.assertEqual(store.describe()["triples"], 737)
 
     def test_example_candidates_cover_install_layouts(self):
         # the pip --target layout puts data files beside

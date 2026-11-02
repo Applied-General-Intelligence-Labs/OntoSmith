@@ -1,7 +1,737 @@
-{"subject": "Alder & Finch", "relation": "founded by", "object": "Mara Alder", "quote": "Alder & Finch is a ceramics studio founded in 2011 by Mara Alder and Tomas Finch.", "doc_id": "alder-finch-history", "tier": 1, "p_true": 0.98}
-{"subject": "Alder & Finch", "relation": "founded by", "object": "Tomas Finch", "quote": "Alder & Finch is a ceramics studio founded in 2011 by Mara Alder and Tomas Finch.", "doc_id": "alder-finch-history", "tier": 1, "p_true": 0.98}
-{"subject": "Alder & Finch", "relation": "located in", "object": "Portland, Oregon", "quote": "The studio is located in Portland, Oregon, where it operates a gas kiln and a small gallery.", "doc_id": "alder-finch-history", "tier": 1, "p_true": 0.96}
-{"subject": "Alder & Finch", "relation": "opened a second workshop in", "object": "Santa Fe, New Mexico", "quote": "In 2023 the studio opened a second workshop in Santa Fe, New Mexico.", "doc_id": "alder-finch-history", "tier": 1, "p_true": 0.93}
-{"subject": "Mara Alder", "relation": "master potter at", "object": "Alder & Finch", "quote": "Mara Alder is the master potter at Alder & Finch and leads the studio's throwing program.", "doc_id": "alder-finch-people", "tier": 1, "p_true": 0.97}
-{"subject": "Priya Nair", "relation": "joined", "object": "Alder & Finch", "quote": "Priya Nair joined Alder & Finch in 2019 as its glaze chemist.", "doc_id": "alder-finch-people", "tier": 1, "p_true": 0.95}
-{"subject": "Alder & Finch", "relation": "produces", "object": "Dune", "quote": "The studio's flagship line, Dune, is a stoneware dinnerware set glazed in matte sand tones.", "doc_id": "alder-finch-products", "tier": 1, "p_true": 0.89}
+{"subject": "Lizzy", "relation": "more_quickness_than", "object": "her sisters", "quote": "Lizzy has something more of", "doc_id": "ch-01", "tier": 1, "p_true": 0.98}
+{"subject": "Lizzy", "relation": "sibling", "object": "Jane", "quote": "she is not half so handsome as Jane", "doc_id": "ch-01", "tier": 1, "p_true": 0.96}
+{"subject": "Lizzy", "relation": "sibling", "object": "Lydia Bennet", "quote": "good-humoured as Lydia", "doc_id": "ch-01", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Bennet", "relation": "child", "object": "Lizzy", "quote": "my little Lizzy", "doc_id": "ch-01", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bennet", "relation": "experience_of", "object": "three-and-twenty years", "quote": "the experience of three-and-twenty years had", "doc_id": "ch-01", "tier": 1, "p_true": 0.75}
+{"subject": "Mr. Bingley", "relation": "agreed_with", "object": "Mr. Morris", "quote": "agreed with Mr. Morris immediately", "doc_id": "ch-01", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bingley", "relation": "annual_income_of", "object": "four or five thousand a year", "quote": "four or five thousand a year", "doc_id": "ch-01", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bingley", "relation": "came_down_on", "object": "Monday", "quote": "down on Monday in a chaise and four", "doc_id": "ch-01", "tier": 1, "p_true": 0.91}
+{"subject": "Mr. Bingley", "relation": "from", "object": "the north of England", "quote": "a young man of large fortune from the north of England", "doc_id": "ch-01", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Bingley", "relation": "marital_status", "object": "single", "quote": "Oh, single, my dear, to be sure!", "doc_id": "ch-01", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "to_take_possession_before", "object": "Michaelmas", "quote": "to take possession before Michaelmas", "doc_id": "ch-01", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Long", "relation": "says_that", "object": "Netherfield House", "quote": "Mrs. Long says that Netherfield is taken", "doc_id": "ch-01", "tier": 1, "p_true": 0.83}
+{"subject": "Netherfield House", "relation": "taken_by", "object": "Mr. Bingley", "quote": "by a young man of large fortune from the north of England", "doc_id": "ch-01", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "am_the_tallest", "object": "the tallest", "quote": "I’m the tallest", "doc_id": "ch-02", "tier": 1, "p_true": 0.88}
+{"subject": "Lydia Bennet", "relation": "is", "object": "the youngest", "quote": "though you _are_ the youngest", "doc_id": "ch-02", "tier": 1, "p_true": 0.98}
+{"subject": "Mary", "relation": "is", "object": "a young lady of deep reflection", "quote": "you are a young lady of deep reflection", "doc_id": "ch-02", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Bennet", "relation": "child", "object": "Miss Elizabeth Bennet", "quote": "his second daughter", "doc_id": "ch-02", "tier": 1, "p_true": 0.5}
+{"subject": "Mr. Bennet", "relation": "intended_to_visit", "object": "Mr. Bingley", "quote": "He had always intended to visit him", "doc_id": "ch-02", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bennet", "relation": "paid_the_visit_to", "object": "Mr. Bingley", "quote": "as I have actually paid the visit", "doc_id": "ch-02", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bennet", "relation": "spouse", "object": "Mrs. Bennet", "quote": "assuring his wife that he should not go", "doc_id": "ch-02", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Bennet", "relation": "waited_on", "object": "Mr. Bingley", "quote": "was among the earliest of those who waited on Mr. Bingley", "doc_id": "ch-02", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Bennet", "relation": "child", "object": "Kitty", "quote": "scolding one of her daughters", "doc_id": "ch-02", "tier": 1, "p_true": 0.85}
+{"subject": "Mrs. Long", "relation": "a", "object": "selfish, hypocritical woman", "quote": "She is a selfish, hypocritical woman", "doc_id": "ch-02", "tier": 1, "p_true": 0.92}
+{"subject": "Mrs. Long", "relation": "has", "object": "two nieces", "quote": "She has two nieces", "doc_id": "ch-02", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Long", "relation": "promised_to_introduce", "object": "Mr. Bingley", "quote": "Mrs. Long has promised to introduce him", "doc_id": "ch-02", "tier": 1, "p_true": 0.85}
+{"subject": "next ball", "relation": "to_be", "object": "To-morrow fortnight", "quote": "When\nis your next ball to be, Lizzy?” “To-morrow fortnight.”", "doc_id": "ch-02", "tier": 1, "p_true": 0.96}
+{"subject": "Lady Lucas", "relation": "neighbour_of", "object": "Mrs. Bennet", "quote": "their neighbour, Lady Lucas", "doc_id": "ch-03", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bingley", "relation": "arrived_in", "object": "Hertfordshire", "quote": "his arrival in Hertfordshire", "doc_id": "ch-03", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley", "relation": "brought_from", "object": "London", "quote": "he had brought only six with him from London", "doc_id": "ch-03", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Bingley", "relation": "danced_with", "object": "Jane", "quote": "Mr. Bingley had danced with her twice", "doc_id": "ch-03", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "five_sisters", "object": "five", "quote": "his five sisters and a cousin", "doc_id": "ch-03", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Bingley", "relation": "returned_visit_to", "object": "Mr. Bennet", "quote": "Mr. Bingley returned Mr. Bennet’s visit", "doc_id": "ch-03", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "wore", "object": "a blue coat", "quote": "he wore a blue coat and rode a black horse", "doc_id": "ch-03", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "danced_with", "object": "Mrs. Hurst", "quote": "danced only once with Mrs. Hurst", "doc_id": "ch-03", "tier": 1, "p_true": 0.99}
+{"subject": "Mr. Darcy", "relation": "danced_with", "object": "Miss Bingley", "quote": "once with Miss Bingley", "doc_id": "ch-03", "tier": 1, "p_true": 0.99}
+{"subject": "Mr. Darcy", "relation": "friend_of", "object": "Mr. Bingley", "quote": "his friend Mr. Darcy", "doc_id": "ch-03", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Darcy", "relation": "has", "object": "ten thousand a year", "quote": "his having ten thousand a year", "doc_id": "ch-03", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Darcy", "relation": "large_estate_in", "object": "Derbyshire", "quote": "his large estate in Derbyshire", "doc_id": "ch-03", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "five_daughters", "object": "five", "quote": "her five daughters", "doc_id": "ch-03", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Bennet", "relation": "spouse", "object": "Mr. Bennet", "quote": "said Mrs. Bennet to her husband", "doc_id": "ch-03", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Hurst", "relation": "brother-in-law_of", "object": "Mr. Bingley", "quote": "His brother-in-law, Mr. Hurst", "doc_id": "ch-03", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Bennet", "relation": "established_as", "object": "a sweet girl", "quote": "Miss Bennet was therefore established as a sweet girl", "doc_id": "ch-04", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Bingley", "relation": "sibling", "object": "Mr. Bingley", "quote": "Miss Bingley is to live with her brother", "doc_id": "ch-04", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "sibling", "object": "Jane", "quote": "expressed to her sister how very much", "doc_id": "ch-04", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley", "relation": "established_only_as_a_tenant", "object": "Netherfield House", "quote": "though he was now established only as a tenant", "doc_id": "ch-04", "tier": 1, "p_true": 0.91}
+{"subject": "Mr. Bingley", "relation": "friendship_with", "object": "Mr. Fitzwilliam Darcy", "quote": "Between him and Darcy there was a very steady friendship", "doc_id": "ch-04", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "inherited_property_from_his_father", "object": "nearly a hundred thousand pounds", "quote": "Mr. Bingley inherited property to the amount of nearly a hundred thousand pounds from his father", "doc_id": "ch-04", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bingley", "relation": "not_been_of_age_two_years_when_he_was_tempted", "object": "two years", "quote": "Mr. Bingley had not been of age two years when he was tempted", "doc_id": "ch-04", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Bingley", "relation": "took", "object": "Netherfield House", "quote": "took it immediately", "doc_id": "ch-04", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "acknowledged_to_be_pretty", "object": "Miss Bennet", "quote": "Miss Bennet he acknowledged to be pretty", "doc_id": "ch-04", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "the_superior_in_understanding", "object": "Mr. Bingley", "quote": "In understanding, Darcy was the superior.", "doc_id": "ch-04", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Hurst", "relation": "and_her_sister_allowed_it_to_be_so", "object": "Miss Bennet", "quote": "Mrs. Hurst and her sister allowed it to be so", "doc_id": "ch-04", "tier": 1, "p_true": 0.6}
+{"subject": "Mrs. Hurst", "relation": "pronounced_her_to_be", "object": "a sweet girl", "quote": "pronounced her to be a sweet girl", "doc_id": "ch-04", "tier": 1, "p_true": 0.88}
+{"subject": "Charlotte", "relation": "elizabeth’s_intimate_friend", "object": "Miss Elizabeth Bennet", "quote": "was Elizabeth’s intimate friend", "doc_id": "ch-05", "tier": 1, "p_true": 0.92}
+{"subject": "Lady Lucas", "relation": "a_valuable_neighbour_to", "object": "Mrs. Bennet", "quote": "a valuable neighbour to Mrs. Bennet", "doc_id": "ch-05", "tier": 1, "p_true": 0.97}
+{"subject": "Lucas Lodge", "relation": "about_a_mile_from", "object": "a house about a mile from Meryton", "quote": "a house about a mile from Meryton", "doc_id": "ch-05", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Bingley", "relation": "told", "object": "Jane", "quote": "Miss Bingley told me", "doc_id": "ch-05", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bingley", "relation": "danced_with", "object": "Jane", "quote": "he danced with her twice", "doc_id": "ch-05", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "sat_close_to", "object": "Mrs. Long", "quote": "he sat close to her for half an hour", "doc_id": "ch-05", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Darcy", "relation": "speaking_to", "object": "Miss Elizabeth Bennet", "quote": "I certainly saw Mr. Darcy speaking to her.", "doc_id": "ch-05", "tier": 1, "p_true": 0.63}
+{"subject": "Mrs. Long", "relation": "not_keep", "object": "a carriage", "quote": "Mrs. Long does not keep a carriage", "doc_id": "ch-05", "tier": 1, "p_true": 0.95}
+{"subject": "Mrs. Long", "relation": "told", "object": "Mrs. Bennet", "quote": "Mrs. Long told me last night that he sat close to her", "doc_id": "ch-05", "tier": 1, "p_true": 0.59}
+{"subject": "Sir William Lucas", "relation": "formerly_in_trade_in", "object": "a house about a mile from Meryton", "quote": "Sir William Lucas had been formerly in trade in Meryton", "doc_id": "ch-05", "tier": 1, "p_true": 0.99}
+{"subject": "Sir William Lucas", "relation": "presentation_at", "object": "St. James’s", "quote": "his presentation at St. James’s had made him courteous", "doc_id": "ch-05", "tier": 1, "p_true": 0.95}
+{"subject": "Sir William Lucas", "relation": "removed_to", "object": "a house about a mile from Meryton", "quote": "he had removed with his family to a house about a mile from Meryton", "doc_id": "ch-05", "tier": 1, "p_true": 0.97}
+{"subject": "Sir William Lucas", "relation": "risen_to_the_honour_of_knighthood_by_an_address_to_the_king_during_his_mayoralty", "object": "knighthood", "quote": "risen to the honour of knighthood by an address to the king during his mayoralty", "doc_id": "ch-05", "tier": 1, "p_true": 0.95}
+{"subject": "Colonel Forster", "relation": "to_give_a_ball_at", "object": "a house about a mile from Meryton", "quote": "to give us a ball at Meryton", "doc_id": "ch-06", "tier": 1, "p_true": 0.87}
+{"subject": "Miss Bingley", "relation": "sibling", "object": "Mr. Bingley", "quote": "their brother’s admiration", "doc_id": "ch-06", "tier": 1, "p_true": 0.85}
+{"subject": "Miss Elizabeth Bennet", "relation": "sibling", "object": "Mary", "quote": "her sister Mary", "doc_id": "ch-06", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Darcy", "relation": "friend_of", "object": "Mr. Bingley", "quote": "Your friend performs delightfully", "doc_id": "ch-06", "tier": 1, "p_true": 0.8}
+{"subject": "Mr. Darcy", "relation": "inspired_such_reflections_as", "object": "Miss Elizabeth Bennet", "quote": "Miss Elizabeth Bennet.", "doc_id": "ch-06", "tier": 1, "p_true": 0.67}
+{"subject": "Sir William Lucas", "relation": "neighbour_of", "object": "Mr. Darcy", "quote": "Sir William Lucas was his neighbour", "doc_id": "ch-06", "tier": 1, "p_true": 0.96}
+{"subject": "Sir William Lucas", "relation": "residence", "object": "Sir William Lucas’s", "quote": "It was at Sir William Lucas’s, where a large party were", "doc_id": "ch-06", "tier": 1, "p_true": 0.58}
+{"subject": "The ladies of Longbourn", "relation": "waited_on", "object": "Netherfield House", "quote": "The ladies of Longbourn soon waited on those of Netherfield", "doc_id": "ch-06", "tier": 1, "p_true": 0.78}
+{"subject": "Captain Carter", "relation": "going_to", "object": "London", "quote": "as he was going the next morning to London", "doc_id": "ch-07", "tier": 1, "p_true": 0.98}
+{"subject": "Catherine", "relation": "child", "object": "Mr. Bennet", "quote": "The two youngest of the family, Catherine and Lydia", "doc_id": "ch-07", "tier": 1, "p_true": 0.78}
+{"subject": "Colonel Forster", "relation": "looked_very_becoming_at", "object": "Sir William’s", "quote": "Colonel Forster looked very becoming the other night at Sir William’s", "doc_id": "ch-07", "tier": 1, "p_true": 0.92}
+{"subject": "Colonel Forster", "relation": "not_go_so_often_to", "object": "Miss Watson’s", "quote": "do not go so often to Miss Watson’s", "doc_id": "ch-07", "tier": 1, "p_true": 0.95}
+{"subject": "Longbourn", "relation": "only_one_mile_from", "object": "a house about a mile from Meryton", "quote": "The village of Longbourn was only one mile from Meryton", "doc_id": "ch-07", "tier": 1, "p_true": 0.99}
+{"subject": "Lydia Bennet", "relation": "child", "object": "Mr. Bennet", "quote": "The two youngest of the family, Catherine and Lydia", "doc_id": "ch-07", "tier": 1, "p_true": 0.77}
+{"subject": "Miss Bingley", "relation": "sibling", "object": "Mr. Bingley", "quote": "My brother and the gentlemen are to dine with the officers", "doc_id": "ch-07", "tier": 1, "p_true": 0.93}
+{"subject": "Miss Elizabeth Bennet", "relation": "sibling", "object": "Jane", "quote": "Her inquiries after her sister", "doc_id": "ch-07", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "walked", "object": "three miles", "quote": "walked three miles so early in the day", "doc_id": "ch-07", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley’s chaise", "relation": "owned_by", "object": "Mr. Bingley", "quote": "Mr. Bingley’s chaise", "doc_id": "ch-07", "tier": 1, "p_true": 0.9}
+{"subject": "Mrs. Philips", "relation": "spouse", "object": "Mrs. Philips", "quote": "a sister married to a Mr. Philips", "doc_id": "ch-07", "tier": 1, "p_true": 0.92}
+{"subject": "militia regiment", "relation": "head-quarters_in", "object": "a house about a mile from Meryton", "quote": "the head-quarters", "doc_id": "ch-07", "tier": 1, "p_true": 0.98}
+{"subject": "Derbyshire", "relation": "located_in_the_administrative_territorial_entity", "object": "England", "quote": "There is not a finer county in England than Derbyshire", "doc_id": "ch-08", "tier": 1, "p_true": 0.92}
+{"subject": "Miss Bingley", "relation": "sister", "object": "Mrs. Hurst", "quote": "her sister scarcely less so", "doc_id": "ch-08", "tier": 1, "p_true": 0.88}
+{"subject": "Miss Elizabeth Bennet", "relation": "sister", "object": "Jane Bennet", "quote": "because her sister had a cold", "doc_id": "ch-08", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Bingley", "relation": "brother_of", "object": "Miss Bingley", "quote": "Their brother, indeed, was the only one of the party", "doc_id": "ch-08", "tier": 1, "p_true": 0.91}
+{"subject": "Mr. Darcy", "relation": "sister", "object": "Miss Darcy", "quote": "would not wish to see _your sister_", "doc_id": "ch-08", "tier": 1, "p_true": 0.89}
+{"subject": "Pemberley", "relation": "owned_by", "object": "Mr. Darcy", "quote": "What a delightful library you have at Pemberley, Mr. Darcy!", "doc_id": "ch-08", "tier": 1, "p_true": 0.86}
+{"subject": "Captain Carter", "relation": "at", "object": "a house about a mile from Meryton", "quote": "Captain Carter\nwould be at Meryton again", "doc_id": "ch-09", "tier": 1, "p_true": 0.67}
+{"subject": "Charlotte Lucas", "relation": "at", "object": "Longbourn", "quote": "Charlotte Lucas had been at Longbourn since _her_ coming away", "doc_id": "ch-09", "tier": 1, "p_true": 0.97}
+{"subject": "Charlotte Lucas", "relation": "father", "object": "Sir William", "quote": "she called yesterday with her father", "doc_id": "ch-09", "tier": 1, "p_true": 0.87}
+{"subject": "Lydia Bennet", "relation": "a_girl_of", "object": "fifteen", "quote": "Lydia was a stout, well-grown girl of fifteen", "doc_id": "ch-09", "tier": 1, "p_true": 0.97}
+{"subject": "Lydia Bennet", "relation": "favourite_of", "object": "Mrs. Bennet", "quote": "a favourite with her mother", "doc_id": "ch-09", "tier": 1, "p_true": 0.97}
+{"subject": "Lydia Bennet", "relation": "the_youngest_daughter_of", "object": "Mrs. Bennet", "quote": "the youngest of\nher daughters put herself forward", "doc_id": "ch-09", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "requested_a_note_sent_to", "object": "Longbourn", "quote": "she requested to have a note sent to Longbourn", "doc_id": "ch-09", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "sister_of", "object": "Jane", "quote": "her sister’s room", "doc_id": "ch-09", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bingley", "relation": "a_short_lease", "object": "Netherfield House", "quote": "you have but a short lease", "doc_id": "ch-09", "tier": 1, "p_true": 0.87}
+{"subject": "Mr. Bingley", "relation": "promised_to_give_a_ball_at", "object": "Netherfield House", "quote": "to give a ball at Netherfield", "doc_id": "ch-09", "tier": 1, "p_true": 0.82}
+{"subject": "Mr. Bingley", "relation": "sister", "object": "Miss Bingley", "quote": "My sister, I am sure, will not hear of her removal.", "doc_id": "ch-09", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Bennet", "relation": "brother", "object": "Gardiner", "quote": "my brother Gardiner’s in town", "doc_id": "ch-09", "tier": 1, "p_true": 0.53}
+{"subject": "Mrs. Bennet", "relation": "child", "object": "Jane", "quote": "my own child", "doc_id": "ch-09", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Miss Elizabeth Bennet", "quote": "“Lizzy,” cried her mother", "doc_id": "ch-09", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Bennet", "relation": "reached", "object": "Netherfield House", "quote": "Mrs. Bennet, accompanied by her\ntwo youngest girls, reached Netherfield", "doc_id": "ch-09", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Bingley", "relation": "dear_friend", "object": "Jane", "quote": "her dear friend Jane", "doc_id": "ch-10", "tier": 1, "p_true": 0.94}
+{"subject": "Miss Bingley", "relation": "see", "object": "Miss Darcy", "quote": "I shall see her in January", "doc_id": "ch-10", "tier": 1, "p_true": 0.73}
+{"subject": "Miss Elizabeth Bennet", "relation": "joined", "object": "drawing-room", "quote": "their party in the drawing-room", "doc_id": "ch-10", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Bingley", "relation": "resolved_on_quitting", "object": "Netherfield House", "quote": "if you ever resolved on quitting Netherfield", "doc_id": "ch-10", "tier": 1, "p_true": 0.6}
+{"subject": "Mr. Darcy", "relation": "friend_of", "object": "Mr. Bingley", "quote": "said his friend", "doc_id": "ch-10", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Darcy", "relation": "sibling", "object": "Miss Darcy", "quote": "messages to his sister", "doc_id": "ch-10", "tier": 1, "p_true": 0.84}
+{"subject": "gallery", "relation": "located_in", "object": "Pemberley", "quote": "the gallery at Pemberley", "doc_id": "ch-10", "tier": 1, "p_true": 0.95}
+{"subject": "Miss Bennet", "relation": "no_longer", "object": "the first object", "quote": "Jane was no longer the first object", "doc_id": "ch-11", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Bennet", "relation": "removed_to_the_other_side_of", "object": "the fireplace", "quote": "she removed, at his desire, to the other side of the fireplace", "doc_id": "ch-11", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Bingley", "relation": "given_me_credit_for", "object": "more than can be", "quote": "has given me credit for more than can be", "doc_id": "ch-11", "tier": 1, "p_true": 0.94}
+{"subject": "Miss Bingley", "relation": "her_eyes_instantly_turned_towards", "object": "Mr. Fitzwilliam Darcy", "quote": "Miss Bingley’s eyes were instantly turned towards Darcy", "doc_id": "ch-11", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Bingley", "relation": "sibling", "object": "Charles", "quote": "By the bye Charles", "doc_id": "ch-11", "tier": 1, "p_true": 0.91}
+{"subject": "Miss Elizabeth Bennet", "relation": "dearly_love", "object": "a laugh", "quote": "I dearly love a laugh.", "doc_id": "ch-11", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "turned_away_to_hide", "object": "a smile", "quote": "Elizabeth turned away to hide a smile.", "doc_id": "ch-11", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Darcy", "relation": "not_to_be", "object": "laughed at", "quote": "“Mr. Darcy is not to be laughed at!”", "doc_id": "ch-11", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Darcy", "relation": "not_wish_for", "object": "cards", "quote": "Mr. Darcy did not wish for cards", "doc_id": "ch-11", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "began_to_feel", "object": "the danger of paying Elizabeth too much attention", "quote": "He began to feel the danger of paying Elizabeth too much attention.", "doc_id": "ch-11", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "faults", "object": "faults enough", "quote": "I have faults enough", "doc_id": "ch-11", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "perhaps_be_called", "object": "resentful", "quote": "My temper would perhaps be called resentful.", "doc_id": "ch-11", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "took_up", "object": "a book", "quote": "Darcy took up a book.", "doc_id": "ch-11", "tier": 1, "p_true": 0.99}
+{"subject": "Mrs. Hurst", "relation": "principally_occupied_in_playing_with", "object": "her bracelets and rings", "quote": "principally occupied in playing with her bracelets and rings", "doc_id": "ch-11", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Hurst", "relation": "said_he_was", "object": "very glad", "quote": "said he was “very glad;”", "doc_id": "ch-11", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Hurst", "relation": "soon_found_even_his_open_petition_rejected", "object": "Mrs. Hurst", "quote": "Mr. Hurst soon found even his open petition rejected", "doc_id": "ch-11", "tier": 1, "p_true": 0.53}
+{"subject": "the ball", "relation": "is", "object": "a settled thing", "quote": "it is quite a settled thing", "doc_id": "ch-11", "tier": 1, "p_true": 0.97}
+{"subject": "Colonel Forster", "relation": "hire", "object": "Richard", "quote": "Colonel Forster will hire him", "doc_id": "ch-12", "tier": 1, "p_true": 0.68}
+{"subject": "Hunsford", "relation": "located_in_the_administrative_territorial_entity", "object": "Kent", "quote": "Hunsford, near Westerham, Kent", "doc_id": "ch-12", "tier": 1, "p_true": 0.95}
+{"subject": "Lady Catherine de Bourgh", "relation": "child", "object": "Lady Catherine de Bourgh", "quote": "She has one only daughter, the heiress of Rosings", "doc_id": "ch-12", "tier": 1, "p_true": 0.95}
+{"subject": "Lady Catherine de Bourgh", "relation": "patronage_of", "object": "Mr. Collins", "quote": "the patronage of the Right Honourable Lady Catherine de Bourgh", "doc_id": "ch-12", "tier": 1, "p_true": 0.94}
+{"subject": "Lady Catherine de Bourgh", "relation": "preferred_me_to", "object": "the valuable rectory of this parish", "quote": "preferred me to the valuable rectory of this parish", "doc_id": "ch-12", "tier": 1, "p_true": 0.81}
+{"subject": "Lady Catherine de Bourgh", "relation": "residence", "object": "Rosings Park", "quote": "Rosings Park, her Ladyship’s residence", "doc_id": "ch-12", "tier": 1, "p_true": 0.97}
+{"subject": "Lydia Bennet", "relation": "cousin_of", "object": "Mr. Collins", "quote": "he bore his young cousin no ill-will", "doc_id": "ch-12", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Bennet", "relation": "cousin", "object": "Mr. Collins", "quote": "It is from my cousin, Mr. Collins", "doc_id": "ch-12", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Bennet", "relation": "spouse", "object": "Mrs. Bennet", "quote": "said Mr. Bennet to his wife", "doc_id": "ch-12", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "sibling", "object": "Miss Bingley", "quote": "Mr. Bingley and his sister", "doc_id": "ch-12", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Collins", "relation": "cousin", "object": "Lydia Bennet", "quote": "my young cousin", "doc_id": "ch-12", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Collins", "relation": "is", "object": "five-and-twenty", "quote": "a tall, heavy-looking young man of five-and-twenty", "doc_id": "ch-12", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "next_in_the_entail_of", "object": "Longbourn", "quote": "next in the entail of Longbourn estate", "doc_id": "ch-12", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "offered_himself_as_antagonist_at", "object": "backgammon", "quote": "he offered himself as his antagonist at backgammon", "doc_id": "ch-12", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "offered_himself_as_antagonist_to", "object": "Mr. Bennet", "quote": "he offered himself as his antagonist at backgammon", "doc_id": "ch-12", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "prepared_for", "object": "backgammon", "quote": "prepared for backgammon", "doc_id": "ch-12", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "proposes_to_wait_on", "object": "Monday, November 18th", "quote": "waiting on you and your family, Monday, November 18th", "doc_id": "ch-12", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Collins", "relation": "seated_himself_at_another_table_with", "object": "Mr. Bennet", "quote": "seated himself at another table with Mr. Bennet", "doc_id": "ch-12", "tier": 1, "p_true": 0.99}
+{"subject": "Mrs. Bennet", "relation": "apologized_for", "object": "Lydia Bennet", "quote": "Mrs. Bennet and her daughters apologized most civilly for Lydia’s interruption", "doc_id": "ch-12", "tier": 1, "p_true": 0.95}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Miss Elizabeth Bennet", "quote": "to her mother, to beg that the carriage might be sent for", "doc_id": "ch-12", "tier": 1, "p_true": 0.98}
+{"subject": "Sir Lewis de Bourgh", "relation": "spouse", "object": "Lady Catherine de Bourgh", "quote": "widow of Sir Lewis de Bourgh", "doc_id": "ch-12", "tier": 1, "p_true": 0.95}
+{"subject": "Uncle Philips", "relation": "talks_of_turning_away", "object": "Richard", "quote": "my uncle Philips talks of turning away Richard", "doc_id": "ch-12", "tier": 1, "p_true": 0.96}
+{"subject": "Jane", "relation": "introduced", "object": "Mr. Collins", "quote": "Jane’s introduction of him", "doc_id": "ch-13", "tier": 1, "p_true": 0.95}
+{"subject": "Lady Catherine de Bourgh", "relation": "patroness_of", "object": "Mr. Collins", "quote": "her as his patroness", "doc_id": "ch-13", "tier": 1, "p_true": 0.97}
+{"subject": "Lydia Bennet", "relation": "intended_to_walk_to", "object": "a house about a mile from Meryton", "quote": "Lydia’s intention of walking to Meryton", "doc_id": "ch-13", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "next_to_in_birth", "object": "Jane", "quote": "Elizabeth, equally next to Jane in birth and beauty", "doc_id": "ch-13", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bingley", "relation": "on_his_way_to", "object": "Longbourn", "quote": "on his way to Longbourn", "doc_id": "ch-13", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley", "relation": "rode_on_with_his_friend", "object": "Mr. Darcy", "quote": "took leave and rode on with his friend", "doc_id": "ch-13", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Collins", "relation": "a_house_and_garden_at", "object": "Hunsford", "quote": "his house and garden at Hunsford", "doc_id": "ch-13", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "only_to_change_from_jane_to", "object": "Miss Elizabeth Bennet", "quote": "Mr. Collins had only to change from Jane to Elizabeth", "doc_id": "ch-13", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Collins", "relation": "recommended_to", "object": "Lady Catherine de Bourgh", "quote": "recommended him to Lady Catherine de Bourgh", "doc_id": "ch-13", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "seeking_a_reconciliation_with", "object": "the Longbourn family", "quote": "seeking a reconciliation with the Longbourn family", "doc_id": "ch-13", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "to_attend_them_at_the_request_of", "object": "Mr. Bennet", "quote": "at the request of Mr. Bennet", "doc_id": "ch-13", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Denny", "relation": "brought_him_from", "object": "London", "quote": "Mr. Denny had brought him from London", "doc_id": "ch-13", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Denny", "relation": "friend_of", "object": "George Wickham", "quote": "introduce his friend, Mr. Wickham", "doc_id": "ch-13", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Denny", "relation": "returned_from", "object": "London", "quote": "whose return from London", "doc_id": "ch-13", "tier": 1, "p_true": 0.95}
+{"subject": "George Wickham", "relation": "connected_with_the_family_of", "object": "Mr. Darcy", "quote": "I have been connected with his family, in a particular manner, from my infancy.", "doc_id": "ch-14", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "friend", "object": "Denny", "quote": "my friend Denny", "doc_id": "ch-14", "tier": 1, "p_true": 0.97}
+{"subject": "Lady Catherine de Bourgh", "relation": "aunt_to", "object": "Mr. Darcy", "quote": "she is aunt to the present Mr. Darcy", "doc_id": "ch-14", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine de Bourgh", "relation": "child", "object": "Lady Catherine de Bourgh", "quote": "Her daughter, Miss de Bourgh, will have a very large fortune", "doc_id": "ch-14", "tier": 1, "p_true": 0.94}
+{"subject": "Lady Catherine de Bourgh", "relation": "sibling", "object": "Lady Anne Darcy", "quote": "Lady Catherine de Bourgh and Lady Anne Darcy were sisters", "doc_id": "ch-14", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine de Bourgh", "relation": "very_lately_given_him", "object": "a living", "quote": "has very lately given him a living", "doc_id": "ch-14", "tier": 1, "p_true": 0.93}
+{"subject": "Miss Darcy", "relation": "about", "object": "fifteen or sixteen", "quote": "She is a handsome girl, about fifteen or sixteen", "doc_id": "ch-14", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Darcy", "relation": "home_has_been", "object": "London", "quote": "her home has been London", "doc_id": "ch-14", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "a_man_of_very_large_property_in", "object": "Derbyshire", "quote": "he is a man of very large property in Derbyshire, I understand.", "doc_id": "ch-14", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "estate_has_income_of", "object": "ten thousand per annum", "quote": "A clear ten thousand per annum.", "doc_id": "ch-14", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Darcy", "relation": "father", "object": "the late Mr. Darcy", "quote": "His father, Miss Bennet, the late Mr. Darcy", "doc_id": "ch-14", "tier": 1, "p_true": 0.87}
+{"subject": "Mr. Darcy", "relation": "godfather_of", "object": "George Wickham", "quote": "He was my godfather", "doc_id": "ch-14", "tier": 1, "p_true": 0.77}
+{"subject": "Mr. Darcy", "relation": "guardian_of", "object": "Miss Darcy", "quote": "a very kind and careful guardian of his sister", "doc_id": "ch-14", "tier": 1, "p_true": 0.96}
+{"subject": "the chimney-piece", "relation": "cost", "object": "eight hundred pounds", "quote": "the chimney-piece alone had cost eight hundred pounds", "doc_id": "ch-14", "tier": 1, "p_true": 0.99}
+{"subject": "the late Mr. Darcy", "relation": "bequeathed", "object": "the next presentation of the best living in his gift", "quote": "the late Mr. Darcy bequeathed me the next presentation of the best living in his gift.", "doc_id": "ch-14", "tier": 1, "p_true": 0.97}
+{"subject": "the next presentation of the best living in his gift", "relation": "became_vacant", "object": "two years ago", "quote": "the living became vacant two years ago", "doc_id": "ch-14", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "came_to_give_personal_invitation_for", "object": "the long expected ball at Netherfield", "quote": "came to give their personal invitation for the long expected ball at Netherfield", "doc_id": "ch-15", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Bennet", "relation": "received_the_invitation_from", "object": "Mr. Bingley", "quote": "receiving the invitation from Mr. Bingley himself", "doc_id": "ch-15", "tier": 1, "p_true": 0.97}
+{"subject": "the long expected ball at Netherfield", "relation": "fixed_for", "object": "the following Tuesday", "quote": "which was fixed for the following Tuesday", "doc_id": "ch-15", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "obliged_to_go_to", "object": "town", "quote": "Wickham had been obliged to go to town on business", "doc_id": "ch-16", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "son_of", "object": "old Wickham", "quote": "the son of old Wickham", "doc_id": "ch-16", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "soon_married_to", "object": "Mr. Bingley", "quote": "Jane would be soon married to Mr. Bingley", "doc_id": "ch-16", "tier": 1, "p_true": 0.58}
+{"subject": "Lady Catherine de Bourgh", "relation": "cousin_of", "object": "Mr. Darcy", "quote": "his cousin Miss De Bourgh", "doc_id": "ch-16", "tier": 1, "p_true": 0.64}
+{"subject": "Lady Catherine de Bourgh", "relation": "nephew_of", "object": "Mr. Darcy", "quote": "a nephew of Lady Catherine de Bourgh", "doc_id": "ch-16", "tier": 1, "p_true": 0.52}
+{"subject": "Miss Elizabeth Bennet", "relation": "father", "object": "Mr. Bennet", "quote": "She looked at her father to entreat his", "doc_id": "ch-16", "tier": 1, "p_true": 0.91}
+{"subject": "Miss Elizabeth Bennet", "relation": "friend", "object": "Miss Lucas", "quote": "her friend Miss Lucas", "doc_id": "ch-16", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Bennet", "relation": "spouse", "object": "Mrs. Bennet", "quote": "his wife seriously commended Mr. Collins", "doc_id": "ch-16", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Bingley", "relation": "sibling", "object": "Miss Bingley", "quote": "She looked at his two sisters", "doc_id": "ch-16", "tier": 1, "p_true": 0.77}
+{"subject": "Mr. Collins", "relation": "cousin_of", "object": "Miss Elizabeth Bennet", "quote": "to the oddities of her cousin", "doc_id": "ch-16", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "asked_for_the_hand_of", "object": "Miss Elizabeth Bennet", "quote": "in his application for her hand", "doc_id": "ch-16", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Denny", "relation": "friend_of", "object": "George Wickham", "quote": "his friend Mr. Denny", "doc_id": "ch-16", "tier": 1, "p_true": 0.61}
+{"subject": "Mrs. Bennet", "relation": "child", "object": "Miss Elizabeth Bennet", "quote": "Elizabeth was the least dear to her of all her children", "doc_id": "ch-16", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Miss Elizabeth Bennet", "quote": "Her mother’s thoughts", "doc_id": "ch-16", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Hurst", "relation": "sibling", "object": "Miss Bingley", "quote": "Mrs. Hurst and her sister scarcely opened their mouths", "doc_id": "ch-16", "tier": 1, "p_true": 0.88}
+{"subject": "old Wickham", "relation": "position_held", "object": "steward", "quote": "the late Mr. Darcy’s steward", "doc_id": "ch-16", "tier": 1, "p_true": 0.96}
+{"subject": "Lady Catherine de Bourgh", "relation": "visit", "object": "Hunsford", "quote": "bring her to Hunsford, and I will visit her", "doc_id": "ch-17", "tier": 1, "p_true": 0.53}
+{"subject": "Miss Elizabeth Bennet", "relation": "entitled_to", "object": "one thousand pounds in the 4 per cents.", "quote": "is all that you may ever be entitled to", "doc_id": "ch-17", "tier": 1, "p_true": 0.87}
+{"subject": "Mr. Collins", "relation": "a", "object": "clergyman", "quote": "A clergyman like you must marry", "doc_id": "ch-17", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "calls_patroness", "object": "Lady Catherine de Bourgh", "quote": "the very noble lady whom I have the honour of calling patroness", "doc_id": "ch-17", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Collins", "relation": "came_into", "object": "Hertfordshire", "quote": "coming into Hertfordshire with the design of selecting a wife", "doc_id": "ch-17", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "connections_with_the_family_of", "object": "De Bourgh", "quote": "my connections with the family of De Bourgh", "doc_id": "ch-17", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "cousin_of", "object": "Miss Elizabeth Bennet", "quote": "my relationship to your own", "doc_id": "ch-17", "tier": 1, "p_true": 0.89}
+{"subject": "Mr. Collins", "relation": "friend", "object": "Lady Catherine", "quote": "your friend Lady Catherine", "doc_id": "ch-17", "tier": 1, "p_true": 0.63}
+{"subject": "Mr. Collins", "relation": "leave_of_absence_extended_to", "object": "the following Saturday", "quote": "his leave of absence extended only to the following Saturday", "doc_id": "ch-17", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "left", "object": "Hunsford", "quote": "before I left Hunsford", "doc_id": "ch-17", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "permission_from", "object": "Mrs. Bennet", "quote": "I have your respected mother’s permission for this address", "doc_id": "ch-17", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "to_inherit", "object": "Longbourn", "quote": "to inherit this estate after the death of your honoured father", "doc_id": "ch-17", "tier": 1, "p_true": 0.92}
+{"subject": "Mrs. Bennet", "relation": "mother_of", "object": "Miss Elizabeth Bennet", "quote": "your fair daughter Elizabeth", "doc_id": "ch-17", "tier": 1, "p_true": 0.98}
+{"subject": "The next day", "relation": "opened_a_new_scene_at", "object": "Longbourn", "quote": "The next day opened a new scene at Longbourn", "doc_id": "ch-17", "tier": 1, "p_true": 0.97}
+{"subject": "one thousand pounds in the 4 per cents.", "relation": "not_be_yours_till_after", "object": "your mother’s decease", "quote": "which will not be yours till after your mother’s decease", "doc_id": "ch-17", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "father", "object": "Mr. Bennet", "quote": "her father as she appeared", "doc_id": "ch-18", "tier": 1, "p_true": 0.85}
+{"subject": "Miss Elizabeth Bennet", "relation": "not_have", "object": "Mr. Collins", "quote": "she will not have him", "doc_id": "ch-18", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Elizabeth Bennet", "relation": "summoned_to", "object": "the library", "quote": "Miss Elizabeth was summoned to the", "doc_id": "ch-18", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "cousin", "object": "Miss Elizabeth Bennet", "quote": "the refusal which his cousin had steadfastly given him", "doc_id": "ch-18", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "made_an_offer_of_marriage_to", "object": "Miss Elizabeth Bennet", "quote": "Mr. Collins has made you an offer of marriage", "doc_id": "ch-18", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "made_an_offer_to", "object": "Lizzy", "quote": "Mr. Collins has made an offer to Lizzy", "doc_id": "ch-18", "tier": 1, "p_true": 0.99}
+{"subject": "Mrs. Bennet", "relation": "rang", "object": "the bell", "quote": "Mrs. Bennet rang the bell", "doc_id": "ch-18", "tier": 1, "p_true": 0.99}
+{"subject": "Mrs. Bennet", "relation": "spouse", "object": "Mr. Bennet", "quote": "her husband regarded the", "doc_id": "ch-18", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "absence_from", "object": "the long expected ball at Netherfield", "quote": "his absence from the Netherfield ball", "doc_id": "ch-19", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "walked_back_to", "object": "Longbourn", "quote": "walked back with them to Longbourn", "doc_id": "ch-19", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Bingley", "relation": "not_be_detained_in", "object": "London", "quote": "Mr. Bingley will not be detained in London by them", "doc_id": "ch-19", "tier": 1, "p_true": 0.74}
+{"subject": "Mr. Bingley", "relation": "return_to", "object": "Netherfield House", "quote": "that Bingley would return to Netherfield", "doc_id": "ch-19", "tier": 1, "p_true": 0.52}
+{"subject": "Mr. Bingley", "relation": "went_to", "object": "London", "quote": "the business which took him to London", "doc_id": "ch-19", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "to_have_gone_on", "object": "Saturday", "quote": "He was always to have gone on Saturday", "doc_id": "ch-19", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "sibling", "object": "Georgiana Darcy", "quote": "Mr. Darcy is impatient to see his sister", "doc_id": "ch-19", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Hurst", "relation": "a_house_in", "object": "Grosvenor Street", "quote": "Mr. Hurst had a house", "doc_id": "ch-19", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine", "relation": "patroness_of", "object": "Mr. Collins", "quote": "offending your patroness", "doc_id": "ch-20", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Lucas", "relation": "accepted", "object": "Mr. Collins", "quote": "who accepted him solely", "doc_id": "ch-20", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Lucas", "relation": "age", "object": "twenty-seven", "quote": "at the age of twenty-seven", "doc_id": "ch-20", "tier": 1, "p_true": 0.92}
+{"subject": "Miss Lucas", "relation": "valued_the_friendship_of", "object": "Miss Elizabeth Bennet", "quote": "whose friendship she valued beyond that of any other person", "doc_id": "ch-20", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "cousin_of", "object": "Miss Elizabeth Bennet", "quote": "my cousin Elizabeth", "doc_id": "ch-20", "tier": 1, "p_true": 0.91}
+{"subject": "Mr. Collins", "relation": "escape_out_of", "object": "Longbourn House", "quote": "escape out of Longbourn House", "doc_id": "ch-20", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "hasten_to", "object": "Lucas Lodge", "quote": "hasten to Lucas Lodge", "doc_id": "ch-20", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "in_possession_of", "object": "Longbourn estate", "quote": "Mr. Collins should be in possession of the Longbourn estate", "doc_id": "ch-20", "tier": 1, "p_true": 0.7}
+{"subject": "Mr. Collins", "relation": "made_two_offers_of_marriage", "object": "within three days", "quote": "making two offers of marriage within three days", "doc_id": "ch-20", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Collins", "relation": "spouse", "object": "Miss Lucas", "quote": "Charlotte, the wife of Mr. Collins", "doc_id": "ch-20", "tier": 1, "p_true": 0.85}
+{"subject": "Mr. Collins", "relation": "to_leave", "object": "Hertfordshire", "quote": "to leave Hertfordshire", "doc_id": "ch-20", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Bennet", "relation": "child", "object": "Mary", "quote": "one of her younger girls", "doc_id": "ch-20", "tier": 1, "p_true": 0.91}
+{"subject": "Charlotte Lucas", "relation": "ever_be_mistress_of", "object": "Longbourn", "quote": "should ever be mistress of this house", "doc_id": "ch-21", "tier": 1, "p_true": 0.82}
+{"subject": "Hunsford", "relation": "distance_from", "object": "London", "quote": "the convenient distance of Hunsford from London", "doc_id": "ch-21", "tier": 1, "p_true": 0.96}
+{"subject": "Letter of thanks from Mr. Collins", "relation": "addressed_to", "object": "Mr. Bennet", "quote": "addressed to their father", "doc_id": "ch-21", "tier": 1, "p_true": 0.74}
+{"subject": "Mr. Bennet", "relation": "spouse", "object": "Mrs. Bennet", "quote": "as foolish as his wife", "doc_id": "ch-21", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Bingley", "relation": "now_been_gone", "object": "a week", "quote": "Bingley had now been gone a week", "doc_id": "ch-21", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "obtained_the_affection_of", "object": "Charlotte Lucas", "quote": "having obtained the affection of their amiable neighbour, Miss Lucas", "doc_id": "ch-21", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "position_held", "object": "clergyman", "quote": "Mr. Collins was only a clergyman", "doc_id": "ch-21", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "returned_to_longbourn_on", "object": "Monday fortnight", "quote": "Mr. Collins returned most punctually on the Monday fortnight", "doc_id": "ch-21", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Collins", "relation": "stayed_in_the_family_for", "object": "a twelve-month", "quote": "a twelve-month’s abode in the family", "doc_id": "ch-21", "tier": 1, "p_true": 0.79}
+{"subject": "Sir William Lucas", "relation": "child", "object": "Charlotte Lucas", "quote": "sent by his daughter to announce her engagement", "doc_id": "ch-21", "tier": 1, "p_true": 0.89}
+{"subject": "Charlotte Lucas", "relation": "marries", "object": "Mr. Collins", "quote": "the woman who marries him", "doc_id": "ch-22", "tier": 1, "p_true": 0.57}
+{"subject": "George Wickham", "relation": "is", "object": "a pleasant fellow", "quote": "He is a pleasant fellow", "doc_id": "ch-22", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Bingley", "relation": "concluded_with_regret_about", "object": "Mr. Bingley", "quote": "concluded with her brother’s regret", "doc_id": "ch-22", "tier": 1, "p_true": 0.64}
+{"subject": "Miss Bingley", "relation": "settled_in", "object": "London", "quote": "all settled in London for the winter", "doc_id": "ch-22", "tier": 1, "p_true": 0.92}
+{"subject": "Miss Bingley", "relation": "sibling", "object": "Mr. Bingley", "quote": "her brother’s regret at not having had time", "doc_id": "ch-22", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Bingley", "relation": "an_inmate_of", "object": "Mr. Darcy’s house", "quote": "her brother’s being an inmate of Mr. Darcy’s house", "doc_id": "ch-22", "tier": 1, "p_true": 0.86}
+{"subject": "Mr. Bingley", "relation": "down_again_in", "object": "the summer", "quote": "Mr. Bingley must be down again in the summer", "doc_id": "ch-22", "tier": 1, "p_true": 0.86}
+{"subject": "Mr. Collins", "relation": "is", "object": "conceited, pompous, narrow-minded, silly man", "quote": "Mr. Collins is a conceited, pompous, narrow-minded, silly man", "doc_id": "ch-22", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "is", "object": "our cousin", "quote": "our cousin", "doc_id": "ch-22", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "condemned_as", "object": "the worst of men", "quote": "Mr. Darcy was condemned as the worst of men", "doc_id": "ch-22", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Jane", "quote": "my dear mother had more command over herself", "doc_id": "ch-22", "tier": 1, "p_true": 0.96}
+{"subject": "Darcy’s father", "relation": "father", "object": "Mr. Fitzwilliam Darcy", "quote": "the death of Darcy’s father", "doc_id": "ch-23", "tier": 1, "p_true": 0.77}
+{"subject": "George Wickham", "relation": "belonged_to", "object": "Derbyshire", "quote": "that very part of Derbyshire to which he belonged", "doc_id": "ch-23", "tier": 1, "p_true": 0.96}
+{"subject": "George Wickham", "relation": "one_of", "object": "the officers", "quote": "of which officers Mr. Wickham was sure to be one", "doc_id": "ch-23", "tier": 1, "p_true": 0.92}
+{"subject": "Longbourn estate", "relation": "entailed", "object": "Longbourn estate", "quote": "Longbourn estate is just as much entailed as ever", "doc_id": "ch-23", "tier": 1, "p_true": 0.6}
+{"subject": "Mr. Bingley", "relation": "in_the_custody_of", "object": "Mr. Darcy", "quote": "he is now in the custody of his friend", "doc_id": "ch-23", "tier": 1, "p_true": 0.89}
+{"subject": "Mrs. Bennet", "relation": "sibling", "object": "Mrs. Gardiner", "quote": "her brother and his wife", "doc_id": "ch-23", "tier": 1, "p_true": 0.89}
+{"subject": "Mrs. Gardiner", "relation": "knew_by_character", "object": "the late Mr. Darcy", "quote": "known the late Mr. Darcy by character perfectly well", "doc_id": "ch-23", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "seen", "object": "Pemberley", "quote": "Mrs. Gardiner had seen Pemberley", "doc_id": "ch-23", "tier": 1, "p_true": 0.99}
+{"subject": "Mrs. Gardiner", "relation": "sibling", "object": "Mrs. Bennet", "quote": "made her sister a slight answer", "doc_id": "ch-23", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Gardiner", "relation": "spent_a_considerable_time_in", "object": "Derbyshire", "quote": "she had spent a considerable time in that very part of Derbyshire", "doc_id": "ch-23", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "spouse", "object": "Mrs. Gardiner", "quote": "her brother and his wife", "doc_id": "ch-23", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "younger_than", "object": "Mrs. Bennet", "quote": "who was several years younger than Mrs. Bennet and Mrs. Philips", "doc_id": "ch-23", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "younger_than", "object": "Mrs. Philips", "quote": "who was several years younger than Mrs. Bennet and Mrs. Philips", "doc_id": "ch-23", "tier": 1, "p_true": 0.96}
+{"subject": "Bride and bridegroom", "relation": "set_off_for", "object": "Kent", "quote": "the bride and bridegroom set off for Kent from the church door", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "Charlotte", "relation": "not_likely_to_leave", "object": "Kent", "quote": "I am not likely to leave Kent for some time", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "a_week_in", "object": "town", "quote": "Jane had been a week in town, without either seeing or hearing from Caroline", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "announce_their_safe_arrival_in", "object": "London", "quote": "to announce their safe arrival in London", "doc_id": "ch-24", "tier": 1, "p_true": 0.95}
+{"subject": "Jane", "relation": "calling_in", "object": "Grosvenor Street", "quote": "I shall take the opportunity of calling in Grosvenor Street", "doc_id": "ch-24", "tier": 1, "p_true": 0.95}
+{"subject": "Maria", "relation": "to_come_to_me_in", "object": "March", "quote": "My father and Maria are to come to me in March", "doc_id": "ch-24", "tier": 1, "p_true": 0.91}
+{"subject": "Miss Elizabeth Bennet", "relation": "to_come_to", "object": "Hunsford", "quote": "Promise me, therefore, to come to Hunsford.", "doc_id": "ch-24", "tier": 1, "p_true": 0.9}
+{"subject": "Miss Lucas", "relation": "paid_her_farewell_visit_on", "object": "Wednesday", "quote": "on Wednesday Miss Lucas paid her farewell visit", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "engaged_with", "object": "Mr. Darcy", "quote": "so much engaged with Mr. Darcy that they scarcely ever saw him", "doc_id": "ch-24", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Collins", "relation": "returned_into", "object": "Hertfordshire", "quote": "Mr. Collins returned into Hertfordshire soon after it had been quitted", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "took_up_his_abode_with", "object": "Lucases", "quote": "as he took up his abode with the Lucases", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "gave_caution_to", "object": "Miss Elizabeth Bennet", "quote": "Mrs. Gardiner’s caution to Elizabeth was punctually and kindly given", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "reminded", "object": "Miss Elizabeth Bennet", "quote": "Mrs. Gardiner about this time reminded Elizabeth of her promise", "doc_id": "ch-24", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "lived_in", "object": "Derbyshire", "quote": "has lived so long in Derbyshire", "doc_id": "ch-25", "tier": 1, "p_true": 0.69}
+{"subject": "Jane", "relation": "given_up", "object": "Miss Bingley", "quote": "the former had, from her heart, given up the acquaintance", "doc_id": "ch-25", "tier": 1, "p_true": 0.96}
+{"subject": "Jane", "relation": "sibling", "object": "Miss Elizabeth Bennet", "quote": "Their first subject was her sister", "doc_id": "ch-25", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Bingley", "relation": "visited", "object": "Gracechurch Street", "quote": "Miss Bingley’s visit in Gracechurch Street", "doc_id": "ch-25", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "in", "object": "Gracechurch Street", "quote": "began it so early as to be in Gracechurch Street by noon", "doc_id": "ch-25", "tier": 1, "p_true": 0.92}
+{"subject": "Miss Elizabeth Bennet", "relation": "to_accompany", "object": "Sir William", "quote": "She was to accompany Sir William and his second daughter", "doc_id": "ch-25", "tier": 1, "p_true": 0.79}
+{"subject": "Miss King", "relation": "has", "object": "ten thousand pounds", "quote": "a girl with only ten thousand pounds", "doc_id": "ch-25", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Gardiner", "relation": "proposed_taking_a_tour_to", "object": "Lakes", "quote": "perhaps, to the Lakes", "doc_id": "ch-25", "tier": 1, "p_true": 0.9}
+{"subject": "Mrs. Gardiner", "relation": "residence", "object": "Gracechurch Street", "quote": "As they drove to Mr. Gardiner’s door", "doc_id": "ch-25", "tier": 1, "p_true": 0.89}
+{"subject": "Sir William Lucas", "relation": "child", "object": "Maria", "quote": "his daughter Maria", "doc_id": "ch-25", "tier": 1, "p_true": 0.96}
+{"subject": "journey", "relation": "was", "object": "twenty-four miles", "quote": "It was a journey of only twenty-four miles", "doc_id": "ch-25", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine", "relation": "is", "object": "a very respectable, sensible woman", "quote": "Lady Catherine is a very respectable, sensible woman, indeed", "doc_id": "ch-26", "tier": 1, "p_true": 0.97}
+{"subject": "Lady Catherine", "relation": "located_in", "object": "the country", "quote": "Lady Catherine was still in the country", "doc_id": "ch-26", "tier": 1, "p_true": 0.96}
+{"subject": "Lady Catherine de Bourgh", "relation": "is", "object": "quite a little creature", "quote": "She is quite a little creature.", "doc_id": "ch-26", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "cousin_of", "object": "Miss Elizabeth Bennet", "quote": "her cousin’s manners were not altered by his marriage", "doc_id": "ch-26", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "dine_at", "object": "Rosings", "quote": "We dine at Rosings twice every week", "doc_id": "ch-26", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Collins", "relation": "sibling", "object": "Maria", "quote": "my sister Maria", "doc_id": "ch-26", "tier": 1, "p_true": 0.73}
+{"subject": "Mr. Collins", "relation": "spouse", "object": "Charlotte", "quote": "her cousin’s manners were not altered by his marriage", "doc_id": "ch-26", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Jenkinson", "relation": "not", "object": "Lady Catherine", "quote": "it is not Lady Catherine", "doc_id": "ch-26", "tier": 1, "p_true": 0.96}
+{"subject": "Rosings", "relation": "located_on_terrain_feature", "object": "rising ground", "quote": "well situated on rising ground", "doc_id": "ch-26", "tier": 1, "p_true": 0.97}
+{"subject": "Sir William", "relation": "accompanied", "object": "Mr. Collins", "quote": "while Sir William accompanied him", "doc_id": "ch-26", "tier": 1, "p_true": 0.97}
+{"subject": "Lady Catherine", "relation": "child", "object": "Lady Catherine de Bourgh", "quote": "Lady Catherine and her daughter", "doc_id": "ch-27", "tier": 1, "p_true": 0.92}
+{"subject": "Lady Catherine", "relation": "patroness_of", "object": "Mr. Collins", "quote": "the grandeur of his patroness", "doc_id": "ch-27", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "cousin_of", "object": "Mr. Collins", "quote": "my dear cousin", "doc_id": "ch-27", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "not", "object": "one-and-twenty", "quote": "I am not one-and-twenty.", "doc_id": "ch-27", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Collins", "relation": "spouse", "object": "Mr. Collins", "quote": "Mrs. Collins had settled it with her husband", "doc_id": "ch-27", "tier": 1, "p_true": 0.97}
+{"subject": "Sir William", "relation": "son-in-law", "object": "Mr. Collins", "quote": "whatever his son-in-law said", "doc_id": "ch-27", "tier": 1, "p_true": 0.64}
+{"subject": "Charlotte", "relation": "spouse", "object": "Mr. Collins", "quote": "from her husband’s room", "doc_id": "ch-28", "tier": 1, "p_true": 0.94}
+{"subject": "Colonel Fitzwilliam", "relation": "about", "object": "thirty", "quote": "Colonel Fitzwilliam,\nwho led the way, was about thirty", "doc_id": "ch-28", "tier": 1, "p_true": 0.98}
+{"subject": "Colonel Fitzwilliam", "relation": "nephew_of", "object": "Lady Catherine", "quote": "There were two nephews of Lady Catherine to require them", "doc_id": "ch-28", "tier": 1, "p_true": 0.81}
+{"subject": "Colonel Fitzwilliam", "relation": "the_younger_son_of", "object": "Lord ----", "quote": "the younger son of his uncle, Lord ----", "doc_id": "ch-28", "tier": 1, "p_true": 0.96}
+{"subject": "Lady Catherine", "relation": "a_most_active_magistrate_in", "object": "her own parish", "quote": "she was a most active magistrate\nin her own parish", "doc_id": "ch-28", "tier": 1, "p_true": 0.97}
+{"subject": "Lady Catherine", "relation": "not_in", "object": "the commission of the peace for the county", "quote": "though this great lady was not in the commission of the peace for the county", "doc_id": "ch-28", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine de Bourgh", "relation": "drove_by_in", "object": "her phaeton", "quote": "Miss De Bourgh drove by in her phaeton", "doc_id": "ch-28", "tier": 1, "p_true": 0.97}
+{"subject": "Lady Catherine de Bourgh", "relation": "stopped_at", "object": "the Parsonage", "quote": "She not unfrequently stopped at the Parsonage", "doc_id": "ch-28", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Bingley", "relation": "designs_on", "object": "Mr. Darcy", "quote": "how hopeless Miss Bingley’s designs on him were", "doc_id": "ch-28", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "carried_concerns_to", "object": "Lady Catherine", "quote": "the minutest concerns of which were carried to her by\nMr. Collins", "doc_id": "ch-28", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "walked_to", "object": "Rosings", "quote": "Very few days passed in which Mr. Collins did not walk to Rosings", "doc_id": "ch-28", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "already_been_frequently_seen_by", "object": "Miss Lucas", "quote": "he had already been frequently seen by\nMiss Lucas and herself", "doc_id": "ch-28", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Darcy", "relation": "already_been_frequently_seen_by", "object": "Miss Elizabeth Bennet", "quote": "he had already been frequently seen by\nMiss Lucas and herself", "doc_id": "ch-28", "tier": 1, "p_true": 0.8}
+{"subject": "Mr. Darcy", "relation": "brought_with_him", "object": "Colonel Fitzwilliam", "quote": "Mr. Darcy had brought\nwith him a Colonel Fitzwilliam", "doc_id": "ch-28", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "expected_in", "object": "Rosings", "quote": "Mr. Darcy was expected there in the course of a few weeks", "doc_id": "ch-28", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Collins", "relation": "joints_of_meat_were_too_large_for", "object": "her family", "quote": "Mrs. Collins’s joints of meat were too large for her family", "doc_id": "ch-28", "tier": 1, "p_true": 0.85}
+{"subject": "Sir William", "relation": "stayed_only_a_week_at", "object": "Hunsford", "quote": "Sir William stayed only a week at Hunsford", "doc_id": "ch-28", "tier": 1, "p_true": 0.99}
+{"subject": "Colonel Fitzwilliam", "relation": "called_at", "object": "the Parsonage", "quote": "Colonel Fitzwilliam had called at the Parsonage more than once", "doc_id": "ch-29", "tier": 1, "p_true": 0.98}
+{"subject": "Colonel Fitzwilliam", "relation": "cousin_of", "object": "Mr. Darcy", "quote": "Your cousin will give you a very pretty notion of me", "doc_id": "ch-29", "tier": 1, "p_true": 0.94}
+{"subject": "Colonel Fitzwilliam", "relation": "nephew_of", "object": "Lady Catherine", "quote": "she was, in fact, almost engrossed by her nephews", "doc_id": "ch-29", "tier": 1, "p_true": 0.93}
+{"subject": "Colonel Fitzwilliam", "relation": "talked_of", "object": "Kent", "quote": "talked so agreeably of Kent and Hertfordshire", "doc_id": "ch-29", "tier": 1, "p_true": 0.98}
+{"subject": "Colonel Fitzwilliam", "relation": "talked_of", "object": "Hertfordshire", "quote": "talked so agreeably of Kent and Hertfordshire", "doc_id": "ch-29", "tier": 1, "p_true": 0.97}
+{"subject": "Easter-day", "relation": "almost_a_week_after", "object": "the gentlemen’s arrival", "quote": "almost a week after the gentlemen’s arrival", "doc_id": "ch-29", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine", "relation": "a_carriage", "object": "her Ladyship’s carriage", "quote": "till her Ladyship’s carriage was ready to take them all home", "doc_id": "ch-29", "tier": 1, "p_true": 0.94}
+{"subject": "Miss Elizabeth Bennet", "relation": "first_saw_mr._darcy_in", "object": "Hertfordshire", "quote": "The first time of my ever seeing him in Hertfordshire", "doc_id": "ch-29", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Darcy", "relation": "at", "object": "a ball", "quote": "was at a ball", "doc_id": "ch-29", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "aunt’s_nephew,_aunt_being", "object": "Lady Catherine", "quote": "Mr. Darcy looked a little ashamed of his aunt’s ill-breeding", "doc_id": "ch-29", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Darcy", "relation": "danced_only", "object": "four dances", "quote": "He danced only four dances!", "doc_id": "ch-29", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Darcy", "relation": "knew_elizabeth_in", "object": "Hertfordshire", "quote": "to mention all that you knew to my disadvantage in Hertfordshire", "doc_id": "ch-29", "tier": 1, "p_true": 0.91}
+{"subject": "Mr. Darcy", "relation": "nephew_of", "object": "Lady Catherine", "quote": "she was, in fact, almost engrossed by her nephews", "doc_id": "ch-29", "tier": 1, "p_true": 0.67}
+{"subject": "Mr. Darcy", "relation": "only_seen_at", "object": "church", "quote": "Mr. Darcy they had only seen at church", "doc_id": "ch-29", "tier": 1, "p_true": 0.85}
+{"subject": "Mr. Darcy", "relation": "sibling", "object": "Georgiana", "quote": "your sister _does_ play so well", "doc_id": "ch-29", "tier": 1, "p_true": 0.89}
+{"subject": "Mr. Darcy", "relation": "the_pleasure_of_acquaintance_with", "object": "Miss Elizabeth Bennet", "quote": "I have had the pleasure of your acquaintance long enough", "doc_id": "ch-29", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Collins", "relation": "no", "object": "instrument", "quote": "though Mrs. Collins has no instrument", "doc_id": "ch-29", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Collins’s pretty friend", "relation": "friend_of", "object": "Mrs. Collins", "quote": "Mrs. Collins’s pretty friend had", "doc_id": "ch-29", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "former_favourite", "object": "George Wickham", "quote": "her former favourite, George Wickham", "doc_id": "ch-30", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Elizabeth Bennet", "relation": "writing_to", "object": "Jane", "quote": "writing to Jane", "doc_id": "ch-30", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "first_came_to", "object": "Hunsford", "quote": "Collins first came to Hunsford", "doc_id": "ch-30", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "spouse", "object": "Mrs. Collins", "quote": "Mr. and Mrs. Collins have a comfortable income", "doc_id": "ch-30", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Darcy", "relation": "came_so_often_to", "object": "the Parsonage", "quote": "why Mr. Darcy came so often to the Parsonage", "doc_id": "ch-30", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "considerable_patronage_in", "object": "the church", "quote": "Mr. Darcy had considerable patronage", "doc_id": "ch-30", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "quitted", "object": "Netherfield House", "quote": "How very suddenly you all quitted Netherfield last November", "doc_id": "ch-30", "tier": 1, "p_true": 0.83}
+{"subject": "Mrs. Collins", "relation": "friend", "object": "Eliza", "quote": "her friend Eliza", "doc_id": "ch-30", "tier": 1, "p_true": 0.91}
+{"subject": "Mrs. Collins", "relation": "gone_on_business_into", "object": "the village", "quote": "were gone on business into the village", "doc_id": "ch-30", "tier": 1, "p_true": 0.91}
+{"subject": "Mrs. Collins", "relation": "planned_her_marrying", "object": "Colonel Fitzwilliam", "quote": "she sometimes planned her marrying", "doc_id": "ch-30", "tier": 1, "p_true": 0.88}
+{"subject": "Colonel Fitzwilliam", "relation": "joined_with_mr._darcy_in_the_guardianship_of", "object": "Miss Darcy", "quote": "I am joined with him in the guardianship of Miss Darcy", "doc_id": "ch-31", "tier": 1, "p_true": 0.93}
+{"subject": "Colonel Fitzwilliam", "relation": "leaves", "object": "Kent", "quote": "Do you certainly leave Kent on Saturday?", "doc_id": "ch-31", "tier": 1, "p_true": 0.92}
+{"subject": "Colonel Fitzwilliam", "relation": "younger_son_of", "object": "an earl", "quote": "A younger son, you know, must be inured to self-denial and dependence", "doc_id": "ch-31", "tier": 1, "p_true": 0.95}
+{"subject": "Miss Darcy", "relation": "a_very_great_favourite_with", "object": "Mrs. Hurst", "quote": "She is a very great favourite with some ladies of my acquaintance, Mrs. Hurst and Miss Bingley", "doc_id": "ch-31", "tier": 1, "p_true": 0.88}
+{"subject": "Miss Darcy", "relation": "a_very_great_favourite_with", "object": "Miss Bingley", "quote": "She is a very great favourite with some ladies of my acquaintance, Mrs. Hurst and Miss Bingley", "doc_id": "ch-31", "tier": 1, "p_true": 0.83}
+{"subject": "Mr. Bingley", "relation": "a_great_friend_of", "object": "Mr. Darcy", "quote": "he is a great friend of Darcy’s", "doc_id": "ch-31", "tier": 1, "p_true": 0.86}
+{"subject": "Mr. Bingley", "relation": "separated_from", "object": "Jane", "quote": "the measures taken to separate Mr. Bingley and Jane", "doc_id": "ch-31", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "very_much_indebted_to", "object": "Mr. Darcy", "quote": "I have reason to think Bingley very much indebted to him", "doc_id": "ch-31", "tier": 1, "p_true": 0.75}
+{"subject": "Mr. Collins", "relation": "spouse", "object": "Mrs. Collins", "quote": "Mr. and Mrs. Collins’s happiness", "doc_id": "ch-31", "tier": 1, "p_true": 0.83}
+{"subject": "Mr. Darcy", "relation": "cousin_of", "object": "Colonel Fitzwilliam", "quote": "my cousin’s triumph", "doc_id": "ch-31", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Darcy", "relation": "sister", "object": "Miss Darcy", "quote": "his sister does as well for the present", "doc_id": "ch-31", "tier": 1, "p_true": 0.68}
+{"subject": "Mr. Darcy", "relation": "uncommonly_kind_to", "object": "Mr. Bingley", "quote": "Mr. Darcy is uncommonly kind to Mr. Bingley", "doc_id": "ch-31", "tier": 1, "p_true": 0.84}
+{"subject": "Colonel Fitzwilliam", "relation": "cousin_of", "object": "Mr. Darcy", "quote": "his cousin was to go with him", "doc_id": "ch-32", "tier": 1, "p_true": 0.97}
+{"subject": "Jane", "relation": "written_to", "object": "Miss Elizabeth Bennet", "quote": "all the letters which Jane had written to her", "doc_id": "ch-32", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "herself_be_with", "object": "Jane", "quote": "she should herself be with Jane again", "doc_id": "ch-32", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Elizabeth Bennet", "relation": "not_known", "object": "Mr. Darcy", "quote": "I had not known you a month before I felt that you were the last man in the world", "doc_id": "ch-32", "tier": 1, "p_true": 0.9}
+{"subject": "Miss Elizabeth Bennet", "relation": "received_the_recital_from", "object": "George Wickham", "quote": "the recital which I received many months ago from Mr. Wickham", "doc_id": "ch-32", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "since_her_being_in", "object": "Kent", "quote": "since her being in Kent", "doc_id": "ch-32", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Darcy", "relation": "admire_and_love", "object": "Miss Elizabeth Bennet", "quote": "how ardently I admire and love you", "doc_id": "ch-32", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Darcy", "relation": "cruelty_towards", "object": "George Wickham", "quote": "his cruelty towards whom he had not attempted to deny", "doc_id": "ch-32", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Darcy", "relation": "everything_in_my_power_to_separate", "object": "Jane", "quote": "I did everything in my power to separate my friend from your sister", "doc_id": "ch-32", "tier": 1, "p_true": 0.74}
+{"subject": "Mr. Darcy", "relation": "in_love_with", "object": "Miss Elizabeth Bennet", "quote": "he should have been in love with her for so many months", "doc_id": "ch-32", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "reduced", "object": "George Wickham", "quote": "You have reduced him to his present state of poverty", "doc_id": "ch-32", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Darcy", "relation": "visit_to_rosings_was_to_end", "object": "Rosings", "quote": "his visit to Rosings was to end on the day after the next", "doc_id": "ch-32", "tier": 1, "p_true": 0.97}
+{"subject": "Colonel Fitzwilliam", "relation": "cousin_of", "object": "Mr. Fitzwilliam Darcy", "quote": "in my cousin", "doc_id": "ch-33", "tier": 1, "p_true": 0.87}
+{"subject": "Colonel Fitzwilliam", "relation": "executor_of", "object": "father’s will", "quote": "one of the executors of my father’s will", "doc_id": "ch-33", "tier": 1, "p_true": 0.95}
+{"subject": "George Wickham", "relation": "a_legacy_of", "object": "one thousand pounds", "quote": "There was also a legacy of one thousand pounds", "doc_id": "ch-33", "tier": 1, "p_true": 0.91}
+{"subject": "George Wickham", "relation": "a_prior_acquaintance_with", "object": "Mrs. Younge", "quote": "a prior acquaintance between him and Mrs. Younge", "doc_id": "ch-33", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "accepted_in_return", "object": "three thousand pounds", "quote": "accepted in return three thousand pounds", "doc_id": "ch-33", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "was", "object": "son of a very respectable man", "quote": "Mr. Wickham is the son of a very respectable man", "doc_id": "ch-33", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "went_to", "object": "Ramsgate", "quote": "thither also went Mr. Wickham", "doc_id": "ch-33", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley", "relation": "left", "object": "Netherfield House", "quote": "He left Netherfield for London on the day following", "doc_id": "ch-33", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Bingley", "relation": "left_for", "object": "London", "quote": "He left Netherfield for London on the day following", "doc_id": "ch-33", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Bingley", "relation": "partiality_for", "object": "Miss Bennet", "quote": "his partiality for Miss Bennet was beyond what I had ever witnessed", "doc_id": "ch-33", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "signed", "object": "This letter", "quote": "FITZWILLIAM DARCY", "doc_id": "ch-33", "tier": 1, "p_true": 0.89}
+{"subject": "This letter", "relation": "dated_from", "object": "Rosings", "quote": "from Rosings, at eight o’clock in the morning", "doc_id": "ch-33", "tier": 1, "p_true": 0.98}
+{"subject": "Colonel Fitzwilliam", "relation": "cousin_of", "object": "Mr. Darcy", "quote": "his near concern in all his cousin’s affairs", "doc_id": "ch-34", "tier": 1, "p_true": 0.95}
+{"subject": "Colonel Fitzwilliam", "relation": "sitting_with", "object": "them", "quote": "Colonel Fitzwilliam had been sitting with them at least an hour", "doc_id": "ch-34", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "attentions_to", "object": "Miss King", "quote": "His attentions to Miss King were now the consequence of views solely and hatefully mercenary", "doc_id": "ch-34", "tier": 1, "p_true": 0.94}
+{"subject": "George Wickham", "relation": "avoided", "object": "the long expected ball at Netherfield", "quote": "he had avoided the Netherfield ball", "doc_id": "ch-34", "tier": 1, "p_true": 0.94}
+{"subject": "George Wickham", "relation": "boasted_of_having_no_fear_of_seeing", "object": "Mr. Darcy", "quote": "he had boasted of having no fear of seeing Mr. Darcy", "doc_id": "ch-34", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "engaged_in", "object": "----shire militia", "quote": "his entrance into the ----shire militia, in which he had engaged", "doc_id": "ch-34", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "met_elizabeth_at", "object": "Mr. Philips’s", "quote": "in their first evening at Mr. Philips’s", "doc_id": "ch-34", "tier": 1, "p_true": 0.88}
+{"subject": "George Wickham", "relation": "received_in_lieu", "object": "three thousand pounds", "quote": "receiving in lieu so considerable a sum as three thousand pounds", "doc_id": "ch-34", "tier": 1, "p_true": 0.97}
+{"subject": "Jane", "relation": "sister_of", "object": "Miss Elizabeth Bennet", "quote": "the generous candour of my sister", "doc_id": "ch-34", "tier": 1, "p_true": 0.81}
+{"subject": "Mr. Bingley", "relation": "asserted_his_blamelessness_in", "object": "the affair", "quote": "Mr. Bingley, when questioned by Jane, had long ago asserted his blamelessness in the affair", "doc_id": "ch-34", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "an_account_of_what_had_happened_at", "object": "Netherfield House", "quote": "she began his account of what had happened at Netherfield", "doc_id": "ch-34", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Darcy", "relation": "called_during_elizabeth's_absence", "object": "Miss Elizabeth Bennet", "quote": "Mr. Darcy, only for a few minutes, to take leave", "doc_id": "ch-34", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Darcy", "relation": "gave_the_letter_to", "object": "Miss Elizabeth Bennet", "quote": "when Mr. Darcy gave her the letter", "doc_id": "ch-34", "tier": 1, "p_true": 0.98}
+{"subject": "the late Mr. Darcy", "relation": "showed_kindness_to", "object": "George Wickham", "quote": "the kindness of the late Mr. Darcy, though she had not before known its extent", "doc_id": "ch-34", "tier": 1, "p_true": 0.94}
+{"subject": "the two gentlemen", "relation": "from", "object": "Rosings", "quote": "the two gentlemen from Rosings had each called during her absence", "doc_id": "ch-34", "tier": 1, "p_true": 0.93}
+{"subject": "Bromley", "relation": "where_horses_are_changed", "object": "Bell", "quote": "Oh, Bromley, of course. If you mention my name at the Bell", "doc_id": "ch-35", "tier": 1, "p_true": 0.53}
+{"subject": "Catherine", "relation": "completely_under_guidance_of", "object": "Lydia Bennet", "quote": "completely under Lydia’s guidance", "doc_id": "ch-35", "tier": 1, "p_true": 0.98}
+{"subject": "Dawson", "relation": "not_object_to", "object": "the barouche-box", "quote": "as Dawson does not object to the barouche-box", "doc_id": "ch-35", "tier": 1, "p_true": 0.97}
+{"subject": "Georgiana", "relation": "niece_of", "object": "Lady Catherine", "quote": "my niece Georgiana", "doc_id": "ch-35", "tier": 1, "p_true": 0.96}
+{"subject": "Georgiana", "relation": "went_to", "object": "Ramsgate", "quote": "When my niece Georgiana went to Ramsgate last summer", "doc_id": "ch-35", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine", "relation": "going_to", "object": "London", "quote": "I am going there early in June, for a week", "doc_id": "ch-35", "tier": 1, "p_true": 0.95}
+{"subject": "Lady Catherine", "relation": "invited_them_to_come_to", "object": "Hunsford", "quote": "invited them to come to Hunsford again next year", "doc_id": "ch-35", "tier": 1, "p_true": 0.93}
+{"subject": "Miss Darcy", "relation": "daughter_of", "object": "Mr. Darcy", "quote": "Miss Darcy, the daughter of Mr. Darcy of Pemberley", "doc_id": "ch-35", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "in", "object": "town", "quote": "I must be in town next Saturday", "doc_id": "ch-35", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "united_with", "object": "Jane", "quote": "Elizabeth had frequently united with Jane in an endeavour to check the imprudence", "doc_id": "ch-35", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "hastened_to", "object": "Rosings", "quote": "To Rosings he then hastened", "doc_id": "ch-35", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "residence", "object": "Pemberley", "quote": "Mr. Darcy of Pemberley", "doc_id": "ch-35", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Darcy", "relation": "restored_bingley_to", "object": "Jane", "quote": "Mr. Darcy’s explanation, by restoring Bingley to all her former good opinion", "doc_id": "ch-35", "tier": 1, "p_true": 0.65}
+{"subject": "Mr. Darcy", "relation": "wrote", "object": "This letter", "quote": "Mr. Darcy’s letter she was in a fair way of soon knowing by heart", "doc_id": "ch-35", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Collins", "relation": "send", "object": "John", "quote": "You must send John with the young ladies, Mrs. Collins", "doc_id": "ch-35", "tier": 1, "p_true": 0.86}
+{"subject": "a house about a mile from Meryton", "relation": "within_a_walk_of", "object": "Longbourn", "quote": "Meryton was within a walk of Longbourn", "doc_id": "ch-35", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "looked", "object": "well", "quote": "Jane looked well", "doc_id": "ch-36", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "to_go_home_with", "object": "Miss Elizabeth Bennet", "quote": "But Jane was to go home with her", "doc_id": "ch-36", "tier": 1, "p_true": 0.94}
+{"subject": "Lady Catherine", "relation": "showed_great_attentions_to", "object": "Mrs. Collins", "quote": "Lady Catherine’s great attentions to Mrs. Collins", "doc_id": "ch-36", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "attended_to_the_carriage_by", "object": "Mr. Collins", "quote": "Elizabeth was attended to the carriage by Mr. Collins", "doc_id": "ch-36", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "met_for_breakfast_on", "object": "Saturday morning", "quote": "On Saturday morning Elizabeth and Mr. Collins met for breakfast", "doc_id": "ch-36", "tier": 1, "p_true": 0.91}
+{"subject": "Miss Elizabeth Bennet", "relation": "spent", "object": "six weeks", "quote": "She had spent six weeks with great enjoyment", "doc_id": "ch-36", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "cousin_of", "object": "Miss Elizabeth Bennet", "quote": "my dear cousin", "doc_id": "ch-36", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Collins", "relation": "received_kindness_at", "object": "Longbourn", "quote": "the kindness he had received at Longbourn in the winter", "doc_id": "ch-36", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Collins", "relation": "spouse", "object": "Charlotte", "quote": "My dear Charlotte and I have but one mind and one way of thinking", "doc_id": "ch-36", "tier": 1, "p_true": 0.95}
+{"subject": "----shire", "relation": "going_to_be_encamped_near", "object": "Brighton", "quote": "They are going to be encamped near Brighton", "doc_id": "ch-37", "tier": 1, "p_true": 0.93}
+{"subject": "----shire", "relation": "left", "object": "a house about a mile from Meryton", "quote": "after the ----shire have left Meryton", "doc_id": "ch-37", "tier": 1, "p_true": 0.84}
+{"subject": "George Wickham", "relation": "safe", "object": "George Wickham", "quote": "Wickham is safe.", "doc_id": "ch-37", "tier": 1, "p_true": 0.72}
+{"subject": "Jane", "relation": "almost", "object": "three-and-twenty", "quote": "She is almost three-and-twenty!", "doc_id": "ch-37", "tier": 1, "p_true": 0.98}
+{"subject": "Mary", "relation": "sister", "object": "Lydia Bennet", "quote": "my dear sister", "doc_id": "ch-37", "tier": 1, "p_true": 0.95}
+{"subject": "Mary King", "relation": "gone_down_to", "object": "Liverpool", "quote": "She is gone down to her uncle at Liverpool", "doc_id": "ch-37", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bennet", "relation": "father", "object": "Miss Elizabeth Bennet", "quote": "her father had not the smallest intention of yielding", "doc_id": "ch-37", "tier": 1, "p_true": 0.9}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Miss Elizabeth Bennet", "quote": "her mother, though often disheartened", "doc_id": "ch-37", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Bennet", "relation": "rejoiced_to_see", "object": "Jane", "quote": "Mrs. Bennet rejoiced to see Jane in undiminished beauty", "doc_id": "ch-37", "tier": 1, "p_true": 0.97}
+{"subject": "the town of ----", "relation": "in", "object": "Hertfordshire", "quote": "for the town of ----, in Hertfordshire", "doc_id": "ch-37", "tier": 1, "p_true": 0.97}
+{"subject": "Collinses", "relation": "talk_of_having", "object": "Longbourn", "quote": "they often talk of having Longbourn when your father is dead", "doc_id": "ch-38", "tier": 1, "p_true": 0.88}
+{"subject": "Jane", "relation": "cherished_a_very_tender_affection_for", "object": "Mr. Bingley", "quote": "She still cherished a very tender affection for Bingley", "doc_id": "ch-38", "tier": 1, "p_true": 0.99}
+{"subject": "Mr. Bingley", "relation": "used_my_daughter_extremely_ill", "object": "Jane", "quote": "he used my daughter extremely ill", "doc_id": "ch-38", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Darcy", "relation": "author", "object": "Mr. Darcy’s letter", "quote": "the other half of Mr. Darcy’s letter", "doc_id": "ch-38", "tier": 1, "p_true": 0.89}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Jane", "quote": "used my daughter extremely ill", "doc_id": "ch-38", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Bennet", "relation": "sibling", "object": "Philips", "quote": "I told my sister Philips so the other day", "doc_id": "ch-38", "tier": 1, "p_true": 0.78}
+{"subject": "Colonel Fitzwilliam", "relation": "spent_three_weeks_at", "object": "Rosings", "quote": "Colonel Fitzwilliam’s and Mr. Darcy’s having both spent three weeks at Rosings", "doc_id": "ch-39", "tier": 1, "p_true": 0.98}
+{"subject": "Colonel Forster", "relation": "is", "object": "a sensible man", "quote": "Colonel Forster is a sensible man", "doc_id": "ch-39", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "dined_at", "object": "Longbourn", "quote": "he dined, with others of the officers, at Longbourn", "doc_id": "ch-39", "tier": 1, "p_true": 0.81}
+{"subject": "Kitty", "relation": "two_years_older_than", "object": "Lydia Bennet", "quote": "I am two years older", "doc_id": "ch-39", "tier": 1, "p_true": 0.95}
+{"subject": "Lydia Bennet", "relation": "going_to", "object": "Brighton", "quote": "Lydia’s going to Brighton", "doc_id": "ch-39", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "received_an_invitation_from", "object": "Mrs. Forster", "quote": "she received an invitation from Mrs. Forster", "doc_id": "ch-39", "tier": 1, "p_true": 0.99}
+{"subject": "Lydia Bennet", "relation": "returned_with_mrs._forster_to", "object": "a house about a mile from Meryton", "quote": "Lydia returned with Mrs. Forster to Meryton", "doc_id": "ch-39", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "now_to_see", "object": "George Wickham", "quote": "Elizabeth was now to see Mr. Wickham for the last time", "doc_id": "ch-39", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "secretly_advising_her_father_not_to_let_her_go", "object": "Mr. Bennet", "quote": "secretly advising her father not to let her go", "doc_id": "ch-39", "tier": 1, "p_true": 0.92}
+{"subject": "Miss Elizabeth Bennet", "relation": "spent_her_time_at", "object": "Hunsford", "quote": "her time had passed at Hunsford", "doc_id": "ch-39", "tier": 1, "p_true": 0.83}
+{"subject": "Mr. Darcy", "relation": "cousin_of", "object": "Colonel Fitzwilliam", "quote": "very different from his cousin’s", "doc_id": "ch-39", "tier": 1, "p_true": 0.76}
+{"subject": "Mr. Darcy", "relation": "forwarding_the_match_with", "object": "Lady Catherine de Bourgh", "quote": "forwarding the match with Miss de Bourgh", "doc_id": "ch-39", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Darcy", "relation": "spent_three_weeks_at", "object": "Rosings", "quote": "Mr. Darcy’s having both spent three weeks at Rosings", "doc_id": "ch-39", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "cried_when_colonel_miller’s_regiment_went_away", "object": "Colonel Miller", "quote": "I cried for two days together when Colonel Miller’s regiment went away", "doc_id": "ch-39", "tier": 1, "p_true": 0.84}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Lydia Bennet", "quote": "Their affectionate mother", "doc_id": "ch-39", "tier": 1, "p_true": 0.96}
+{"subject": "George Wickham", "relation": "passed_all_his_youth_at", "object": "Pemberley", "quote": "Wickham passed all his youth there", "doc_id": "ch-40", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "promised_to_write_to", "object": "Mrs. Bennet", "quote": "she promised to write very often and very minutely to her mother and Kitty", "doc_id": "ch-40", "tier": 1, "p_true": 0.93}
+{"subject": "Miss Elizabeth Bennet", "relation": "father", "object": "Mr. Bennet", "quote": "her father’s behaviour as a husband", "doc_id": "ch-40", "tier": 1, "p_true": 0.77}
+{"subject": "Miss Elizabeth Bennet", "relation": "mother", "object": "Mrs. Bennet", "quote": "a mother and sister, whose constant repinings", "doc_id": "ch-40", "tier": 1, "p_true": 0.76}
+{"subject": "Mr. Bennet", "relation": "spouse", "object": "Mrs. Bennet", "quote": "had married a woman whose weak understanding and illiberal mind", "doc_id": "ch-40", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Darcy", "relation": "owner_of", "object": "Pemberley", "quote": "Pemberley and its owner", "doc_id": "ch-40", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. and Mrs. Gardiner", "relation": "has", "object": "four children", "quote": "with their four children", "doc_id": "ch-40", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Forster", "relation": "called", "object": "Lydia Bennet", "quote": "as Mrs. Forster called her", "doc_id": "ch-40", "tier": 1, "p_true": 0.82}
+{"subject": "Mrs. Gardiner", "relation": "aunt_of", "object": "Miss Elizabeth Bennet", "quote": "her uncle and aunt’s arrival", "doc_id": "ch-40", "tier": 1, "p_true": 0.92}
+{"subject": "Mrs. Gardiner", "relation": "spouse", "object": "Mrs. Gardiner", "quote": "Mr. and Mrs. Gardiner, with their four children", "doc_id": "ch-40", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Gardiner", "relation": "uncle_of", "object": "Miss Elizabeth Bennet", "quote": "her uncle and aunt’s arrival", "doc_id": "ch-40", "tier": 1, "p_true": 0.91}
+{"subject": "Pemberley", "relation": "situated_within_five_miles_of", "object": "Lambton", "quote": "within five miles of Lambton, Elizabeth found, from her aunt, that Pemberley was situated", "doc_id": "ch-40", "tier": 1, "p_true": 0.96}
+{"subject": "The Gardiners", "relation": "stayed_at", "object": "Longbourn", "quote": "The Gardiners stayed only one night at Longbourn", "doc_id": "ch-40", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "gone_into", "object": "the army", "quote": "He is now gone into the army", "doc_id": "ch-41", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Darcy", "relation": "always_down_for", "object": "the summer months", "quote": "Miss Darcy is always down for the summer months", "doc_id": "ch-41", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Darcy", "relation": "comes_here", "object": "to-morrow", "quote": "she comes here to-morrow with him", "doc_id": "ch-41", "tier": 1, "p_true": 0.91}
+{"subject": "Miss Darcy", "relation": "goes_to", "object": "Ramsgate", "quote": "when she goes to Ramsgate", "doc_id": "ch-41", "tier": 1, "p_true": 0.93}
+{"subject": "Miss Elizabeth Bennet", "relation": "niece_of", "object": "Mrs. Gardiner", "quote": "their niece", "doc_id": "ch-41", "tier": 1, "p_true": 0.75}
+{"subject": "Miss Elizabeth Bennet", "relation": "niece_of", "object": "Mrs. Gardiner", "quote": "by her niece", "doc_id": "ch-41", "tier": 1, "p_true": 0.9}
+{"subject": "Miss Elizabeth Bennet", "relation": "stay_at", "object": "Lambton", "quote": "your stay at Lambton", "doc_id": "ch-41", "tier": 1, "p_true": 0.85}
+{"subject": "Mr. Darcy", "relation": "behaved_cruelly_toward", "object": "George Wickham", "quote": "as he has done by poor Wickham", "doc_id": "ch-41", "tier": 1, "p_true": 0.8}
+{"subject": "Mr. Darcy", "relation": "invited_to_fish", "object": "Mrs. Gardiner", "quote": "invite him, with the greatest civility, to fish there", "doc_id": "ch-41", "tier": 1, "p_true": 0.74}
+{"subject": "Mr. Darcy", "relation": "met_elizabeth_in", "object": "Kent", "quote": "when they met in Kent", "doc_id": "ch-41", "tier": 1, "p_true": 0.89}
+{"subject": "Mr. Darcy", "relation": "residence", "object": "Pemberley", "quote": "he may spend half his time here", "doc_id": "ch-41", "tier": 1, "p_true": 0.91}
+{"subject": "Mr. Darcy", "relation": "sibling", "object": "Miss Darcy", "quote": "his sister", "doc_id": "ch-41", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Gardiner", "relation": "aunt_of", "object": "Miss Elizabeth Bennet", "quote": "her uncle and aunt", "doc_id": "ch-41", "tier": 1, "p_true": 0.8}
+{"subject": "Mrs. Gardiner", "relation": "spouse", "object": "Mrs. Gardiner", "quote": "to her husband all the interesting spots", "doc_id": "ch-41", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Reynolds", "relation": "employer", "object": "Mr. Darcy", "quote": "is my master", "doc_id": "ch-41", "tier": 1, "p_true": 0.84}
+{"subject": "Pemberley", "relation": "ten_miles_round", "object": "ten miles", "quote": "it was ten miles round", "doc_id": "ch-41", "tier": 1, "p_true": 0.83}
+{"subject": "Pemberley House", "relation": "situated_on", "object": "the opposite side of the valley", "quote": "situated on the opposite side of the valley", "doc_id": "ch-41", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "left_many_debts_behind_him", "object": "many debts", "quote": "he had left many debts behind him", "doc_id": "ch-42", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "quitting", "object": "Derbyshire", "quote": "on his quitting Derbyshire", "doc_id": "ch-42", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Bennet", "relation": "invited_to_dinner_at", "object": "Pemberley", "quote": "and Miss Bennet, to dinner at Pemberley", "doc_id": "ch-42", "tier": 1, "p_true": 0.95}
+{"subject": "Miss Darcy", "relation": "arrival_at", "object": "Pemberley", "quote": "on the very day of her arrival at Pemberley", "doc_id": "ch-42", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Darcy", "relation": "little_more_than", "object": "sixteen", "quote": "though little more than sixteen", "doc_id": "ch-42", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Darcy", "relation": "set_up_as_a_rival_to", "object": "Jane", "quote": "who had been set up as a rival to Jane", "doc_id": "ch-42", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Darcy", "relation": "sibling", "object": "Mr. Darcy", "quote": "Miss Darcy and her brother appeared", "doc_id": "ch-42", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "niece_of", "object": "Mr. and Mrs. Gardiner", "quote": "their niece", "doc_id": "ch-42", "tier": 1, "p_true": 0.76}
+{"subject": "Mr. Darcy", "relation": "afterwards_discharged", "object": "many debts", "quote": "which Mr. Darcy afterwards discharged", "doc_id": "ch-42", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Darcy", "relation": "much_good_among", "object": "the poor", "quote": "he was a liberal man, and did much good among the poor", "doc_id": "ch-42", "tier": 1, "p_true": 0.85}
+{"subject": "Mr. Darcy", "relation": "very_much_in_love_with", "object": "Miss Elizabeth Bennet", "quote": "it was evident that he was very much in love with her", "doc_id": "ch-42", "tier": 1, "p_true": 0.95}
+{"subject": "Colonel Forster", "relation": "came_on_to", "object": "Longbourn", "quote": "With the kindest concern he came on to Longbourn", "doc_id": "ch-43", "tier": 1, "p_true": 0.97}
+{"subject": "Colonel Forster", "relation": "came_yesterday,_having_left", "object": "Brighton", "quote": "Colonel Forster came yesterday, having left Brighton", "doc_id": "ch-43", "tier": 1, "p_true": 0.93}
+{"subject": "Colonel Forster", "relation": "obliged_to_be_at", "object": "Brighton", "quote": "Colonel Forster is obliged to be at Brighton again to-morrow evening", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Colonel Forster", "relation": "traced_them_to", "object": "Clapham", "quote": "He did trace them easily to Clapham", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "left", "object": "Brighton", "quote": "They left Brighton together on Sunday night", "doc_id": "ch-43", "tier": 1, "p_true": 0.77}
+{"subject": "George Wickham", "relation": "meaning_to_marry", "object": "Lydia Bennet", "quote": "Wickham’s meaning to marry her", "doc_id": "ch-43", "tier": 1, "p_true": 0.51}
+{"subject": "Jane", "relation": "the_sister_of", "object": "Miss Elizabeth Bennet", "quote": "By this time, my dearest sister, you have received my hurried letter", "doc_id": "ch-43", "tier": 1, "p_true": 0.58}
+{"subject": "Lydia Bennet", "relation": "attached", "object": "George Wickham", "quote": "how Lydia could ever have attached him", "doc_id": "ch-43", "tier": 1, "p_true": 0.96}
+{"subject": "Lydia Bennet", "relation": "going_to", "object": "Gretna Green", "quote": "they were going to Gretna Green", "doc_id": "ch-43", "tier": 1, "p_true": 0.88}
+{"subject": "Lydia Bennet", "relation": "gone_off_to_scotland_with", "object": "George Wickham", "quote": "she was gone off to Scotland with one of his officers; to own the truth, with Wickham", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "never_been_a_favourite_with", "object": "Mr. and Mrs. Gardiner", "quote": "been a favourite with them", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "the_youngest_sister_of", "object": "Miss Elizabeth Bennet", "quote": "My youngest sister has left all her friends", "doc_id": "ch-43", "tier": 1, "p_true": 0.84}
+{"subject": "Miss Bingley", "relation": "venting_her_feelings_in_criticisms_on", "object": "Miss Elizabeth Bennet", "quote": "Miss Bingley was venting her feelings in criticisms on Elizabeth’s person, behaviour, and dress", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Darcy", "relation": "sibling", "object": "Mr. Darcy", "quote": "Her brother, whose eye she feared to meet", "doc_id": "ch-43", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "on_the_road_to", "object": "Longbourn", "quote": "on the road to Longbourn", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "partiality_for", "object": "George Wickham", "quote": "her partiality for Wickham", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "some_time_with", "object": "Mrs. Gardiner", "quote": "He had been some time with Mr. Gardiner", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "sibling", "object": "Miss Darcy", "quote": "This unfortunate affair will, I fear, prevent my sister’s having the pleasure of seeing you at Pemberley to-day.", "doc_id": "ch-43", "tier": 1, "p_true": 0.89}
+{"subject": "Mrs. Gardiner", "relation": "aunt_of", "object": "Miss Elizabeth Bennet", "quote": "her uncle and aunt, leaving her to enjoy them in quiet", "doc_id": "ch-43", "tier": 1, "p_true": 0.72}
+{"subject": "Mrs. Gardiner", "relation": "readily_promised", "object": "every assistance in his power", "quote": "Mr. Gardiner readily\npromised every assistance in his power", "doc_id": "ch-43", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "uncle_of", "object": "Miss Elizabeth Bennet", "quote": "I know my dear uncle and aunt so well", "doc_id": "ch-43", "tier": 1, "p_true": 0.87}
+{"subject": "Aunt Philips", "relation": "aunt_of", "object": "Jane", "quote": "My aunt Philips", "doc_id": "ch-44", "tier": 1, "p_true": 0.57}
+{"subject": "Aunt Philips", "relation": "came_to", "object": "Longbourn", "quote": "My aunt Philips came to Longbourn on Tuesday", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "Aunt Philips", "relation": "came_to_longbourn_on", "object": "Tuesday", "quote": "came to Longbourn on Tuesday", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "Aunt Philips", "relation": "stayed_till", "object": "Thursday", "quote": "was so good as to stay till Thursday with me", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "Colonel Forster", "relation": "suspected", "object": "Lydia Bennet", "quote": "Colonel Forster did own that he had often suspected some partiality, especially on Lydia’s side", "doc_id": "ch-44", "tier": 1, "p_true": 0.87}
+{"subject": "George Wickham", "relation": "left", "object": "a house about a mile from Meryton", "quote": "it is said that he left Meryton greatly in debt", "doc_id": "ch-44", "tier": 1, "p_true": 0.83}
+{"subject": "Lady Lucas", "relation": "walked_here_on", "object": "Wednesday morning", "quote": "she walked here on Wednesday morning", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "go_with", "object": "Mrs. Forster", "quote": "Lydia should go with Mrs. Forster", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "going_to", "object": "Gretna Green", "quote": "I am going to Gretna Green", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "in", "object": "Kent", "quote": "Till I was in Kent", "doc_id": "ch-44", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Bennet", "relation": "went_on", "object": "Tuesday", "quote": "Yes, he went on Tuesday, as I wrote you word.", "doc_id": "ch-44", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Bennet", "relation": "wrote_on", "object": "Wednesday", "quote": "He wrote me a few lines on Wednesday", "doc_id": "ch-44", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Darcy", "relation": "his_relation", "object": "Colonel Fitzwilliam", "quote": "Mr. Darcy and his relation Colonel Fitzwilliam", "doc_id": "ch-44", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Gardiner", "relation": "assist", "object": "Mr. Bennet", "quote": "would assist Mr. Bennet in every endeavour for recovering Lydia", "doc_id": "ch-44", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Gardiner", "relation": "make_him_come_home_with_me_to", "object": "Gracechurch Street", "quote": "make him come home with me to Gracechurch Street", "doc_id": "ch-44", "tier": 1, "p_true": 0.77}
+{"subject": "Mrs. Gardiner", "relation": "meant_to_be_in", "object": "London", "quote": "he meant to be in London the very next day", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "hackney coach", "relation": "come_with_a_fare_from", "object": "London", "quote": "It had come with a fare from London", "doc_id": "ch-44", "tier": 1, "p_true": 0.98}
+{"subject": "hackney coach", "relation": "took_them_from", "object": "Clapham", "quote": "which took them from Clapham", "doc_id": "ch-44", "tier": 1, "p_true": 0.97}
+{"subject": "the ----shire", "relation": "first_quartered_in", "object": "a house about a mile from Meryton", "quote": "Since the ----shire were first quartered in Meryton", "doc_id": "ch-44", "tier": 1, "p_true": 0.97}
+{"subject": "Colonel Forster", "relation": "believed_that_more_than_a_thousand_pounds_would_be_necessary_to_clear_his_expenses_at", "object": "Brighton", "quote": "Colonel Forster believed that more than a thousand pounds would be necessary to clear his expenses at Brighton", "doc_id": "ch-45", "tier": 1, "p_true": 0.93}
+{"subject": "George Wickham", "relation": "in", "object": "the militia", "quote": "since he had been in the militia", "doc_id": "ch-45", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "left_gaming_debts_behind_him_to_a_very_considerable_amount", "object": "gaming debts", "quote": "he had left gaming debts behind him to a very considerable amount", "doc_id": "ch-45", "tier": 1, "p_true": 0.92}
+{"subject": "Lydia Bennet", "relation": "used_to_want_to_go_to", "object": "London", "quote": "And Lydia used to want to go to London", "doc_id": "ch-45", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bennet", "relation": "at_home_on", "object": "Saturday", "quote": "they might expect to see their father at home on the following day, which was Saturday", "doc_id": "ch-45", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Bennet", "relation": "father", "object": "Miss Elizabeth Bennet", "quote": "Lizzy, I bear you no ill-will", "doc_id": "ch-45", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bennet", "relation": "residence", "object": "Longbourn", "quote": "brought its master back to Longbourn", "doc_id": "ch-45", "tier": 1, "p_true": 0.79}
+{"subject": "Mr. Bennet", "relation": "to", "object": "Epsom", "quote": "Mr. Bennet had been to Epsom and Clapham", "doc_id": "ch-45", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bennet", "relation": "to", "object": "Clapham", "quote": "Mr. Bennet had been to Epsom and Clapham", "doc_id": "ch-45", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "sent_a_letter_to", "object": "Mr. Bennet", "quote": "a letter arrived for their father, from a different quarter, from Mr. Collins", "doc_id": "ch-45", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Bennet", "relation": "spouse", "object": "Mr. Bennet", "quote": "her husband’s not being killed in a duel", "doc_id": "ch-45", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Gardiner", "relation": "left_longbourn_on", "object": "Sunday", "quote": "Mr. Gardiner left Longbourn on Sunday", "doc_id": "ch-45", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "located_in", "object": "Hertfordshire", "quote": "remain in Hertfordshire a few days longer", "doc_id": "ch-45", "tier": 1, "p_true": 0.95}
+{"subject": "Mrs. Gardiner", "relation": "sibling", "object": "Mrs. Bennet", "quote": "to the great consolation of his sister", "doc_id": "ch-45", "tier": 1, "p_true": 0.57}
+{"subject": "Mrs. Gardiner", "relation": "spouse", "object": "Mrs. Gardiner", "quote": "his wife received a letter from him", "doc_id": "ch-45", "tier": 1, "p_true": 0.94}
+{"subject": "George Wickham", "relation": "marry", "object": "Lydia Bennet", "quote": "that he will marry her?", "doc_id": "ch-46", "tier": 1, "p_true": 0.78}
+{"subject": "Lydia Bennet", "relation": "only_sixteen_last_june", "object": "sixteen", "quote": "she was only sixteen last June", "doc_id": "ch-46", "tier": 1, "p_true": 0.91}
+{"subject": "Mr. Bennet", "relation": "allowing_her,_during_your_life,_one_hundred_pounds_per_annum", "object": "one hundred pounds per annum", "quote": "allowing her, during your life, one hundred pounds per annum", "doc_id": "ch-46", "tier": 1, "p_true": 0.69}
+{"subject": "Mrs. Bennet", "relation": "child", "object": "Jane", "quote": "Her eldest daughter endeavoured", "doc_id": "ch-46", "tier": 1, "p_true": 0.85}
+{"subject": "Mrs. Bennet", "relation": "child", "object": "Lydia Bennet", "quote": "To know that her daughter would be married was enough", "doc_id": "ch-46", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "go_to", "object": "a house about a mile from Meryton", "quote": "I will go to Meryton", "doc_id": "ch-46", "tier": 1, "p_true": 0.73}
+{"subject": "Mrs. Gardiner", "relation": "find_out_in_what_part_of_london", "object": "London", "quote": "find out in what part of London they were", "doc_id": "ch-46", "tier": 1, "p_true": 0.81}
+{"subject": "Mrs. Gardiner", "relation": "immediately_give_directions_to", "object": "Haggerston", "quote": "I will immediately give directions to Haggerston for preparing a proper settlement", "doc_id": "ch-46", "tier": 1, "p_true": 0.91}
+{"subject": "Mrs. Gardiner", "relation": "pledged_himself_to_assist", "object": "George Wickham", "quote": "he has pledged himself to assist Mr. Wickham with money", "doc_id": "ch-46", "tier": 1, "p_true": 0.81}
+{"subject": "Mrs. Gardiner", "relation": "sent_express_to", "object": "Mr. Bennet", "quote": "there is an express come for master from Mr. Gardiner", "doc_id": "ch-46", "tier": 1, "p_true": 0.91}
+{"subject": "Mrs. Gardiner", "relation": "uncle_of", "object": "Lydia Bennet", "quote": "her own uncle", "doc_id": "ch-46", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Gardiner", "relation": "wrote_from", "object": "Gracechurch Street", "quote": "Gracechurch Street, _Monday, August 2_.", "doc_id": "ch-46", "tier": 1, "p_true": 0.89}
+{"subject": "five thousand pounds", "relation": "secured_among_your_children_after_the_decease_of_yourself_and_my_sister", "object": "five thousand pounds", "quote": "secured among your children after the decease of yourself and my sister", "doc_id": "ch-46", "tier": 1, "p_true": 0.56}
+{"subject": "General----’s regiment", "relation": "now_quartered_in", "object": "the north", "quote": "now quartered in the north", "doc_id": "ch-47", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "creditors_in", "object": "a house about a mile from Meryton", "quote": "his creditors in Meryton", "doc_id": "ch-47", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "creditors_in_and_near", "object": "Brighton", "quote": "the various creditors of Mr. Wickham\nin and near Brighton", "doc_id": "ch-47", "tier": 1, "p_true": 0.97}
+{"subject": "George Wickham", "relation": "intention_to_go_into", "object": "Regulars", "quote": "It is Mr. Wickham’s intention to go into the Regulars", "doc_id": "ch-47", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "resolved_on_quitting", "object": "the militia", "quote": "Mr. Wickham had resolved\non quitting the militia", "doc_id": "ch-47", "tier": 1, "p_true": 0.98}
+{"subject": "George Wickham", "relation": "the_promise_of_an_ensigncy_in", "object": "General----’s regiment", "quote": "He has the promise of an\nensigncy in General----’s regiment", "doc_id": "ch-47", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "married_to", "object": "George Wickham", "quote": "Lydia’s marriage", "doc_id": "ch-47", "tier": 1, "p_true": 0.78}
+{"subject": "Lydia Bennet", "relation": "so_fond_of", "object": "Mrs. Forster", "quote": "She is so fond of Mrs. Forster", "doc_id": "ch-47", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bennet", "relation": "married", "object": "Mrs. Bennet", "quote": "When first Mr. Bennet had married", "doc_id": "ch-47", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "sibling", "object": "Mr. Bennet", "quote": "Mr. Gardiner soon wrote again to his brother", "doc_id": "ch-47", "tier": 1, "p_true": 0.88}
+{"subject": "Mrs. Gardiner", "relation": "written_to", "object": "Colonel Forster", "quote": "I have written to Colonel Forster", "doc_id": "ch-47", "tier": 1, "p_true": 0.84}
+{"subject": "five thousand pounds", "relation": "settled_by_marriage_articles_on", "object": "Mrs. Bennet", "quote": "Five thousand pounds was settled by marriage articles on Mrs. Bennet and\nthe children", "doc_id": "ch-47", "tier": 1, "p_true": 0.95}
+{"subject": "George Wickham", "relation": "received", "object": "his commission", "quote": "Mr. Wickham had received his commission before he left London", "doc_id": "ch-48", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "sibling", "object": "Lydia Bennet", "quote": "Their sister’s wedding-day arrived", "doc_id": "ch-48", "tier": 1, "p_true": 0.97}
+{"subject": "Lydia Bennet", "relation": "at", "object": "Newcastle", "quote": "We shall be at Newcastle all the winter", "doc_id": "ch-48", "tier": 1, "p_true": 0.94}
+{"subject": "Lydia Bennet", "relation": "exceedingly_fond_of", "object": "George Wickham", "quote": "Lydia was exceedingly fond of him", "doc_id": "ch-48", "tier": 1, "p_true": 0.99}
+{"subject": "Lydia Bennet", "relation": "father", "object": "Mr. Bennet", "quote": "Her father lifted up his eyes", "doc_id": "ch-48", "tier": 1, "p_true": 0.8}
+{"subject": "Lydia Bennet", "relation": "mother", "object": "Mrs. Bennet", "quote": "Her mother stepped forwards", "doc_id": "ch-48", "tier": 1, "p_true": 0.8}
+{"subject": "Lydia Bennet", "relation": "overtook", "object": "William Goulding", "quote": "we overtook William Goulding in his curricle", "doc_id": "ch-48", "tier": 1, "p_true": 0.83}
+{"subject": "Lydia Bennet", "relation": "spouse", "object": "George Wickham", "quote": "I am married to-day", "doc_id": "ch-48", "tier": 1, "p_true": 0.59}
+{"subject": "Mr. Darcy", "relation": "to_come_there_with", "object": "George Wickham", "quote": "he was to come there with Wickham", "doc_id": "ch-48", "tier": 1, "p_true": 0.98}
+{"subject": "They", "relation": "all_go_to", "object": "Brighton", "quote": "They must all go to Brighton", "doc_id": "ch-48", "tier": 1, "p_true": 0.72}
+{"subject": "George Wickham", "relation": "brother_and_sister", "object": "Miss Elizabeth Bennet", "quote": "we are brother and sister, you know", "doc_id": "ch-49", "tier": 1, "p_true": 0.57}
+{"subject": "George Wickham", "relation": "knew_in", "object": "Hertfordshire", "quote": "when I knew him in Hertfordshire", "doc_id": "ch-49", "tier": 1, "p_true": 0.68}
+{"subject": "Lydia Bennet", "relation": "settled_upon_her", "object": "another thousand", "quote": "another thousand in addition to her own settled upon _her_", "doc_id": "ch-49", "tier": 1, "p_true": 0.81}
+{"subject": "Miss Elizabeth Bennet", "relation": "at", "object": "Lambton", "quote": "Did you see him while you were at Lambton?", "doc_id": "ch-49", "tier": 1, "p_true": 0.93}
+{"subject": "Miss Elizabeth Bennet", "relation": "in", "object": "Kent", "quote": "when you were in Kent", "doc_id": "ch-49", "tier": 1, "p_true": 0.72}
+{"subject": "Mr. Bennet", "relation": "father", "object": "Miss Elizabeth Bennet", "quote": "your father was still with him", "doc_id": "ch-49", "tier": 1, "p_true": 0.78}
+{"subject": "Mr. Darcy", "relation": "attended", "object": "the wedding", "quote": "Mr. Darcy was punctual in his return, and, as Lydia informed you, attended the wedding", "doc_id": "ch-49", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "called", "object": "Mrs. Gardiner", "quote": "Mr. Darcy called, and was shut up with him several hours", "doc_id": "ch-49", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Darcy", "relation": "dined_with", "object": "us", "quote": "He dined with us the next day", "doc_id": "ch-49", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "first_called_in", "object": "Gracechurch Street", "quote": "he first called in Gracechurch", "doc_id": "ch-49", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "found_out_where", "object": "George Wickham", "quote": "he had found out where your sister and Mr. Wickham were", "doc_id": "ch-49", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Darcy", "relation": "left", "object": "Derbyshire", "quote": "he left Derbyshire only one day after ourselves", "doc_id": "ch-49", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "sibling", "object": "Miss Darcy", "quote": "he introduced us to his sister", "doc_id": "ch-49", "tier": 1, "p_true": 0.93}
+{"subject": "Mrs. Bennet and Lydia", "relation": "going_in_the_carriage_to", "object": "a house about a mile from Meryton", "quote": "Mrs. Bennet and Lydia are going in the carriage to Meryton", "doc_id": "ch-49", "tier": 1, "p_true": 0.99}
+{"subject": "Mrs. Gardiner", "relation": "uncle", "object": "Miss Elizabeth Bennet", "quote": "Your uncle is as much surprised as I am", "doc_id": "ch-49", "tier": 1, "p_true": 0.77}
+{"subject": "Mrs. Younge", "relation": "governess_to", "object": "Miss Darcy", "quote": "Mrs. Younge, who was some time ago governess to Miss Darcy", "doc_id": "ch-49", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Younge", "relation": "intimately_acquainted_with", "object": "George Wickham", "quote": "was, he knew, intimately acquainted with Wickham", "doc_id": "ch-49", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Younge", "relation": "took_a_large_house_in", "object": "Edward Street", "quote": "She then took a large house in Edward Street", "doc_id": "ch-49", "tier": 1, "p_true": 0.98}
+{"subject": "Reynolds", "relation": "was", "object": "the old housekeeper", "quote": "Poor Reynolds, she was always very fond of me", "doc_id": "ch-49", "tier": 1, "p_true": 0.96}
+{"subject": "Gardiner", "relation": "sibling", "object": "Mrs. Bennet", "quote": "It was my brother Gardiner’s drawing up", "doc_id": "ch-50", "tier": 1, "p_true": 0.82}
+{"subject": "George Wickham", "relation": "gone_down_to", "object": "Newcastle", "quote": "They are gone down to Newcastle", "doc_id": "ch-50", "tier": 1, "p_true": 0.55}
+{"subject": "George Wickham", "relation": "gone_into", "object": "Regulars", "quote": "gone into the Regulars", "doc_id": "ch-50", "tier": 1, "p_true": 0.72}
+{"subject": "George Wickham", "relation": "spouse", "object": "Lydia Bennet", "quote": "George Wickham, Esq., to Miss Lydia Bennet", "doc_id": "ch-50", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley", "relation": "comes_down_on", "object": "Thursday", "quote": "He comes down on Thursday", "doc_id": "ch-50", "tier": 1, "p_true": 0.8}
+{"subject": "Mr. Bingley", "relation": "legally_hired", "object": "Netherfield House", "quote": "a house, which he has legally hired", "doc_id": "ch-50", "tier": 1, "p_true": 0.67}
+{"subject": "Mr. Darcy", "relation": "friend_of", "object": "Mr. Bingley", "quote": "any friend of Mr. Bingley’s will always be welcome here", "doc_id": "ch-50", "tier": 1, "p_true": 0.84}
+{"subject": "Mrs. Bennet", "relation": "invited", "object": "Mr. Bingley", "quote": "they were invited and engaged to dine at\nLongbourn", "doc_id": "ch-50", "tier": 1, "p_true": 0.89}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Lydia Bennet", "quote": "and one of my own daughters", "doc_id": "ch-50", "tier": 1, "p_true": 0.95}
+{"subject": "Mrs. Bennet", "relation": "spouse", "object": "Mr. Bennet", "quote": "as her husband by no means entered into her scheme", "doc_id": "ch-50", "tier": 1, "p_true": 0.93}
+{"subject": "Mrs. Nichols", "relation": "in", "object": "a house about a mile from Meryton", "quote": "Meryton last night", "doc_id": "ch-50", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Philips", "relation": "brought_the_news_to", "object": "Mrs. Bennet", "quote": "for Mrs. Philips first brought her the news", "doc_id": "ch-50", "tier": 1, "p_true": 0.97}
+{"subject": "Miss Bennet", "relation": "making", "object": "tea", "quote": "Miss Bennet was making tea", "doc_id": "ch-51", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "pouring_out", "object": "the coffee", "quote": "Elizabeth pouring out the coffee", "doc_id": "ch-51", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "acknowledged_that", "object": "the partridges were remarkably well done", "quote": "even Mr. Darcy acknowledged that the partridges were remarkably well done", "doc_id": "ch-51", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "astonished_and_vexed", "object": "Miss Elizabeth Bennet", "quote": "Mr. Darcy’s behaviour astonished and vexed her.", "doc_id": "ch-51", "tier": 1, "p_true": 0.78}
+{"subject": "Mr. Darcy", "relation": "dines_here_on", "object": "Tuesday", "quote": "I am glad he dines here on Tuesday.", "doc_id": "ch-51", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "walked_away_to", "object": "another part of the room", "quote": "Darcy had walked away to another part of the room.", "doc_id": "ch-51", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Bennet", "relation": "designed_to_keep", "object": "the two Netherfield gentlemen", "quote": "Mrs. Bennet had designed to keep the two Netherfield gentlemen to supper", "doc_id": "ch-51", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "in", "object": "very great spirits", "quote": "Mrs. Bennet, in short, was in very great spirits", "doc_id": "ch-51", "tier": 1, "p_true": 0.99}
+{"subject": "Mrs. Long", "relation": "as_good_a_creature_as", "object": "ever lived", "quote": "Mrs. Long is as good a creature as ever lived", "doc_id": "ch-51", "tier": 1, "p_true": 0.93}
+{"subject": "Jane", "relation": "sibling", "object": "Kitty", "quote": "I dare say Kitty is forwarder than either of us", "doc_id": "ch-52", "tier": 1, "p_true": 0.95}
+{"subject": "Mary", "relation": "petitioned_for_the_use_of", "object": "the library at Netherfield", "quote": "Mary petitioned for the use of the library at Netherfield", "doc_id": "ch-52", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Bingley", "relation": "sibling", "object": "Mr. Bingley", "quote": "It must have been his sisters’ doing", "doc_id": "ch-52", "tier": 1, "p_true": 0.81}
+{"subject": "Miss Elizabeth Bennet", "relation": "sibling", "object": "Jane", "quote": "her sister and Bingley standing together over the hearth", "doc_id": "ch-52", "tier": 1, "p_true": 0.96}
+{"subject": "Mr. Bennet", "relation": "father", "object": "Jane", "quote": "he turned to his daughter", "doc_id": "ch-52", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley", "relation": "came_into", "object": "Hertfordshire", "quote": "he first came into Hertfordshire last year", "doc_id": "ch-52", "tier": 1, "p_true": 0.83}
+{"subject": "Mr. Bingley", "relation": "income_of", "object": "four or five thousand a year", "quote": "he has four or five thousand a year", "doc_id": "ch-52", "tier": 1, "p_true": 0.88}
+{"subject": "Mr. Bingley", "relation": "shoot_with", "object": "Mr. Bennet", "quote": "his coming next morning to shoot with her husband", "doc_id": "ch-52", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Bingley", "relation": "spent_the_morning_together_with", "object": "Mr. Bennet", "quote": "he and Mr. Bennet spent the morning together", "doc_id": "ch-52", "tier": 1, "p_true": 0.99}
+{"subject": "Mr. Bingley", "relation": "visitor_at", "object": "Longbourn", "quote": "a daily visitor at Longbourn", "doc_id": "ch-52", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "went_to", "object": "town", "quote": "when he went to town last November", "doc_id": "ch-52", "tier": 1, "p_true": 0.8}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "friend_of", "object": "Mr. Bingley", "quote": "all his friend’s anxious circumspection", "doc_id": "ch-52", "tier": 1, "p_true": 0.83}
+{"subject": "Mrs. Bennet", "relation": "invited_to_dine", "object": "Mr. Bingley", "quote": "Mrs. Bennet invited him to dine with them", "doc_id": "ch-52", "tier": 1, "p_true": 0.64}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Jane", "quote": "Oh, my dear, dear Jane, I am so happy!", "doc_id": "ch-52", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Kitty", "quote": "Kitty and I are going upstairs", "doc_id": "ch-52", "tier": 1, "p_true": 0.95}
+{"subject": "Mrs. Bennet", "relation": "spouse", "object": "Mr. Bennet", "quote": "cried his wife", "doc_id": "ch-52", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Bennet", "relation": "whispered_to", "object": "Mrs. Philips", "quote": "Mrs. Bennet was privileged to whisper it to Mrs. Philips", "doc_id": "ch-52", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine de Bourgh", "relation": "child", "object": "Lady Catherine de Bourgh", "quote": "Mr. Darcy is engaged to _my daughter_.", "doc_id": "ch-53", "tier": 1, "p_true": 0.89}
+{"subject": "Lady Catherine de Bourgh", "relation": "saw", "object": "Mr. and Mrs. Collins", "quote": "I saw them the night before last.", "doc_id": "ch-53", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "mother", "object": "Mrs. Bennet", "quote": "Elizabeth had mentioned her name to her mother", "doc_id": "ch-53", "tier": 1, "p_true": 0.8}
+{"subject": "Miss Elizabeth Bennet", "relation": "not_engaged_to", "object": "Mr. Darcy", "quote": "I am not.", "doc_id": "ch-53", "tier": 1, "p_true": 0.95}
+{"subject": "Mr. Bingley", "relation": "engagement_with", "object": "Jane", "quote": "Bingley’s engagement with Jane had been formed", "doc_id": "ch-53", "tier": 1, "p_true": 0.99}
+{"subject": "Mr. Bingley", "relation": "prevailed_on", "object": "Miss Bennet", "quote": "Bingley instantly prevailed on Miss Bennet", "doc_id": "ch-53", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "engaged_to", "object": "Lady Catherine de Bourgh", "quote": "his tacit engagement with Miss de Bourgh", "doc_id": "ch-53", "tier": 1, "p_true": 0.67}
+{"subject": "Mr. Darcy", "relation": "the_nephew_of", "object": "Lady Catherine de Bourgh", "quote": "my own nephew, Mr. Darcy", "doc_id": "ch-53", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Bennet", "relation": "child", "object": "Kitty", "quote": "She is my youngest girl but one.", "doc_id": "ch-53", "tier": 1, "p_true": 0.65}
+{"subject": "Lady Catherine", "relation": "sought_to_break_off_engagement_with", "object": "Mr. Darcy", "quote": "breaking off her supposed engagement with Mr. Darcy", "doc_id": "ch-54", "tier": 1, "p_true": 0.94}
+{"subject": "Lady Catherine", "relation": "travelled_from", "object": "Rosings", "quote": "had actually taken the trouble of this journey from Rosings", "doc_id": "ch-54", "tier": 1, "p_true": 0.98}
+{"subject": "Lady Catherine de Bourgh", "relation": "the_aunt_of", "object": "Mr. Darcy", "quote": "his aunt, Lady Catherine de Bourgh", "doc_id": "ch-54", "tier": 1, "p_true": 0.97}
+{"subject": "Lydia Bennet", "relation": "the_cousin_of", "object": "Mr. Collins", "quote": "my cousin Lydia’s sad business", "doc_id": "ch-54", "tier": 1, "p_true": 0.95}
+{"subject": "Miss Elizabeth Bennet", "relation": "the_cousin_of", "object": "Mr. Collins", "quote": "let me warn my cousin Elizabeth, and yourself", "doc_id": "ch-54", "tier": 1, "p_true": 0.88}
+{"subject": "Miss Elizabeth Bennet", "relation": "the_sister_of", "object": "Jane", "quote": "being the sister of Jane", "doc_id": "ch-54", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Collins", "relation": "spouse", "object": "Mrs. Collins", "quote": "the sincere congratulations of Mrs. Collins and myself", "doc_id": "ch-54", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Darcy", "relation": "engagement_to_come_again_to", "object": "Netherfield House", "quote": "his engagement to Bingley of coming again to Netherfield", "doc_id": "ch-54", "tier": 1, "p_true": 0.82}
+{"subject": "Mr. Darcy", "relation": "the_nephew_of", "object": "Lady Catherine", "quote": "application to her nephew", "doc_id": "ch-54", "tier": 1, "p_true": 0.86}
+{"subject": "This letter", "relation": "from", "object": "Mr. Collins", "quote": "This letter is from Mr. Collins.", "doc_id": "ch-54", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "in_town", "object": "three months last winter", "quote": "your sister had been in town three months last winter", "doc_id": "ch-55", "tier": 1, "p_true": 0.91}
+{"subject": "Jane", "relation": "sibling_of", "object": "Miss Elizabeth Bennet", "quote": "that my sister loved him", "doc_id": "ch-55", "tier": 1, "p_true": 0.9}
+{"subject": "Kitty", "relation": "wished_to_call_upon", "object": "Maria", "quote": "Kitty wished to call upon Maria", "doc_id": "ch-55", "tier": 1, "p_true": 0.97}
+{"subject": "Lady Catherine", "relation": "aunt_of", "object": "Mr. Fitzwilliam Darcy", "quote": "the efforts of his aunt", "doc_id": "ch-55", "tier": 1, "p_true": 0.87}
+{"subject": "Lady Catherine", "relation": "journeyed_to", "object": "Longbourn", "quote": "relate her journey to Longbourn", "doc_id": "ch-55", "tier": 1, "p_true": 0.72}
+{"subject": "Lady Catherine", "relation": "returned_through", "object": "London", "quote": "in her return through London", "doc_id": "ch-55", "tier": 1, "p_true": 0.88}
+{"subject": "Miss Elizabeth Bennet", "relation": "met_at", "object": "Pemberley", "quote": "when we met at Pemberley", "doc_id": "ch-55", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Bingley", "relation": "able_to_bring_darcy_with_him_to", "object": "Longbourn", "quote": "he was able to bring Darcy with him to Longbourn", "doc_id": "ch-55", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "engagement_with", "object": "Jane", "quote": "Darcy was delighted with their engagement", "doc_id": "ch-55", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "gave_earliest_information_to", "object": "Mr. Fitzwilliam Darcy", "quote": "his friend had given him the earliest information of it", "doc_id": "ch-55", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "spoiled_by", "object": "my parents", "quote": "I was spoiled by my parents", "doc_id": "ch-55", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "such_from", "object": "eight to eight-and-twenty", "quote": "from eight to eight-and-twenty", "doc_id": "ch-55", "tier": 1, "p_true": 0.94}
+{"subject": "Mrs. Gardiner", "relation": "aunt_of", "object": "Miss Elizabeth Bennet", "quote": "You must not blame my aunt", "doc_id": "ch-55", "tier": 1, "p_true": 0.89}
+{"subject": "Miss Elizabeth Bennet", "relation": "and_shall_be_married_by", "object": "a special licence", "quote": "you must and shall be married by a special licence", "doc_id": "ch-56", "tier": 1, "p_true": 0.91}
+{"subject": "Miss Elizabeth Bennet", "relation": "favourite_child_of", "object": "Mr. Bennet", "quote": "his favourite child", "doc_id": "ch-56", "tier": 1, "p_true": 0.95}
+{"subject": "Miss Elizabeth Bennet", "relation": "loves", "object": "Mr. Darcy", "quote": "I love him", "doc_id": "ch-56", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "we_are_engaged", "object": "Mr. Darcy", "quote": "we are engaged", "doc_id": "ch-56", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bennet", "relation": "father", "object": "Miss Elizabeth Bennet", "quote": "Her father was walking about the room", "doc_id": "ch-56", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Bennet", "relation": "favourite", "object": "George Wickham", "quote": "Wickham, perhaps, is my favourite", "doc_id": "ch-56", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Bennet", "relation": "i_have_given_him_my_consent", "object": "Mr. Darcy", "quote": "I have given him my consent", "doc_id": "ch-56", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Bennet", "relation": "son-in-law", "object": "George Wickham", "quote": "I admire all my three sons-in-law highly", "doc_id": "ch-56", "tier": 1, "p_true": 0.94}
+{"subject": "Mr. Darcy", "relation": "annual_income_of", "object": "ten thousand a year", "quote": "Ten thousand a year", "doc_id": "ch-56", "tier": 1, "p_true": 0.89}
+{"subject": "Mr. Darcy", "relation": "friend_of", "object": "Mr. Bingley", "quote": "as Bingley’s friend and your husband", "doc_id": "ch-56", "tier": 1, "p_true": 0.97}
+{"subject": "Mr. Darcy", "relation": "grounds_at", "object": "Pemberley", "quote": "his beautiful grounds at Pemberley", "doc_id": "ch-56", "tier": 1, "p_true": 0.92}
+{"subject": "Mr. Darcy", "relation": "still_loves", "object": "Miss Elizabeth Bennet", "quote": "He still loves me", "doc_id": "ch-56", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Darcy", "relation": "voluntarily_done_for", "object": "Lydia Bennet", "quote": "what Mr. Darcy had voluntarily done for Lydia", "doc_id": "ch-56", "tier": 1, "p_true": 0.97}
+{"subject": "Mrs. Bennet", "relation": "advises_walk_to", "object": "Oakham Mount", "quote": "to walk to Oakham Mount this morning", "doc_id": "ch-56", "tier": 1, "p_true": 0.96}
+{"subject": "Mrs. Bennet", "relation": "mother", "object": "Miss Elizabeth Bennet", "quote": "her mother followed her", "doc_id": "ch-56", "tier": 1, "p_true": 0.97}
+{"subject": "Charlotte", "relation": "spouse", "object": "Mr. Collins", "quote": "the parading and obsequious civility of her\nhusband", "doc_id": "ch-57", "tier": 1, "p_true": 0.9}
+{"subject": "Collinses", "relation": "come_themselves_to", "object": "Lucas Lodge", "quote": "the Collinses were come themselves to Lucas Lodge", "doc_id": "ch-57", "tier": 1, "p_true": 0.98}
+{"subject": "Jane", "relation": "ill_at", "object": "Netherfield House", "quote": "while she was\nill at Netherfield", "doc_id": "ch-57", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Bingley", "relation": "sent_congratulations_to", "object": "her brother", "quote": "Miss Bingley’s congratulations to her brother", "doc_id": "ch-57", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Bingley", "relation": "wrote_to", "object": "Jane", "quote": "She wrote even to\nJane on the occasion", "doc_id": "ch-57", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Darcy", "relation": "sibling", "object": "Mr. Darcy", "quote": "as sincere as her brother’s in sending it", "doc_id": "ch-57", "tier": 1, "p_true": 0.96}
+{"subject": "Miss Elizabeth Bennet", "relation": "never_yet_answered", "object": "Mrs. Gardiner’s long letter", "quote": "Elizabeth had never yet answered Mrs. Gardiner’s long letter", "doc_id": "ch-57", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "soon_be_the_wife_of", "object": "Mr. Darcy", "quote": "Elizabeth will soon be the wife of Mr. Darcy", "doc_id": "ch-57", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bennet", "relation": "sent_to", "object": "Mr. Collins", "quote": "what Mr. Bennet sent to Mr. Collins", "doc_id": "ch-57", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Collins", "relation": "wife", "object": "Charlotte", "quote": "any congratulations to Elizabeth from his wife", "doc_id": "ch-57", "tier": 1, "p_true": 0.9}
+{"subject": "Mr. Darcy", "relation": "came_down_to", "object": "Netherfield House", "quote": "what did you come down to\nNetherfield for", "doc_id": "ch-57", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Darcy", "relation": "ride_to", "object": "Longbourn", "quote": "Was it merely to ride to Longbourn", "doc_id": "ch-57", "tier": 1, "p_true": 0.87}
+{"subject": "Mr. Darcy", "relation": "wrote_to", "object": "Lady Catherine", "quote": "Mr. Darcy’s letter to Lady Catherine", "doc_id": "ch-57", "tier": 1, "p_true": 0.98}
+{"subject": "Mrs. Gardiner", "relation": "wrote", "object": "Mrs. Gardiner’s long letter", "quote": "Mrs. Gardiner’s long letter", "doc_id": "ch-57", "tier": 1, "p_true": 0.94}
+{"subject": "CHARLES WHITTINGHAM AND CO.", "relation": "located_in", "object": "London", "quote": "TOOKS COURT, CHANCERY LANE, LONDON", "doc_id": "ch-58", "tier": 1, "p_true": 0.96}
+{"subject": "Georgiana", "relation": "more_than_ten_years_younger_than", "object": "Mr. Fitzwilliam Darcy", "quote": "a sister more than ten years younger than himself", "doc_id": "ch-58", "tier": 1, "p_true": 0.57}
+{"subject": "Georgiana", "relation": "residence", "object": "Pemberley", "quote": "Pemberley was now Georgiana’s home", "doc_id": "ch-58", "tier": 1, "p_true": 0.97}
+{"subject": "Jane", "relation": "within_thirty_miles_of", "object": "Miss Elizabeth Bennet", "quote": "were within thirty miles of each other", "doc_id": "ch-58", "tier": 1, "p_true": 0.97}
+{"subject": "Kitty", "relation": "father", "object": "Mr. Bennet", "quote": "her father would never consent to her going", "doc_id": "ch-58", "tier": 1, "p_true": 0.75}
+{"subject": "Lady Catherine", "relation": "aunt_of", "object": "Mr. Fitzwilliam Darcy", "quote": "on the part of his aunt", "doc_id": "ch-58", "tier": 1, "p_true": 0.87}
+{"subject": "Lydia Bennet", "relation": "occasionally_a_visitor_at", "object": "Pemberley", "quote": "Lydia was occasionally a visitor there", "doc_id": "ch-58", "tier": 1, "p_true": 0.98}
+{"subject": "Lydia Bennet", "relation": "spouse", "object": "George Wickham", "quote": "my dear Wickham", "doc_id": "ch-58", "tier": 1, "p_true": 0.96}
+{"subject": "Lydia Bennet", "relation": "the_wife_of", "object": "George Wickham", "quote": "by his wife at least, if not by himself", "doc_id": "ch-58", "tier": 1, "p_true": 0.95}
+{"subject": "Mary", "relation": "father", "object": "Mr. Bennet", "quote": "it was suspected by her father", "doc_id": "ch-58", "tier": 1, "p_true": 0.9}
+{"subject": "Miss Bingley", "relation": "fonder_than_ever_of", "object": "Georgiana", "quote": "was fonder than ever of Georgiana", "doc_id": "ch-58", "tier": 1, "p_true": 0.98}
+{"subject": "Miss Elizabeth Bennet", "relation": "received_congratulatory_letter_from", "object": "Lydia Bennet", "quote": "The congratulatory letter which Elizabeth received from Lydia on her marriage", "doc_id": "ch-58", "tier": 1, "p_true": 0.99}
+{"subject": "Mr. Bennet", "relation": "delighted_in_going_to", "object": "Pemberley", "quote": "He delighted in going to Pemberley", "doc_id": "ch-58", "tier": 1, "p_true": 0.98}
+{"subject": "Mr. Bingley", "relation": "remained_at", "object": "Netherfield House", "quote": "remained at Netherfield only a twelvemonth", "doc_id": "ch-58", "tier": 1, "p_true": 0.93}
+{"subject": "Mr. Fitzwilliam Darcy", "relation": "the_nephew_of", "object": "Lady Catherine", "quote": "the marriage of her nephew", "doc_id": "ch-58", "tier": 1, "p_true": 0.84}
+{"subject": "The Gardiners", "relation": "brought_into", "object": "Derbyshire", "quote": "by bringing her into Derbyshire", "doc_id": "ch-58", "tier": 1, "p_true": 0.62}
+{"subject": "The Gardiners", "relation": "uncle_and_aunt_of", "object": "Miss Elizabeth Bennet", "quote": "her uncle and aunt from the city", "doc_id": "ch-58", "tier": 1, "p_true": 0.89}

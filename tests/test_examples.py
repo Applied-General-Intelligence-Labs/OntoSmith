@@ -23,16 +23,33 @@ class TestWorkedExample(unittest.TestCase):
     def test_recorded_triples_are_triple_shaped(self):
         from pipeline.inspect import is_triple_record
 
-        lines = (EXAMPLES / "triples.jsonl").read_text() \
-            .splitlines()
+        lines = (EXAMPLES / "alder-finch" / "triples.jsonl") \
+            .read_text().splitlines()
         records = [json.loads(ln) for ln in lines if ln.strip()]
         self.assertGreaterEqual(len(records), 1)
         for rec in records:
             self.assertTrue(is_triple_record(rec), rec)
 
-    def test_evidence_quotes_are_verbatim(self):
+    def test_demo_build_records_are_triple_shaped(self):
+        # The shipped demo build (examples/triples.jsonl):
+        # a real full-text build's frozen records — many,
+        # all triple-shaped, all carrying evidence quotes
+        # and chapter doc ids.
+        from pipeline.inspect import is_triple_record
+
         lines = (EXAMPLES / "triples.jsonl").read_text() \
             .splitlines()
+        records = [json.loads(ln) for ln in lines if ln.strip()]
+        self.assertGreaterEqual(len(records), 500)
+        for rec in records:
+            self.assertTrue(is_triple_record(rec), rec)
+            self.assertTrue(rec["quote"].strip(), rec)
+            self.assertTrue(rec["doc_id"].startswith("ch-"),
+                            rec)
+
+    def test_evidence_quotes_are_verbatim(self):
+        lines = (EXAMPLES / "alder-finch" / "triples.jsonl") \
+            .read_text().splitlines()
         for ln in lines:
             if not ln.strip():
                 continue
@@ -49,7 +66,7 @@ class TestWorkedExample(unittest.TestCase):
             select,
         )
 
-        path = EXAMPLES / "triples.jsonl"
+        path = EXAMPLES / "alder-finch" / "triples.jsonl"
         records = load_records(path)
         rec, position, total = select(records)
         card = render_card(build_report(rec, path, position,

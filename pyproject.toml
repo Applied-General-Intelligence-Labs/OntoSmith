@@ -116,6 +116,9 @@ pipeline = ["bindings-template.env"]
     "examples/README.md",
     "examples/triples.jsonl",
 ]
+"share/ontosmith/examples/alder-finch" = [
+    "examples/alder-finch/triples.jsonl",
+]
 "share/ontosmith/examples/corpus" = [
     "examples/corpus/alder-finch-history.txt",
     "examples/corpus/alder-finch-people.txt",
