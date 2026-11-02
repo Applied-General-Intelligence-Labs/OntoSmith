@@ -509,6 +509,7 @@ little before pinning it into a pack.
 | **Connect** | |
 | `configure` | declare the seat bindings (wizard / --from-file) |
 | **Pipeline** | |
+| `identity-freeze` | freeze per-point identity-seat decisions into a global decisions file |
 | `batch` | create / run / status / rollback |
 | `profile` | corpus profiler (deterministic, no LLM) |
 | `ontology` | draft / validate / approve / emit a pack |
