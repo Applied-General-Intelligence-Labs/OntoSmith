@@ -219,7 +219,10 @@ class TestInstalledWheel(unittest.TestCase):
             "inspect", str(share / "examples" / "triples.jsonl"))
         self.assertEqual(r.returncode, 0,
                          f"{r.stdout[-1000:]}\n{r.stderr[-1000:]}")
-        self.assertIn("Alder & Finch", r.stdout)
+        # The shipped demo build's frozen records (the
+        # Pride and Prejudice full-text build).
+        self.assertIn("1 of 737", r.stdout)
+        self.assertIn("Lizzy", r.stdout)
 
 
 if __name__ == "__main__":

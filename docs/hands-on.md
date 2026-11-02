@@ -104,6 +104,14 @@ carrying the conformance record of what its content
 measured. A batch binds one of each; the full pack
 contract is [PACK_DESIGN.md](PACK_DESIGN.md).
 
+This track is the long form — every step visible. For
+a single text file there is a one-command short form,
+`ontosmith quickstart <file.txt>`, which runs the
+build steps below (open-domain pack, no profile) and
+then serves the result; it refuses up front when the
+key or the store is missing. Take the track when you
+want to see — and steer — the steps it wraps.
+
 ### 1. Profile the corpus (no key)
 
 ```console
@@ -399,9 +407,9 @@ $ ontosmith batch create --source demo --collection redocred-dev-subset \
     --docs "demo-data/doc_*.txt" --profile profiles/redocred/profile.json \
     --pack open-domain --max-cost-usd 2
 profile: redocred sha256:aceac6fb15f59e38
-pack: open-domain 0.6.0 (payload sha256:ac14ac0483ed444b…)
+pack: open-domain 0.8.0 (payload sha256:30419e82daf14af8…)
 binding: reference
-setup_config: resolved (core baseline + open-domain, 36 keys) -> setup_config.resolved.json
+setup_config: resolved (core baseline + open-domain, 38 keys) -> setup_config.resolved.json
 proposer_framing: Extract factual relations from this document excerpt.
 created batch redocred-dev-subset-40docs with 40 docs
 ```

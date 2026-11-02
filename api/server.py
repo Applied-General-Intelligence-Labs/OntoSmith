@@ -420,6 +420,11 @@ def main(argv=None) -> int:
           f"{desc['documents']} documents) at "
           f"http://{host}:{port} — /search /entity "
           f"/neighborhood /triple /health")
+    if args.source is None and args.batch is None:
+        print("ontosmith serve: this is the shipped demo "
+              "graph — Pride and Prejudice, the full text, "
+              "built by this pipeline. For your own "
+              "document: ontosmith quickstart <your-file.txt>")
     app = app_dir()
     if app is not None:
         print(f"ontosmith serve: demo app at "

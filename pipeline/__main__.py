@@ -75,6 +75,9 @@ COMMANDS: dict[str, tuple[str, str, str, tuple[str, ...]]] = {
     "serve": ("api.server", "Serve",
               "Sample API server: search / entity / "
               "neighborhood / triple endpoints", ()),
+    "quickstart": ("pipeline.quickstart", "Serve",
+                   "First run: build a graph from one text "
+                   "file and serve it", ()),
     "verify": ("harness.verification.verify_cli", "Evaluate",
                "Verification cores: score/audit-sets/project/report",
                ()),

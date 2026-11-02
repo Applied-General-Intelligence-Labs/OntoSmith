@@ -901,6 +901,40 @@ options:
                         seat's key is unset)
 ```
 
+### `ontosmith quickstart` — First run: build a graph from one text file and serve it
+
+The first-run door: a thin wrapper over `batch create` +
+`batch run` (open-domain pack) and `serve`, sequenced for a
+first run. Preflight refuses — before anything is created —
+when the file is missing or the proposer seat's key does not
+resolve, naming the remedy. The build is a real batch
+(`quickstart-<file stem>` unless `--batch-id` overrides) and
+can be resumed with `ontosmith batch run`.
+
+`ontosmith quickstart --help`:
+
+```text
+usage: ontosmith quickstart [-h] [--batch-id BATCH_ID]
+                            [--max-cost-usd MAX_COST_USD] [--port PORT]
+                            [--no-serve]
+                            file
+
+Build a knowledge graph from one text document and serve it: batch create +
+run (open-domain pack), then serve.
+
+positional arguments:
+  file                  the text document to build from
+
+options:
+  -h, --help            show this help message and exit
+  --batch-id BATCH_ID   batch id (default: quickstart-<file stem>)
+  --max-cost-usd MAX_COST_USD
+                        hard spend cap for the build (default: 2.0)
+  --port PORT           serve port (default: 8765)
+  --no-serve            build only; print the serve command instead of
+                        starting it
+```
+
 ### `ontosmith verify` — Verification cores: score/audit-sets/project/report
 
 `ontosmith verify --help`:

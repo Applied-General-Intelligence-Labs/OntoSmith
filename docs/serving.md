@@ -20,14 +20,20 @@ says. It is a way to inspect recordings, not a second
 place a build can live.
 
 Everything below was executed against the shipped
-example build (the Alder & Finch studio — 7 triples,
-4 documents), so you can reproduce every line before
-building anything of your own.
+demo build — *Pride and Prejudice*, the full novel,
+built by this pipeline (737 triples) — so you can
+reproduce every line before building anything of
+your own. The demo ships as frozen records (triples
+and their evidence quotes, not the source text), so
+its document arm has no novel text to rank; watch
+the graph arm carry the answers, and see the batch
+read-back below for the full surface over your own
+build, text included.
 
 ## The 30-second version
 
 ```bash
-python -m pipeline search "Who founded Alder & Finch?"
+python -m pipeline search "What is Mr. Darcy's income?"
 python -m pipeline serve   # http://127.0.0.1:8765
 ```
 
@@ -37,27 +43,27 @@ ships with the package.
 ## `ontosmith search`
 
 ```console
-$ python -m pipeline search "Who founded Alder & Finch?"
-Search  'Who founded Alder & Finch?'
-  store   file · …/examples (7 triples, 4 documents)
+$ python -m pipeline search "What is Mr. Darcy's income?"
+Search  "What is Mr. Darcy's income?"
+  store   file · …/examples (737 triples, 4 documents)
   arms    lexical · graph
 Entities
-  - Alder & Finch
+  - Miss Darcy
+  - Mr. Darcy
 Documents
-  1. alder-finch-history  (score 0.016393)
-     Alder & Finch is a ceramics studio founded in 2011 by Mara Alder and Tomas Finch. The studio is located in Portland, Oregon, where it operates a gas kiln and a
-  2. alder-finch-people  (score 0.016129)
-     …
+  (no chunk matched)
 Triples
-  - Alder & Finch — founded by → Mara Alder  (p 0.98, tier 1, alder-finch-history)
-    "Alder & Finch is a ceramics studio founded in 2011 by Mara Alder and Tomas Finch."
-  - Alder & Finch — founded by → Tomas Finch  (p 0.98, tier 1, alder-finch-history)
-    "Alder & Finch is a ceramics studio founded in 2011 by Mara Alder and Tomas Finch."
-  …
+  - Mr. Darcy — estate_has_income_of → ten thousand per annum  (p 0.96, tier 1, ch-14)
+    "A clear ten thousand per annum."
+  - Mr. Darcy — annual_income_of → ten thousand a year  (p 0.89, tier 1, ch-56)
+    "Ten thousand a year"
 ```
 
-(The document excerpts and triple list are trimmed
-here; the command prints them in full.)
+(The store line counts the worked example's four
+corpus files, which share the examples directory, as
+its documents; the demo's own text is not shipped —
+see the note at the top. The triple list is trimmed
+here; the command prints it in full.)
 
 What a search returns, in order:
 
@@ -100,7 +106,7 @@ bundles no Korean morphological analyzer, and `cjk`
 (bigram) is the closest shipped option.
 
 ```bash
-python -m pipeline search --json "Dune stoneware dinnerware"
+python -m pipeline search --json "Mr. Darcy danced with"
 python -m pipeline search --k 5 --batch my-batch-id "…"
 python -m pipeline search --source path/to/build "…"
 ```
@@ -162,9 +168,9 @@ python -m pipeline search --batch 2026-10-01T120000Z-ab12cd34 "your question"
 from pipeline.search import hybrid_search, open_store
 
 store = open_store()                    # same selection rules
-result = hybrid_search(store, "Who founded Alder & Finch?", k=10)
-result["documents"][0]["doc_id"]       # 'alder-finch-history'
-result["triples"][0]["relation"]        # 'founded by'
+result = hybrid_search(store, "What is Mr. Darcy's income?", k=10)
+result["triples"][0]["relation"]        # 'estate_has_income_of'
+result["graph_documents"][0]            # 'ch-14'
 ```
 
 An embedder (the connections layer's embedding seat)
@@ -181,7 +187,8 @@ framework dependency, localhost by default.
 
 ```console
 $ python -m pipeline serve
-ontosmith serve: file store (7 triples, 4 documents) at http://127.0.0.1:8765 — /search /entity /neighborhood /triple /health
+ontosmith serve: file store (737 triples, 4 documents) at http://127.0.0.1:8765 — /search /entity /neighborhood /triple /health
+ontosmith serve: this is the shipped demo graph — Pride and Prejudice, the full text, built by this pipeline. For your own document: ontosmith quickstart <your-file.txt>
 ontosmith serve: demo app at http://127.0.0.1:8765/ (assets: …/app)
 ```
 
@@ -195,10 +202,10 @@ ontosmith serve: demo app at http://127.0.0.1:8765/ (assets: …/app)
 
 ```bash
 $ curl -s http://127.0.0.1:8765/health
-{"status": "ok", "store": {"kind": "file", "source": "…/examples", "batch_id": "examples", "entities": 7, "triples": 7, "documents": 4, "chunks": 4, "embeddings": false}}
+{"status": "ok", "store": {"kind": "file", "source": "…/examples", "batch_id": "examples", "entities": 280, "triples": 737, "documents": 4, "chunks": 4, "embeddings": false}}
 
-$ curl -s "http://127.0.0.1:8765/triple?subject=Priya"
-{"source": "api", "position": 5, "triples": 7, "triple": {"subject": "Priya Nair", "relation": "joined", "object": "Alder & Finch"}, "evidence": [{"kind": "quote", "text": "Priya Nair joined Alder & Finch in 2019 as its glaze chemist."}], "provenance": {"doc_id": "alder-finch-people", "batch_id": "examples", "tier": 1, "tag": "VERIFIED", "p_true": 0.95}, "gaps": []}
+$ curl -s "http://127.0.0.1:8765/triple?subject=Darcy"
+{"source": "api", "position": 33, "triples": 737, "triple": {"subject": "Mr. Darcy", "relation": "danced_with", "object": "Mrs. Hurst"}, "evidence": [{"kind": "quote", "text": "danced only once with Mrs. Hurst"}], "provenance": {"doc_id": "ch-03", "batch_id": "examples", "tier": 1, "tag": "VERIFIED", "p_true": 0.99}, "gaps": []}
 
 $ curl -s "http://127.0.0.1:8765/entity?name=Nobody"   # HTTP 404
 {"error": {"code": "entity_not_found", "message": "no entity matches name 'Nobody'"}}

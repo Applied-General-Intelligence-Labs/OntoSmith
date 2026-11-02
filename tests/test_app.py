@@ -47,8 +47,25 @@ APP_FILES = ("index.html", "app.css", "app.js",
              "favicon.svg", "logo-mark.svg")
 
 
+def _worked_example_dir() -> Path:
+    """The worked example as one self-contained records
+    directory (its recorded triples beside its corpus);
+    the app contracts stay pinned against it."""
+    import shutil
+    import tempfile
+
+    d = Path(tempfile.mkdtemp(prefix="af-example-"))
+    shutil.copy(EXAMPLES / "alder-finch" / "triples.jsonl",
+                d / "triples.jsonl")
+    shutil.copytree(EXAMPLES / "corpus", d / "corpus")
+    return d
+
+
+WORKED = _worked_example_dir()
+
+
 def _service() -> SearchService:
-    store = search.FileServingStore(EXAMPLES, root=ROOT)
+    store = search.FileServingStore(WORKED, root=ROOT)
     return SearchService(store)
 
 
