@@ -543,7 +543,9 @@ whose search runs the lexical and graph arms only
 
 ## Status
 
-Release 0.1.3, published on PyPI. The pipeline,
+Release 0.1.4 is the version prepared in this
+tree; the current release published on PyPI is
+0.1.3. The pipeline,
 profiler, ontology builder, inspect viewer,
 verification cores, packs, and the serving surface
 (search command + sample API) in this tree are
