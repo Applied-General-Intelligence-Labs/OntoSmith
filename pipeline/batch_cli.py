@@ -10,9 +10,12 @@ with per-stage state persisted under the batch directory, so a
 run can resume after failure without redoing completed stages.
 
 Batch state (the batches/ tree, the registry) lives under
-state_root() — see its docstring; shipped data (packs) is
-resolved against ROOT through the pack candidates, never
-against the state root.
+state_root() — see its docstring. Packs resolve through
+the pack candidates anchored at state_root(): a ``packs/``
+tree in the state root shadows the shipped trees, so a
+pack placed beside the user's data is the pack a batch
+binds; absent one, the installed data-files tree and then
+the source tree beside the code supply the shipped packs.
 
 Usage:
     python -m pipeline batch create --source <name> --collection <coll> --docs <glob>
@@ -148,12 +151,13 @@ def cmd_create(args) -> None:
     pack_dir = None
     if getattr(args, "pack", None):
         try:
-            pack_dir = find_pack_dir(ROOT, args.pack)
+            pack_dir = find_pack_dir(state_root(), args.pack)
         except ValueError as e:
             print(f"pack resolution failed: {e}", file=sys.stderr)
             sys.exit(1)
     elif profile_family:
-        pack_dir = pack_dir_for_family(ROOT, profile_family)
+        pack_dir = pack_dir_for_family(state_root(),
+                                       profile_family)
     resolved_cfg: dict | None = None
     prov: dict | None = None
     if pack_dir is not None:
@@ -168,7 +172,8 @@ def cmd_create(args) -> None:
             sys.exit(1)
         profile_family = profile_family or pack_family
         try:
-            resolved_cfg = resolve_setup_config(ROOT, pack_dir)
+            resolved_cfg = resolve_setup_config(state_root(),
+                                                pack_dir)
         except ValueError as e:
             print(f"setup_config resolution failed: {e}",
                   file=sys.stderr)
@@ -249,7 +254,8 @@ def cmd_create(args) -> None:
                           file=sys.stderr)
                 sys.exit(1)
         try:
-            resolved_cfg = resolve_setup_config(ROOT, None)
+            resolved_cfg = resolve_setup_config(state_root(),
+                                                None)
         except ValueError as e:
             print(f"setup_config resolution failed: {e}",
                   file=sys.stderr)

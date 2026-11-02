@@ -17,10 +17,10 @@
  "corpus_scope": {
   "family": "redocred",
   "registry_namespace": "redocred",
-  "working_slice": "Dev (500 docs) — gold-audit slice of 30, issue #66 stage 2",
+  "working_slice": "Dev (500 docs) \u2014 gold-audit slice of 30, issue #66 stage 2",
   "sealed_splits": [],
   "untouched_splits": [
-   "train_revised (one revision round — never scored, per survey §3.1)",
+   "train_revised (one revision round \u2014 never scored, per survey \u00a73.1)",
    "test_revised (not used in stage 2)"
   ],
   "cross_corpus_links": "reviewed_edges_only"
@@ -137,7 +137,7 @@
   "sibling"
  ],
  "schema_front": {
-  "purpose": "The corpus schema as the proposer's working instructions: DocRED's closed entity-type inventory and 96-relation inventory. Pack candidate payload (DocRED pack, issue #66 stage 3): relation definitions authored from the denoted Wikidata property's semantics and train-gold usage; endpoint signatures and directionality derived from the TRAIN split (fitting side) — dev is never used for fitting.",
+  "purpose": "The corpus schema as the proposer's working instructions: DocRED's closed entity-type inventory and 96-relation inventory. Pack candidate payload (DocRED pack, issue #66 stage 3): relation definitions authored from the denoted Wikidata property's semantics and train-gold usage; endpoint signatures and directionality derived from the TRAIN split (fitting side) \u2014 dev is never used for fitting.",
   "entity_inventory": [
    {
     "type": "PER",
@@ -473,7 +473,7 @@
     "direction": "directed",
     "signature_note": "Train gold: the modal endpoint pattern covers 14981/20402 (73%) of train triples for this relation. Other attested patterns: ORG->LOC (5091), MISC->LOC (178), LOC->ORG (65).",
     "inverse_of": "contains administrative territorial entity",
-    "extraction_intent": "Extract every containment the text states, at each stated level. The inverse viewpoint (territory -> what it contains) is 'contains administrative territorial entity'. Do not use for bodies of water — that is 'located in or next to body of water'."
+    "extraction_intent": "Extract every containment the text states, at each stated level. The inverse viewpoint (territory -> what it contains) is 'contains administrative territorial entity'. Do not use for bodies of water \u2014 that is 'located in or next to body of water'."
    },
    {
     "type": "genre",
@@ -544,7 +544,7 @@
     ],
     "direction": "directed",
     "signature_note": "Train gold: the modal endpoint pattern covers 230/263 (87%) of train triples for this relation. Other attested patterns: LOC->LOC (14), MISC->LOC (12), LOC->ORG (2).",
-    "extraction_intent": "The stated headquarters place, not merely the country the organization is from — that is 'country' / 'country of origin'."
+    "extraction_intent": "The stated headquarters place, not merely the country the organization is from \u2014 that is 'country' / 'country of origin'."
    },
    {
     "type": "cast member",
@@ -982,7 +982,7 @@
    },
    {
     "type": "notable work",
-    "definition": "A notable work of the subject person — a work they are known for: the subject is the person, the object is the work.",
+    "definition": "A notable work of the subject person \u2014 a work they are known for: the subject is the person, the object is the work.",
     "endpoint_signature": [
      "subject PER -> object MISC"
     ],
@@ -1137,6 +1137,6 @@
   "relation_directionality": "directed"
  },
  "profile_hash": "sha256:36460a1134ef7deda7bb7f4607d47f5855995a9da2e44a99f18288d50e82a068",
- "proposer_guidance": "## Corpus schema (from this corpus's profile — binding)\nThis corpus is open-domain: its documents may be of any genre — narrative, expository, legal, technical, or other. Extract the factual relations the text actually states.\n\n### Entity types\nReport each endpoint's type as \"subject_type\" / \"object_type\" using one of these exact names: PER, ORG, LOC, TIME, NUM, MISC. Use MISC for any endpoint that fits none of the others. Never drop a fact because an endpoint is hard to type.\n\n### Relations\nThis corpus's canonical relations are: head of government, country, place of birth, place of death, father, mother, spouse, country of citizenship, continent, instance of, head of state, capital, official language, position held, child, author, member of sports team, director, screenwriter, educated at, composer, member of political party, employer, founded by, league, publisher, owned by, located in the administrative territorial entity, genre, operator, religion, contains administrative territorial entity, follows, followed by, headquarters location, cast member, producer, award received, creator, parent taxon, ethnic group, performer, manufacturer, developer, series, sister city, legislative body, basin country, located in or next to body of water, military branch, record label, production company, location, subclass of, subsidiary, part of, original language of work, platform, mouth of the watercourse, original network, member of, chairperson, country of origin, has part, residence, date of birth, date of death, inception, dissolved, abolished or demolished, publication date, start time, end time, point in time, conflict, characters, lyrics by, located on terrain feature, participant, influenced by, location of formation, parent organization, notable work, separated from, narrative location, work location, applies to jurisdiction, product or material produced, unemployment rate, territory claimed by, participant of, replaces, replaced by, capital of, languages spoken, written or signed, present in work, sibling.\nWhen a fact the text states matches one of these canonical relations, report \"relation\" as that exact name. When no canonical relation matches, report \"relation\" as the short verb phrase the text itself uses (for example \"danced with\", \"was born in\", \"grants a licence to\"). Never drop a stated fact because its relation is not in the canonical list, and never force a fact into a canonical relation that does not match what the text says.\n\n### Completeness\nBe exhaustive. Extract every fact the excerpt states, including definitions, dates, quantities, amounts, family relations, and facts stated in secondary or subordinate clauses — not only the headline facts. When an excerpt states many facts, return all of them.",
- "proposer_max_per_chunk": 25
+ "proposer_guidance": "## Corpus schema (from this corpus's profile \u2014 binding)\nThis corpus is open-domain: its documents may be of any genre \u2014 narrative, expository, legal, technical, or other. Extract the factual relations the text actually states.\n\n### Entity types\nReport each endpoint's type as \"subject_type\" / \"object_type\" using one of these exact names: PER, ORG, LOC, TIME, NUM, MISC. Use MISC for any endpoint that fits none of the others. Never drop a fact because an endpoint is hard to type.\n\n### Relations\nThis corpus's canonical relations are: head of government, country, place of birth, place of death, father, mother, spouse, country of citizenship, continent, instance of, head of state, capital, official language, position held, child, author, member of sports team, director, screenwriter, educated at, composer, member of political party, employer, founded by, league, publisher, owned by, located in the administrative territorial entity, genre, operator, religion, contains administrative territorial entity, follows, followed by, headquarters location, cast member, producer, award received, creator, parent taxon, ethnic group, performer, manufacturer, developer, series, sister city, legislative body, basin country, located in or next to body of water, military branch, record label, production company, location, subclass of, subsidiary, part of, original language of work, platform, mouth of the watercourse, original network, member of, chairperson, country of origin, has part, residence, date of birth, date of death, inception, dissolved, abolished or demolished, publication date, start time, end time, point in time, conflict, characters, lyrics by, located on terrain feature, participant, influenced by, location of formation, parent organization, notable work, separated from, narrative location, work location, applies to jurisdiction, product or material produced, unemployment rate, territory claimed by, participant of, replaces, replaced by, capital of, languages spoken, written or signed, present in work, sibling.\nWhen a fact the text states matches one of these canonical relations, report \"relation\" as that exact name. When no canonical relation matches, report \"relation\" as the short verb phrase the text itself uses (for example \"danced with\", \"was born in\", \"grants a licence to\"). Never drop a stated fact because its relation is not in the canonical list, and never force a fact into a canonical relation that does not match what the text says.\n\n### Completeness\nBe exhaustive. Extract every fact the excerpt states, including definitions, dates, quantities, amounts, family relations, and facts stated in secondary or subordinate clauses \u2014 not only the headline facts. When an excerpt states many facts, return all of them.",
+ "proposer_max_per_chunk": 40
 }

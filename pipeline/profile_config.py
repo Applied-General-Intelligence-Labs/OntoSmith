@@ -1044,7 +1044,21 @@ def packs_dir_candidates(root) -> list:
     """Every ``packs/`` directory a lookup may consult, in
     resolution order: ``root/packs`` first (a source tree
     or explicit root always wins), then the installed
-    data-files tree when it is a different directory.
+    data-files tree, then the tree beside this package in
+    a source checkout — each only when it is a different
+    directory from the ones before it.
+
+    The package-tree fallback keeps a run whose root is a
+    fresh state directory (ONTOSMITH_ROOT pointing at a
+    workspace, the layout the guides and the quickstart
+    use) resolving the checkout's shipped packs, while the
+    root's own ``packs/`` — when it carries one — shadows
+    them: a pack placed beside the user's data is the pack
+    the user means. (Before this fallback existed in the
+    candidate list, batch creation anchored the lookup at
+    the code tree and a state root's ``packs/`` was silently
+    ignored; artefact resolution already fell back this
+    way, so the two lookups disagreed.)
 
     Missing directories are simply absent from the list —
     a lookup that finds no candidate behaves exactly as
@@ -1055,9 +1069,15 @@ def packs_dir_candidates(root) -> list:
     if local.is_dir():
         candidates.append(local)
     installed = installed_packs_dir()
-    if installed.is_dir() and \
-            installed.resolve() != local.resolve():
+    if installed.is_dir() and all(
+            installed.resolve() != c.resolve()
+            for c in candidates):
         candidates.append(installed)
+    pkg_tree = Path(__file__).resolve().parents[1] / "packs"
+    if pkg_tree.is_dir() and all(
+            pkg_tree.resolve() != c.resolve()
+            for c in candidates):
+        candidates.append(pkg_tree)
     return candidates
 
 
