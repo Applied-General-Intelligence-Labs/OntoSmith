@@ -66,7 +66,7 @@ def read_points(path) -> list[dict]:
 
 def main(argv=None) -> None:
     ap = argparse.ArgumentParser(
-        prog="identity-freeze",
+        prog="ontosmith identity-freeze",
         description="Freeze per-point identity-seat "
                     "decisions into a global decisions "
                     "file (unanimous pairs freeze; "
