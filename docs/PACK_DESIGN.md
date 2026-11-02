@@ -113,6 +113,23 @@ Per surface, concretely:
    freezes the resolution into the batch directory
    (`setup_config.resolved.json`) and stamps it into the
    batch record.
+
+   **The framing exception.** The domain-framing keys
+   (`proposer_framing`, `slot_framing`, `slot_rules`,
+   `pair_judge_generic_relation`) are profile data: the
+   family's own generated profile —
+   `profiles/<family>/setup_config.json` in the state
+   root, written by `ontosmith profile` for the user's
+   corpus — may redeclare any of them over the binding
+   pack's payload at batch creation, and the profile's
+   value governs. No other key crosses: a generated
+   profile's thresholds, inventories, and guards never
+   overlay a pack. A profile that declares no framing
+   leaves the resolution exactly the pack's — the
+   measured path stays byte-identical. Batch creation
+   prints the effective `proposer_framing` with the
+   resolution, so the genre in force is visible before
+   any spend.
 3. Partial packs are legal: a pack that declares only an
    inventory is a vocabulary pack and nothing more.
 4. One active pack per family in format 1. Composition of

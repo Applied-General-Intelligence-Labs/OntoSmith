@@ -293,6 +293,24 @@ METADATA_KEYS: set[str] = {
 }
 
 
+#: The domain-framing keys (§5 of the module docstring):
+#: the one setup_config surface a family's own generated
+#: profile may redeclare over a binding pack's payload at
+#: batch creation (docs/PACK_DESIGN.md §1.3, the framing
+#: exception). Every other key keeps the §1.3 precedence —
+#: the pack governs where it declares, the core elsewhere.
+FRAMING_KEYS = ("proposer_framing", "slot_framing",
+                "slot_rules", "pair_judge_generic_relation")
+
+
+def framing_declarations(cfg: dict | None) -> dict:
+    """The framing declarations a setup_config carries:
+    exactly the FRAMING_KEYS it declares, verbatim ({} when
+    it declares none)."""
+    cfg = cfg or {}
+    return {k: cfg[k] for k in FRAMING_KEYS if k in cfg}
+
+
 def _is_registered(key: str) -> bool:
     return (key in CONSUMED_KEYS or key in METADATA_KEYS
             or key.endswith("_note"))
@@ -471,8 +489,7 @@ def setup_config_errors(cfg: dict, *, merged: bool = False) -> list[str]:
                     "must be a canonical relation string or a "
                     "{'canonical': str, 'flipped': bool} "
                     "declaration object")
-    for fkey in ("proposer_framing", "slot_framing", "slot_rules",
-                 "pair_judge_generic_relation"):
+    for fkey in FRAMING_KEYS:
         fv = cfg.get(fkey)
         if fv is not None and not (isinstance(fv, str) and fv.strip()):
             errors.append(
@@ -1206,6 +1223,36 @@ def pack_for_setup_config(root, family: str,
             pack_setup_config(pdir)  # pin + validation, fail-closed
             return pack_provenance(pdir)
     return None
+
+
+def generated_profile_setup_config(state_root, family: str):
+    """The family's generated profile setup_config, or None.
+
+    The generated profile is the one `ontosmith profile`
+    wrote for the user's own corpus, at
+    ``<state_root>/profiles/<family>/setup_config.json`` —
+    distinct from any pack's staged profile. Returns the
+    parsed dict, or None when the family has no generated
+    profile in this state root. A file that exists but
+    cannot be read as a JSON object raises ValueError
+    (fail closed: a declaration that cannot be read never
+    silently degrades to absent)."""
+    import json
+    path = Path(state_root) / "profiles" / family \
+        / "setup_config.json"
+    if not path.exists():
+        return None
+    try:
+        cfg = json.loads(path.read_text())
+    except Exception as e:
+        raise ValueError(
+            f"generated profile setup_config {path} is not "
+            f"valid JSON: {e}") from e
+    if not isinstance(cfg, dict):
+        raise ValueError(
+            f"generated profile setup_config {path} is not "
+            f"a JSON object")
+    return cfg
 
 
 def profile_setup_config_path(root, family: str):

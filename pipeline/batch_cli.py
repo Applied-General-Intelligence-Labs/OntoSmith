@@ -173,6 +173,40 @@ def cmd_create(args) -> None:
             print(f"setup_config resolution failed: {e}",
                   file=sys.stderr)
             sys.exit(1)
+        # Framing exception (docs/PACK_DESIGN.md §1.3): the
+        # family's own generated profile — the one written
+        # for the user's corpus — may redeclare the
+        # domain-framing keys over the pack's payload.
+        # Framing is profile data (profile_config §5), and a
+        # corpus whose genre differs from the pack's
+        # measured one (a novel under the encyclopedia pack)
+        # otherwise has no surface to say so: the run would
+        # silently propose against the wrong genre. ONLY the
+        # framing keys overlay — every other key keeps the
+        # §1.3 precedence, and a profile that declares no
+        # framing leaves the resolution byte-identical.
+        from .profile_config import (
+            framing_declarations,
+            generated_profile_setup_config,
+            setup_config_errors,
+        )
+        try:
+            _prof_cfg = generated_profile_setup_config(
+                state_root(), profile_family)
+        except ValueError as e:
+            print(f"setup_config validation failed: {e}",
+                  file=sys.stderr)
+            sys.exit(1)
+        _framing = framing_declarations(_prof_cfg)
+        if _framing:
+            resolved_cfg = {**resolved_cfg, **_framing}
+            _errs = setup_config_errors(resolved_cfg,
+                                         merged=True)
+            if _errs:
+                for e in _errs:
+                    print(f"setup_config validation failed: "
+                          f"{e}", file=sys.stderr)
+                sys.exit(1)
         prov = pack_provenance(pack_dir)
     elif profile_family:
         # No binding pack: the core baseline still applies by
@@ -326,6 +360,14 @@ def cmd_create(args) -> None:
         print(f"setup_config: resolved (core baseline + "
               f"{_over}, {len(resolved_cfg)} keys) -> "
               f"setup_config.resolved.json")
+        # The effective proposer framing, printed before
+        # any spend: the genre the run will propose against
+        # is a first-run fact, never a discovery made from
+        # an empty graph afterwards.
+        from .profile_config import proposer_framing
+        _effective_framing = proposer_framing(resolved_cfg)
+        if _effective_framing is not None:
+            print(f"proposer_framing: {_effective_framing}")
     print(f"created batch {batch_id} with {len(paths)} docs")
     print(f"run: python -m pipeline batch run {batch_id}")
 
