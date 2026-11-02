@@ -1,0 +1,515 @@
+{
+ "table_id": "open-domain-relation-declarations",
+ "pack_id": "open-domain",
+ "kind": "relation_declarations",
+ "version": 1,
+ "status": "in_force",
+ "source": {
+  "base": "Declared BEFORE S4 scoring: canonical relation -> acceptable [emission surface, flipped] pairs. flipped=true means the stated triple's subject/object are swapped relative to the canonical head/tail. Transcribed mechanically from the research copy (ontology-scale-test/s4/gold_mapping.json); this artefact is now the shipped declaration.",
+  "base_sha256": "58b6c1796216ecb04913dfc768f7001c43ddd7345f24ef3434002d40cd8189b6",
+  "additions": "Density program Test A (2026-11-01): 14 pairs, origin 'density_test_a', each carrying its justification. Measured on the A-final stack: raw lenient recall 0.4551 -> 0.5150 (+54 gold rows, 0 lost); the gain is the declaration catching up with the pack's actual emission conventions, not an extraction change.",
+  "vocabulary_and_write": "0.1.4 scope freeze items 5-6 (2026-11-01): declared emission vocabulary with no canonical counterpart, and the WRITE canonicalization of the parent/child dual."
+ },
+ "declarations": [
+  {
+   "canonical": "located in the administrative territorial entity",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "located in the administrative territorial entity",
+   "surface": "located in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "contains administrative territorial entity",
+   "surface": "part of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "contains administrative territorial entity",
+   "surface": "located in",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "country",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "country",
+   "surface": "citizen of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "country",
+   "surface": "located in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "participant",
+   "surface": "participant in",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "participant of",
+   "surface": "participant in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "conflict",
+   "surface": "participant in",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "country of citizenship",
+   "surface": "citizen of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "member of",
+   "surface": "member of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "member of sports team",
+   "surface": "member of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "member of political party",
+   "surface": "member of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "location",
+   "surface": "located in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "location",
+   "surface": "occurred in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "location",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "child",
+   "surface": "parent of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "child",
+   "surface": "child of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "mother",
+   "surface": "parent of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "mother",
+   "surface": "child of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "father",
+   "surface": "parent of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "father",
+   "surface": "child of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "place of birth",
+   "surface": "born in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "sibling",
+   "surface": "sibling of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "spouse",
+   "surface": "married to",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "work location",
+   "surface": "employed by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "employer",
+   "surface": "employed by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "replaced by",
+   "surface": "replaced by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "performer",
+   "surface": "performed by",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "creator",
+   "surface": "written by",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "creator",
+   "surface": "developed by",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "league",
+   "surface": "member of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "league",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "parent organization",
+   "surface": "part of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "subsidiary",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "headquarters location",
+   "surface": "located in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "founded by",
+   "surface": "founded by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "publisher",
+   "surface": "published by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "author",
+   "surface": "written by",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "developer",
+   "surface": "developed by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "has part",
+   "surface": "part of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "part of",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "notable work",
+   "surface": "written by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "notable work",
+   "surface": "performed by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "notable work",
+   "surface": "developed by",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "series",
+   "surface": "part of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "mouth of the watercourse",
+   "surface": "flows into",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "located in or next to body of water",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "located in or next to body of water",
+   "surface": "located in",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "located on terrain feature",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "capital",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "capital of",
+   "surface": "part of",
+   "flipped": true,
+   "origin": "s4"
+  },
+  {
+   "canonical": "applies to jurisdiction",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "country of origin",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "s4"
+  },
+  {
+   "canonical": "participant",
+   "surface": "participant in",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "'participant in' with the participant as subject denotes the participation relation; gold 'participant' rows orient from the participant (head=person, tail=event). The same stack shape is already declared acceptable for 'participant of' read the other way."
+  },
+  {
+   "canonical": "conflict",
+   "surface": "participant in",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "Gold 'conflict' rows are participation rows (head = the participant, tail = the conflict event); 'participant in' with the participant as subject denotes exactly that fact."
+  },
+  {
+   "canonical": "performer",
+   "surface": "performed by",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "'performed by' is the passive naming of the performer relation with the work as subject; the mapping already declares ('performed by', False) acceptable for 'notable work'. Gold 'performer' orients head=work."
+  },
+  {
+   "canonical": "creator",
+   "surface": "written by",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "Gold 'creator' orients head=work, tail=creator; (work, 'written by', person) denotes exactly that authorship fact."
+  },
+  {
+   "canonical": "author",
+   "surface": "written by",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "Gold 'author' rows in this corpus orient head=work, tail=author; (work, 'written by', person) denotes it."
+  },
+  {
+   "canonical": "publisher",
+   "surface": "published by",
+   "flipped": true,
+   "origin": "density_test_a",
+   "justification": "(publication, 'published by', person) read person-ward denotes the publisher relation; parallel to the declared ('written by', True) entries for creator/author."
+  },
+  {
+   "canonical": "mother",
+   "surface": "parent of",
+   "flipped": true,
+   "origin": "density_test_a",
+   "justification": "Gold 'mother' orients head=child, tail=mother. (mother, 'parent of', child) read child-ward denotes it; the tail name match picks out the mother specifically (the declared mapping already uses gender-neutral parent carriers for mother/father)."
+  },
+  {
+   "canonical": "mother",
+   "surface": "child of",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "(child, 'child of', mother) denotes the mother relation directly; missing twin of the declared ('child of', True) which serves parent-headed gold relations."
+  },
+  {
+   "canonical": "father",
+   "surface": "parent of",
+   "flipped": true,
+   "origin": "density_test_a",
+   "justification": "Same as mother: (father, 'parent of', child) read child-ward denotes gold (child, 'father', father)."
+  },
+  {
+   "canonical": "father",
+   "surface": "child of",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "Same as mother: (child, 'child of', father) denotes it."
+  },
+  {
+   "canonical": "parent organization",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "A subordinate being 'part of' an organization denotes the parent-organization relation from the subordinate side; gold orients head=subordinate."
+  },
+  {
+   "canonical": "subsidiary",
+   "surface": "part of",
+   "flipped": true,
+   "origin": "density_test_a",
+   "justification": "Inverse view of the same organizational parthood: (subordinate, 'part of', parent) read parent-ward denotes gold (parent, 'subsidiary', subordinate)."
+  },
+  {
+   "canonical": "series",
+   "surface": "part of",
+   "flipped": false,
+   "origin": "density_test_a",
+   "justification": "A work being 'part of' a series IS the series relation; gold orients head=work."
+  },
+  {
+   "canonical": "spouse",
+   "surface": "married to",
+   "flipped": true,
+   "origin": "density_test_a",
+   "justification": "'married to' is symmetric: endpoint order carries no meaning, both orders denote the identical fact. The declared entry accepts only gold's arbitrary order."
+  }
+ ],
+ "no_accepted_surface": [
+  "educated at",
+  "position held",
+  "head of government",
+  "chairperson",
+  "owned by",
+  "residence",
+  "director",
+  "manufacturer",
+  "present in work",
+  "characters",
+  "cast member",
+  "narrative location",
+  "place of death"
+ ],
+ "vocabulary": [
+  "commander of",
+  "formed from",
+  "named after",
+  "teacher of"
+ ],
+ "vocabulary_note": "Emission surfaces attested in the stack (11 triples) that denote no canonical relation in the inventory. Declared as first-class vocabulary - the declaration widens instead of the emission narrowing, because all four state text-grounded facts (formation by merger, naming commemoration, teaching, military command). At WRITE each is its own canonical form.",
+ "write_canonicalizations": [
+  {
+   "surface": "parent of",
+   "canonical": "child of",
+   "flipped": true,
+   "note": "The one true inverse pair in the emission inventory. 'child of' is canonical (emission dominance 27 vs 19 in the measured stack); a triple stated as (parent, 'parent of', child) is stored as (child, 'child of', parent). Measured score-neutral both ways; the product gain is consistency - the stack stated every parent fact twice, once under each dual (19-21 duplicate pairs removed). One declaration; reversing it is a one-line change here."
+  }
+ ],
+ "refusals": [
+  {
+   "canonical": "child",
+   "surface": "parent of",
+   "flipped": true,
+   "reason": "NOT added: gold 'child' orients head=parent (17/20 rows hit naturally); the single residual 'child' row (doc18) orients head=child-person, tail=parent - a gold-side orientation anomaly. Fitting a pair to it would be yardstick overfitting."
+  },
+  {
+   "canonical": "child",
+   "surface": "child of",
+   "flipped": false,
+   "reason": "NOT added: same doc18 anomaly as above."
+  },
+  {
+   "canonical": "notable work",
+   "surface": "written by",
+   "flipped": true,
+   "reason": "NOT added: 'notable work' carries selective semantics (notability) - fan-out to it would manufacture claims the text does not make."
+  },
+  {
+   "canonical": "notable work",
+   "surface": "performed by",
+   "flipped": true,
+   "reason": "NOT added: same selective-semantics reason as above."
+  },
+  {
+   "canonical": "creator",
+   "surface": "developed by",
+   "flipped": false,
+   "reason": "NOT added: semantically parallel to ('written by', False) but no gold creator row corresponds to either 'developed by' emission in this corpus - untestable mapping surface."
+  },
+  {
+   "canonical": "country / country of origin / applies to jurisdiction",
+   "surface": "part of",
+   "flipped": null,
+   "reason": "NOT added: the residual firings for these rows are spurious - substring containment ('australia' inside 'australian government' / inside the agreement's name; 'china' inside 'chinese') fired on triples that do not state the gold fact at all. The facts are absent, not mis-oriented."
+  }
+ ],
+ "consumers": [
+  "pipeline/relation_map.py — load_relation_declarations / acceptance_mapping / write_map; the WRITE canonicalization and vocabulary entries feed RelationNormalizer when the payload declares relation_declarations_source",
+  "verification — acceptance_mapping is the (name, orientation) coverage the recall yardstick scores against"
+ ]
+}

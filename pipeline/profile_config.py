@@ -247,6 +247,14 @@ CONSUMED_KEYS: dict[str, str] = {
     # WRITE (stage_write)
     "relation_map": "WRITE relation normalization "
                     "(RelationNormalizer profile_map)",
+    "relation_declarations_source": "WRITE relation "
+                    "declarations: path (repo-root relative or "
+                    "absolute) of the pinned relation-"
+                    "declarations artefact the WRITE map's "
+                    "canonicalizations and declared vocabulary "
+                    "are read from (stage_write -> "
+                    "relation_map.write_map; the family pack's "
+                    "declarations artefact)",
     "merge_prohibited_type_pairs": "WRITE ER merge prohibitions, "
                                    "both channels "
                                    "(prohibited_type_pairs)",
@@ -437,6 +445,32 @@ def setup_config_errors(cfg: dict, *, merged: bool = False) -> list[str]:
             "'pair_judge_symmetric_source' is not declared — the "
             "JF-F1 symmetric set must come from a pinned pack "
             "artefact, never from core code (fail closed)")
+    rds = cfg.get("relation_declarations_source")
+    if rds is not None and not (isinstance(rds, str) and rds.strip()):
+        errors.append(
+            "setup_config key 'relation_declarations_source' must "
+            "be a non-empty string (path to the pinned relation-"
+            "declarations artefact)")
+    rmap = cfg.get("relation_map")
+    if rmap is not None:
+        if not isinstance(rmap, dict):
+            errors.append(
+                "setup_config key 'relation_map' must be an "
+                "object mapping surface -> canonical")
+        else:
+            for surf, target in rmap.items():
+                if isinstance(target, str) and target:
+                    continue
+                if isinstance(target, dict) \
+                        and isinstance(target.get("canonical"), str) \
+                        and target["canonical"] \
+                        and isinstance(target.get("flipped"), bool):
+                    continue
+                errors.append(
+                    f"setup_config 'relation_map' entry {surf!r} "
+                    "must be a canonical relation string or a "
+                    "{'canonical': str, 'flipped': bool} "
+                    "declaration object")
     for fkey in ("proposer_framing", "slot_framing", "slot_rules",
                  "pair_judge_generic_relation"):
         fv = cfg.get(fkey)
@@ -895,6 +929,43 @@ def effective_role_words(root, cfg) -> frozenset | None:
             f"{family!r}); the declaring pack must ship a "
             "role_words artefact")
     return vocab
+
+
+def pack_relation_declarations(pack_dir) -> dict | None:
+    """The pack's relation declarations, or None.
+
+    The declarations are pack DATA: a pack ships them as a
+    ``relation_declarations`` artefact in its manifest,
+    sha256-pinned like the payload. Returns None when the
+    manifest lists no such artefact. Fail-closed: a listed
+    artefact that is missing, pin-drifted, or structurally
+    invalid raises ValueError naming the defect — a declared
+    mapping never runs on a guessed table.
+    """
+    import hashlib
+
+    from .relation_map import load_relation_declarations
+    manifest = load_pack_manifest(pack_dir)
+    root = _pack_root(pack_dir)
+    for art in manifest.get("artefacts") or []:
+        if not isinstance(art, dict) \
+                or art.get("kind") != "relation_declarations":
+            continue
+        apath = root / art["path"]
+        if not apath.exists():
+            raise ValueError(
+                f"pack {manifest['pack_id']!r}: "
+                f"relation_declarations artefact not found: "
+                f"{apath}")
+        digest = hashlib.sha256(apath.read_bytes()).hexdigest()
+        if art.get("sha256") and digest != art["sha256"]:
+            raise ValueError(
+                f"pack {manifest['pack_id']!r}: "
+                f"relation_declarations artefact pin mismatch — "
+                f"manifest pins sha256:{art['sha256'][:16]}… but "
+                f"{apath} hashes to sha256:{digest[:16]}…")
+        return load_relation_declarations(apath)
+    return None
 
 
 def installed_packs_dir() -> Path:

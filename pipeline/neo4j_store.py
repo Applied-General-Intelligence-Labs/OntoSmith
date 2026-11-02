@@ -582,6 +582,12 @@ class Neo4jEntityRegistry(EntityRegistry):
         from .registry import pick_survivor
         cur = self.get(existing_id)
         best = pick_survivor([cur.name, new.name]) if cur else new.name
+        # The incoming entity's own aliases are retained alongside
+        # its name (union semantics, as in the file registry):
+        # a merge never drops an attested surface form.
+        extra = [f for f in dict.fromkeys(new.aliases)
+                 if f != best and f != new.name
+                 and f not in (cur.aliases if cur else [])]
         self.c.run([{
             "statement": (
                 "MATCH (e:Entity {entity_id: $id}) "
@@ -589,7 +595,7 @@ class Neo4jEntityRegistry(EntityRegistry):
                 "e.aliases = coalesce(e.aliases, []) + $alias"
             ),
             "parameters": {"id": existing_id, "best": best,
-                           "alias": [new.name]}}])
+                           "alias": [new.name, *extra]}}])
         return existing_id
 
 

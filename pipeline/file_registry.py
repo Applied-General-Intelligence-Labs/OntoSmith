@@ -262,7 +262,10 @@ class SqliteEntityRegistry(EntityRegistry):
                 return existing_id
             best = pick_survivor([cur.name, new.name])
             aliases = list(cur.aliases)
-            for form in (cur.name, new.name):
+            # The incoming entity's own aliases are retained on
+            # the survivor alongside both names — a merge unions
+            # the surface sets, it never drops an attested form.
+            for form in (cur.name, new.name, *new.aliases):
                 if form != best and form not in aliases:
                     aliases.append(form)
             self._con.execute(

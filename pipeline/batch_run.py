@@ -2030,11 +2030,26 @@ def stage_write(b: Batch, root: Path, stages: list[str],
             # exactly as before. Untyped mention -> label "" ->
             # legacy behavior.
             label = j.get(type_key) or ""
+            # Declared-surface retention: when the endpoint was
+            # proposed in a normalized form (the declared-surface
+            # proposer layer — a country name for a nationality
+            # adjective, 'Germany' for 'German'), the record
+            # carries the attested surface in *_attested. It
+            # travels into the registry as an alias of the
+            # endpoint's entity, so the attested form stays
+            # addressable instead of being dropped at WRITE.
+            att_key = ("subject_attested"
+                       if type_key == "subject_type"
+                       else "object_attested")
+            attested = j.get(att_key) or ""
+            extra_aliases = [attested] if attested \
+                and attested != name else []
             hit = er_match(name, "", j.get("context", "")[:500],
                            j["doc_id"], mention_type=label)
             if hit:
                 existing, gate_p = hit
                 new_ent = Entity(entity_id="", name=name, label=label,
+                                 aliases=extra_aliases,
                                  batch_id=b.batch_id, run_id=b.run_id,
                                  doc_id=j["doc_id"], corpus=corpus)
                 if gate_p is None:
@@ -2050,6 +2065,7 @@ def stage_write(b: Batch, root: Path, stages: list[str],
             else:
                 ent_ids[key] = registry.create(
                     Entity(entity_id="", name=name, label=label,
+                           aliases=extra_aliases,
                            batch_id=b.batch_id, run_id=b.run_id,
                            doc_id=j["doc_id"], corpus=corpus))
     # 1.4. Store identity: the store holds ONE
@@ -2111,17 +2127,54 @@ def stage_write(b: Batch, root: Path, stages: list[str],
     # 2. Graph second (derived view). Relations are normalized at
     # WRITE: profile vocabulary / explicit map / deterministic
     # canonical form; unmapped surfaces pass through and are counted
-    # in relation_map.json for the per-batch report.
+    # in relation_map.json for the per-batch report. When the
+    # profile names a relation-declarations artefact
+    # (relation_declarations_source), its WRITE view — declared
+    # canonicalizations + declared vocabulary — seeds the map;
+    # the profile's own relation_map entries win per surface.
+    # A flipped canonicalization renames the relation AND swaps
+    # the endpoints, so the stored triple reads in the canonical
+    # direction.
     from .relation_map import RelationNormalizer
+    profile_map = dict((setup_cfg or {}).get("relation_map")
+                       or {})
+    decl_src = (setup_cfg or {}).get(
+        "relation_declarations_source")
+    if decl_src:
+        from .relation_map import (
+            load_relation_declarations,
+            write_map,
+        )
+        dpath = Path(decl_src)
+        if not dpath.is_absolute():
+            # Pack-declared artefact paths are workspace-relative,
+            # resolved against the batch state root (as for the
+            # JF-F1 symmetric source).
+            dpath = root / dpath
+        try:
+            declarations = load_relation_declarations(dpath)
+            declared_map = write_map(declarations)
+        except Exception as e:
+            raise ValueError(
+                f"relation declarations artefact {dpath} is "
+                f"unreadable or malformed: {e} (fail closed)"
+            ) from e
+        for key, entry in declared_map.items():
+            profile_map.setdefault(key, entry)
+        _log(b.batch_id,
+             f"WRITE: relation declarations from {decl_src} "
+             f"({len(declared_map)} write entries)")
     normalizer = RelationNormalizer(
-        profile_map=(setup_cfg or {}).get("relation_map"),
+        profile_map=profile_map,
         vocab=(setup_cfg or {}).get("label_categories") or [])
     triples = []
     for j in tier1:
-        stored_rel, _layer = normalizer.normalize(j["relation"])
+        s_name, stored_rel, o_name, _layer = \
+            normalizer.normalize_triple(
+                j["subject"], j["relation"], j["object"])
         triples.append(Triple(
-            subject_id=ent_ids[j["subject"].lower()],
-            object_id=ent_ids[j["object"].lower()],
+            subject_id=ent_ids[s_name.lower()],
+            object_id=ent_ids[o_name.lower()],
             relation=stored_rel, p_true=j["p_true"],
             tier=1, tag="VERIFIED",
             batch_id=b.batch_id, run_id=b.run_id,
