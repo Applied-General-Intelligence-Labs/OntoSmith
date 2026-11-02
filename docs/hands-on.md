@@ -136,6 +136,7 @@ $ ontosmith batch create --source examples/corpus --collection demo \
     --max-cost-usd 2
 profile: demo sha256:7ae51d31fa9120ec
 binding: reference
+setup_config: resolved (core baseline + profile 'demo', 32 keys) -> setup_config.resolved.json
 created batch demo-4docs with 4 docs
 run: python -m pipeline batch run demo-4docs
 ```
@@ -547,7 +548,7 @@ actually wrote.
 ```console
 $ ontosmith ontology emit drafts/demo-ceramics.json \
     --approval drafts/approval_<date>.json --out-root .
-pack emitted: ./packs/demo-ceramics
+pack emitted: packs/demo-ceramics
   payload pin sha256:0e521c59d46b0db6…
 ```
 
@@ -583,7 +584,7 @@ $ ontosmith batch create --source examples/corpus --collection demo-own \
 profile: demo sha256:7ae51d31fa9120ec
 pack: demo-ceramics 0.1.0 (payload sha256:0e521c59d46b0db6…)
 binding: reference
-setup_config: resolved (core baseline + demo-ceramics, 25 keys) -> setup_config.resolved.json
+setup_config: resolved (core baseline + demo-ceramics, 26 keys) -> setup_config.resolved.json
 created batch demo-own-4docs with 4 docs
 ```
 
