@@ -7,6 +7,8 @@ and the project adheres to
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-01
+
 ### Added
 
 - **Relation declarations** — a pack can now ship its
