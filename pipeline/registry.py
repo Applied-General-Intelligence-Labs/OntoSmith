@@ -65,9 +65,10 @@ def index_normalize(name: str) -> str:
 
     The form-variant rules: case folding, diacritic folding
     ('Léon' → 'leon'), punctuation/underscore cleanup (via
-    normalize_name), and stripping of leading honorific tokens
-    ('Dr. Smith' → 'smith'). Index keys drive candidate LOOKUP only;
-    they are never an auto-merge decision.
+    normalize_name), the spaced-hyphen fold ('Charles -
+    Édouard' → 'charles-édouard'), and stripping of leading
+    honorific tokens ('Dr. Smith' → 'smith'). Index keys drive
+    candidate LOOKUP only; they are never an auto-merge decision.
     """
     import unicodedata
     n = unicodedata.normalize("NFKD", name)
@@ -77,6 +78,27 @@ def index_normalize(name: str) -> str:
     # string's ends, so 'Dr. Smith' would otherwise keep 'dr.'.
     toks = [t.strip(".,;:") for t in n.split(" ")]
     toks = [t for t in toks if t]
+    # Spaced-hyphen fold: tokenized corpora space their hyphens
+    # ('Charles - Édouard', 'Kang Won - yong') — the same
+    # punctuation-spacing convention the guard's attestation
+    # tier collapses (proposer.punct_collapse). A standalone
+    # hyphen token joins its neighbours, so the spaced and
+    # closed forms share one index key and resolve as form
+    # variants of one name. The fold lives in the index key
+    # only: stored surfaces are never rewritten, and a merge
+    # retains BOTH attested forms (one as the name, the other
+    # as an alias) — alias retention, not replacement (the
+    # replacement form measured net-negative in the density
+    # program: gold itself mixes the two conventions).
+    folded: list[str] = []
+    for tok in toks:
+        if tok in ("-", "\u2013", "\u2014") and folded:
+            folded[-1] += "-"
+        elif folded and folded[-1].endswith("-"):
+            folded[-1] += tok
+        else:
+            folded.append(tok)
+    toks = folded
     while len(toks) > 1 and toks[0] in _HONORIFICS:
         toks = toks[1:]
     return " ".join(toks)
@@ -213,7 +235,9 @@ class EntityRegistry(ABC):
     def merge(self, existing_id: str, new: Entity,
               model: str = "", p_same: float | None = None) -> str:
         """Merge new entity into existing. Returns surviving entity_id.
-        The new name is added as an alias; provenance is preserved.
+        The new name is added as an alias, and any aliases the new
+        entity carries are retained on the survivor (unioned, never
+        dropped); provenance is preserved.
         model/p_same record the deciding gate when a gate made the
         call (deterministic form-variant merges pass neither)."""
 

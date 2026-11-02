@@ -397,9 +397,9 @@ $ ontosmith batch create --source demo --collection redocred-dev-subset \
     --docs "demo-data/doc_*.txt" --profile profiles/redocred/profile.json \
     --pack open-domain --max-cost-usd 2
 profile: redocred sha256:aceac6fb15f59e38
-pack: open-domain 0.5.0 (payload sha256:ee9a1960f01d44ae…)
+pack: open-domain 0.6.0 (payload sha256:ac14ac0483ed444b…)
 binding: reference
-setup_config: resolved (core baseline + open-domain, 34 keys) -> setup_config.resolved.json
+setup_config: resolved (core baseline + open-domain, 36 keys) -> setup_config.resolved.json
 created batch redocred-dev-subset-40docs with 40 docs
 ```
 
@@ -904,7 +904,7 @@ $ ontosmith batch create --source cuad-subset-100 \
 profile: fibo-cuad sha256:b54c32666bb16ea7
 pack: fibo-contracts 0.1.0 (payload sha256:0d77115fb79acf07…)
 binding: reference
-setup_config: resolved (core baseline + fibo-contracts, 26 keys) -> setup_config.resolved.json
+setup_config: resolved (core baseline + fibo-contracts, 27 keys) -> setup_config.resolved.json
 created batch fibo-cuad-100-100docs with 100 docs
 ```
 

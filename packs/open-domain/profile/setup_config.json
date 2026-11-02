@@ -27,6 +27,7 @@
  },
  "c1_whitelist": null,
  "c1_whitelist_note": "unchanged from the playbook: never fires on LLM-proposed candidates",
+ "relation_declarations_source": "packs/open-domain/relation_declarations.json",
  "label_categories": [],
  "label_categories_note": "triples-only (DP-B11 analog)",
  "proposer_framing": "Extract factual relations from this encyclopedia article excerpt.",

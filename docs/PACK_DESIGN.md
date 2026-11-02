@@ -208,7 +208,7 @@ carry exactly those paths, no more and no fewer.
 | `convention_notes[].note` | string | yes | — (record) | The observation, in aggregate form |
 | `convention_notes[].status` | enum: `in_force`, `observed_not_in_force` | yes | — (record) | `in_force`: states a rule the in-force payload follows; `observed_not_in_force`: recorded observation, governs nothing |
 | `artefacts` | array | no | loader | In-force pack data files beyond the payload, each pinned |
-| `artefacts[].kind` | string | yes | loader | Artefact kind; the loader consumes `role_words`, other kinds ride as data through the payload's declarations |
+| `artefacts[].kind` | string | yes | loader | Artefact kind; the loader consumes `role_words` and `relation_declarations` (the latter named by the payload's `relation_declarations_source` key), other kinds ride as data through the payload's declarations |
 | `artefacts[].path` | string | yes | loader | Repo-relative path of the artefact file |
 | `artefacts[].sha256` | string (sha256 hex) | yes | loader (pin) | The pin over the artefact's bytes |
 | `artefacts[].note` | string | no | — (record) | What the artefact is and how it is consumed |

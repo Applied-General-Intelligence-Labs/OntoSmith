@@ -9,6 +9,33 @@ and the project adheres to
 
 ### Added
 
+- **Relation declarations** — a pack can now ship its
+  relation coverage as a pinned `relation_declarations`
+  artefact: per canonical relation, the emission surfaces
+  that denote it and the orientation each is stated in.
+  The open-domain pack's table (v1) carries the
+  S4-declared base plus 14 (name, orientation) pairs the
+  density program's orientation test measured (+54 gold
+  rows on the A-final stack, a declaration-coverage gain,
+  not an extraction change), the declared emission
+  vocabulary with no canonical counterpart (`formed
+  from`, `named after`, `teacher of`, `commander of`),
+  and one WRITE canonicalization: `parent of` is stored
+  as `child of` with endpoints swapped, ending the dual
+  double-statements. `pipeline/relation_map.py` loads
+  the declaration when the profile declares
+  `relation_declarations_source`; profile `relation_map`
+  entries may also carry `{canonical, flipped}` objects
+  directly.
+- **Alias retention at WRITE** — registry index keys now
+  fold spaced hyphens (`Charles - Édouard` ≡
+  `Charles-Édouard`), so the two attested forms resolve
+  as variants of one entity and both stay on it (name +
+  alias) instead of splitting; a merge unions the
+  incoming entity's aliases rather than dropping them,
+  and a proposer's declared attested surface (e.g.
+  `German` for `Germany`) is retained as an alias of the
+  endpoint's entity.
 - **Global identity freeze** — the identity seat's
   frozen decisions now have a corpus-level form.
   `ontosmith identity-freeze` groups per-point

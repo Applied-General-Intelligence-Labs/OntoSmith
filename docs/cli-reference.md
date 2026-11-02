@@ -247,6 +247,31 @@ options:
                     probed')
 ```
 
+### `ontosmith identity-freeze` — Freeze per-point identity-seat decisions into a global decisions file
+
+`ontosmith identity-freeze --help`:
+
+```text
+usage: ontosmith identity-freeze [-h] points freeze
+
+Freeze per-point identity-seat decisions into a global decisions file
+(unanimous pairs freeze; disagreeing pairs become ambiguous records).
+
+positional arguments:
+  points      per-point decisions JSONL ({doc, ep, cand, decision})
+  freeze      output global freeze JSONL
+
+options:
+  -h, --help  show this help message and exit
+```
+
+The freeze is the corpus-level form of the identity
+seat's frozen decisions: a profile declares the output
+file as `identity_seat_decisions_global`, and pairs the
+freeze promoted to ambiguous defer to the rule chain
+and surface in the batch's `identity_ambiguous.jsonl`
+([connections.md](connections.md#the-identity-seat)).
+
 ### `ontosmith batch` — Batch pipeline: create/run/status/rollback + ER settlement
 
 `ontosmith batch --help`:
@@ -372,8 +397,14 @@ options:
 > - **`relations_unmapped`** — the number of written
 >   triples whose surface relation matched nothing at
 >   WRITE: not the profile's `label_categories`
->   vocabulary, not its explicit `relation_map`, and
->   unchanged by the deterministic canonicalization
+>   vocabulary, not its explicit `relation_map`, not
+>   the WRITE view of its pack's relation declarations
+>   (when the profile declares
+>   `relation_declarations_source`: the declared
+>   canonicalizations — a flipped entry renames the
+>   relation and swaps the endpoints — and the declared
+>   vocabulary, each surface its own canonical form),
+>   and unchanged by the deterministic canonicalization
 >   (case/whitespace folding, auxiliary stripping,
 >   `_`-joining). An unmapped relation is not dropped:
 >   it is stored **unchanged** and counted here. The
