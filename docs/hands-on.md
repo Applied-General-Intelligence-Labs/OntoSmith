@@ -402,7 +402,7 @@ profile: redocred sha256:aceac6fb15f59e38
 pack: open-domain 0.6.0 (payload sha256:ac14ac0483ed444b…)
 binding: reference
 setup_config: resolved (core baseline + open-domain, 36 keys) -> setup_config.resolved.json
-proposer_framing: Extract factual relations from this encyclopedia article excerpt.
+proposer_framing: Extract factual relations from this document excerpt.
 created batch redocred-dev-subset-40docs with 40 docs
 ```
 
