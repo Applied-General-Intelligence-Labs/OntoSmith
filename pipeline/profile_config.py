@@ -1001,6 +1001,45 @@ def installed_packs_dir() -> Path:
         "ontosmith" / "packs"
 
 
+def resolve_pack_artefact(root, rel_path):
+    """Resolve a pack-declared artefact path to a file, or None.
+
+    Pack profiles name artefacts by workspace-relative paths
+    (``packs/<pack>/<file>``). A batch run may execute from a
+    state root that carries no ``packs/`` tree of its own — a
+    fresh root, or a wheel install whose packs live in the
+    data-files tree — so a root-only resolution fails closed
+    on runs the pack lookup itself accepted. Resolution order:
+    the state root (the checkout layout, which always wins),
+    then every packs tree a lookup may consult
+    (packs_dir_candidates: root/packs, the installed tree),
+    then the tree beside this package in a source checkout,
+    with the leading ``packs/`` segment mapped onto each tree.
+    None when no candidate holds the file — callers fail
+    closed on None exactly as on a missing root-relative file.
+    """
+    from pathlib import Path
+    rel = Path(rel_path)
+    if rel.is_absolute():
+        return rel if rel.exists() else None
+    direct = Path(root) / rel
+    if direct.exists():
+        return direct
+    parts = rel.parts
+    if parts and parts[0] == "packs":
+        rest = Path(*parts[1:])
+        trees = list(packs_dir_candidates(root))
+        pkg_tree = Path(__file__).resolve().parents[1] / "packs"
+        if pkg_tree.is_dir() and all(
+                pkg_tree.resolve() != t.resolve() for t in trees):
+            trees.append(pkg_tree)
+        for tree in trees:
+            cand = tree / rest
+            if cand.exists():
+                return cand
+    return None
+
+
 def packs_dir_candidates(root) -> list:
     """Every ``packs/`` directory a lookup may consult, in
     resolution order: ``root/packs`` first (a source tree

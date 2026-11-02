@@ -1,88 +1,88 @@
 {
-  "artefacts": [
-    {
-      "kind": "direction_declarations",
-      "note": "The 96 types' direction / inverse_of declarations, mechanically extracted from the v2 payload's schema_front. Consumed as DATA by the batch path: the JF-F1 symmetric set is read from this artefact through the profile's pair_judge_symmetric_source key (stage 11, W-1/W-2). Not a prompt surface.",
-      "path": "packs/open-domain/direction_declarations.json",
-      "sha256": "33f46b54bef4ff895f6d013d00a6a033db63804868a51c00a18d356aee2599b8",
-      "status": "in_force_emission_data_only"
-    },
-    {
-      "kind": "normalization_table",
-      "note": "The scoring instrument's TN declarations (table docred-tn, version 2): TN-1 symmetric types and TN-2 inverse pairs frozen at v1; TN-3 relation groups, TN-4 inverse expansions and TN-5 subsumptions adopted 2026-10-29 under registered evaluation RE-TN-1 (conformance DC-6) for the EXTENDED figure only — the frozen v1 figure is always reported beside it. Consumed as DATA by the verification path: harness.verification.verify_cli.load_table reads this file directly. Not a prompt surface; never emitted as relations.",
-      "path": "packs/open-domain/tn_table.json",
-      "sha256": "8cd5aa1c2691ca3894a00dbddc3269d6328409e8126726829ccd1fea5babfe6b",
-      "status": "in_force"
-    },
-    {
-      "kind": "relation_declarations",
-      "note": "The pack's relation declarations (table open-domain-relation-declarations, version 1): per canonical relation, the emission surfaces that denote it and the orientation each is stated in — the base set declared before S4 scoring, plus 14 (name, orientation) pairs adopted 2026-11-01 from the density program's Test A (conformance entry DC-7), the declared emission vocabulary with no canonical counterpart (formed from / named after / teacher of / commander of), and the one WRITE canonicalization (parent of -> child of, flipped). Consumed as DATA: pipeline/relation_map.py loads it (load_relation_declarations) when the payload declares relation_declarations_source; its acceptance view is the coverage the recall yardstick scores against. Not a prompt surface.",
-      "path": "packs/open-domain/relation_declarations.json",
-      "sha256": "b47ddfaf0f023338b5a0a4b32d47c9936e1c530220d383a6dd0d54b86a1ccaef",
-      "status": "in_force"
-    }
-  ],
-  "assembled": "2026-10-21",
-  "candidates": [
-    {
-      "kind": "setup_config",
-      "note": "Authored-definitions payload. Not adopted: the stage-4 pilot that priced it ran under configurations the fitting line later corrected, and its counted ceilings sit below the v1 payload's measured rates. Adoption only via a registered gate in a future pack version; the bytes stay in the repo. Its direction declarations ARE in force as emission data via direction_declarations.json (this manifest's artefacts list).",
-      "path": "packs/open-domain/profile/setup_config_v2.json",
-      "profile_version": 2,
-      "sha256": "d65d74e9abdc0e83a3e03302b31bf472a66e10b79cddb6d9ceeb18a445b22022",
-      "status": "candidate_not_in_force"
-    }
-  ],
-  "conformance_record": "conformance.json",
-  "contents_index": {
-    "entity_inventory": "DocRED's 6 entity types (PER / ORG / LOC / TIME / NUM / MISC) with definitions and form examples, carried from profile v1; v2 adds one audit-grounded extraction prohibition: demonym adjectives are never LOC endpoints (stage-2 audit, Set B malformed-gold species).",
-    "merge_prohibitions": "MP-1: never merge entities of different schema types (carried from v1).",
-    "metadata_declarations": "Per-run parameter declarations mirrored in the payload (triple_threshold 0.25, review_band 0.25-0.50, er_threshold 0.40, er_cross_doc_min_p_same 0.85, embed_model, batch_cost_cap_usd, provider_sort). Declarations, not live values — BatchConfig governs the run (docs/PACK_DESIGN.md §3).",
-    "relation_directionality": "schema_front declares 'directed': DocRED relations hold in the annotated direction. 3 of 96 types are declared symmetric per type (spouse, sister city, sibling); 7 inverse pairs (14 entries) are declared via inverse_of. The declarations are materialized as direction_declarations.json and are IN FORCE as emission data: the JF-F1 pair judge's symmetric set is read from that artefact (pack 0.2.0). father / mother / child carry no inverse_of — a recorded gap in the artefact, not filled by invention. The guidance RENDERING of directionality remains candidate (the renderer's fixed undirected line is a registered defect until the rendering is fitted).",
-    "relation_inventory": "All 96 DocRED relations. Each entry: an authored definition (anchored on the Wikidata property the label denotes — rel_info.json P-id — and on train-gold usage), a train-derived modal endpoint signature with its coverage share and other attested patterns (signature_note), a direction declaration, an inverse_of pointer where the inventory contains the inverse, and an extraction_intent for the confusable clusters (inverse pairs, containment cluster, date cluster, creator cluster, whole/part non-transfer).",
-    "relation_declarations": "The relation declarations (relation_declarations.json, version 1) ship as a pinned artefact: the (name, orientation) acceptance coverage per canonical relation — S4-declared base plus the density program's 14 Test A pairs (DC-7) — the declared emission vocabulary without a canonical counterpart, and the WRITE canonicalization of the parent/child dual to 'child of'. The payload declares the artefact via relation_declarations_source; pipeline/relation_map.py consumes it as data at WRITE and for verification.",
-    "scoring_normalization": "The TN matching-normalization table (tn_table.json, docred-tn v2) ships as a pinned artefact: TN-1/TN-2 frozen; TN-3 relation groups, TN-4 inverse expansions, TN-5 subsumptions adopted under registered evaluation RE-TN-1 (conformance DC-6) for the extended figure only, with the frozen figure always reported beside it."
+ "artefacts": [
+  {
+   "kind": "direction_declarations",
+   "note": "The 96 types' direction / inverse_of declarations, mechanically extracted from the v2 payload's schema_front. Consumed as DATA by the batch path: the JF-F1 symmetric set is read from this artefact through the profile's pair_judge_symmetric_source key (stage 11, W-1/W-2). Not a prompt surface.",
+   "path": "packs/open-domain/direction_declarations.json",
+   "sha256": "33f46b54bef4ff895f6d013d00a6a033db63804868a51c00a18d356aee2599b8",
+   "status": "in_force_emission_data_only"
   },
-  "convention_notes": [
-    {
-      "id": "CN-1",
-      "note": "Dev gold contains world-knowledge triples not stated in the released text (concentrated in located-in / country / present-in-work): measured pair support 0.5859 on the stage-2 audit sample (58/99). Exact-match recall against this gold is capped near 0.59 at pair level; recall is therefore reported against the judged-supported denominator (the main-run design, §3).",
-      "status": "observed_not_in_force"
-    },
-    {
-      "id": "CN-2",
-      "note": "Gold occasionally uses a demonym adjective as a LOC cluster's only mention (e.g. 'Russian' as the tail of a located-in triple) — malformed under any convention. The pack's extraction side prohibits demonym endpoints; the scoring side does not credit them.",
-      "status": "observed_not_in_force"
-    },
-    {
-      "id": "CN-3",
-      "note": "Gold-side cluster splitting exists (7/49 sampled mentions, stage-2 audit step 3) but barely damages triple-level recall under surface matching: stage-3 decomposition bucket (f) = 1 of 1,098 misses. Recorded so a future entity-level measurement on this corpus inherits the warning.",
-      "status": "observed_not_in_force"
-    },
-    {
-      "id": "CN-4",
-      "note": "Dev/test gold received two revision rounds, train one (Re-DocRED paper). Scoring is dev-only, permanently; train is the fitting side for definitions, signatures, and examples.",
-      "status": "observed_not_in_force"
-    },
-    {
-      "id": "CN-5",
-      "note": "Renamed pre-release (2026-10-22): pack id 'general-documents' / display 'General Documents' -> 'open-domain' / 'Open Domain'. The old name collided with the 'General' baseline pack (itself renamed 'Core'): the baseline is a layer, this pack is the open-domain (general prose) domain. Manifest identity and internal paths were updated and the version bumped; the payload, candidate, and artefact bytes — and their pins — are unchanged.",
-      "status": "in_force"
-    }
-  ],
-  "design": "docs/PACK_DESIGN.md",
-  "display_name": "Open Domain",
-  "pack_format": 1,
-  "pack_id": "open-domain",
-  "pack_version": "0.6.0",
-  "payload": {
-    "kind": "setup_config",
-    "note": "In force. The fitted production configuration (stages 4c-12) runs on the v1 payload: the full v1 guidance is the extraction surface the fitting line adopted (J5s0/J3F/J3F2 all rejected; the v2 payload's cost ceilings sit below v1's, so v2 was never priced in the corrected configuration). Promotion binds the v1 bytes by this pin, per the main-run design (section 6). Pack 0.6.0 adds one key to the v1 bytes: relation_declarations_source, naming the pack's relation-declarations artefact (DC-7); no other payload content changes.",
-    "path": "packs/open-domain/profile/setup_config.json",
-    "profile_version": 1,
-    "sha256": "ac14ac0483ed444bf876d0c446bd571cf47a4b53ea2f51c52b25b2b5151d174e"
+  {
+   "kind": "normalization_table",
+   "note": "The scoring instrument's TN declarations (table docred-tn, version 2): TN-1 symmetric types and TN-2 inverse pairs frozen at v1; TN-3 relation groups, TN-4 inverse expansions and TN-5 subsumptions adopted 2026-10-29 under registered evaluation RE-TN-1 (conformance DC-6) for the EXTENDED figure only — the frozen v1 figure is always reported beside it. Consumed as DATA by the verification path: harness.verification.verify_cli.load_table reads this file directly. Not a prompt surface; never emitted as relations.",
+   "path": "packs/open-domain/tn_table.json",
+   "sha256": "8cd5aa1c2691ca3894a00dbddc3269d6328409e8126726829ccd1fea5babfe6b",
+   "status": "in_force"
   },
-  "profile_family": "redocred",
-  "status": "in_force",
-  "validated_on": "Re-DocRED"
+  {
+   "kind": "relation_declarations",
+   "note": "The pack's relation declarations (table open-domain-relation-declarations, version 1): per canonical relation, the emission surfaces that denote it and the orientation each is stated in — the base set declared before S4 scoring, plus 14 (name, orientation) pairs adopted 2026-11-01 from the density program's Test A (conformance entry DC-7), the declared emission vocabulary with no canonical counterpart (formed from / named after / teacher of / commander of), and the one WRITE canonicalization (parent of -> child of, flipped). Consumed as DATA: pipeline/relation_map.py loads it (load_relation_declarations) when the payload declares relation_declarations_source; its acceptance view is the coverage the recall yardstick scores against. Not a prompt surface.",
+   "path": "packs/open-domain/relation_declarations.json",
+   "sha256": "b47ddfaf0f023338b5a0a4b32d47c9936e1c530220d383a6dd0d54b86a1ccaef",
+   "status": "in_force"
+  }
+ ],
+ "assembled": "2026-10-21",
+ "candidates": [
+  {
+   "kind": "setup_config",
+   "note": "Authored-definitions payload. Not adopted: the stage-4 pilot that priced it ran under configurations the fitting line later corrected, and its counted ceilings sit below the v1 payload's measured rates. Adoption only via a registered gate in a future pack version; the bytes stay in the repo. Its direction declarations ARE in force as emission data via direction_declarations.json (this manifest's artefacts list).",
+   "path": "packs/open-domain/profile/setup_config_v2.json",
+   "profile_version": 2,
+   "sha256": "d65d74e9abdc0e83a3e03302b31bf472a66e10b79cddb6d9ceeb18a445b22022",
+   "status": "candidate_not_in_force"
+  }
+ ],
+ "conformance_record": "conformance.json",
+ "contents_index": {
+  "entity_inventory": "DocRED's 6 entity types (PER / ORG / LOC / TIME / NUM / MISC) with definitions and form examples, carried from profile v1; v2 adds one audit-grounded extraction prohibition: demonym adjectives are never LOC endpoints (stage-2 audit, Set B malformed-gold species).",
+  "merge_prohibitions": "MP-1: never merge entities of different schema types (carried from v1).",
+  "metadata_declarations": "Per-run parameter declarations mirrored in the payload (triple_threshold 0.25, review_band 0.25-0.50, er_threshold 0.40, er_cross_doc_min_p_same 0.85, embed_model, batch_cost_cap_usd, provider_sort). Declarations, not live values — BatchConfig governs the run (docs/PACK_DESIGN.md §3).",
+  "relation_directionality": "schema_front declares 'directed': DocRED relations hold in the annotated direction. 3 of 96 types are declared symmetric per type (spouse, sister city, sibling); 7 inverse pairs (14 entries) are declared via inverse_of. The declarations are materialized as direction_declarations.json and are IN FORCE as emission data: the JF-F1 pair judge's symmetric set is read from that artefact (pack 0.2.0). father / mother / child carry no inverse_of — a recorded gap in the artefact, not filled by invention. The guidance RENDERING of directionality remains candidate (the renderer's fixed undirected line is a registered defect until the rendering is fitted).",
+  "relation_inventory": "All 96 DocRED relations. Each entry: an authored definition (anchored on the Wikidata property the label denotes — rel_info.json P-id — and on train-gold usage), a train-derived modal endpoint signature with its coverage share and other attested patterns (signature_note), a direction declaration, an inverse_of pointer where the inventory contains the inverse, and an extraction_intent for the confusable clusters (inverse pairs, containment cluster, date cluster, creator cluster, whole/part non-transfer).",
+  "relation_declarations": "The relation declarations (relation_declarations.json, version 1) ship as a pinned artefact: the (name, orientation) acceptance coverage per canonical relation — S4-declared base plus the density program's 14 Test A pairs (DC-7) — the declared emission vocabulary without a canonical counterpart, and the WRITE canonicalization of the parent/child dual to 'child of'. The payload declares the artefact via relation_declarations_source; pipeline/relation_map.py consumes it as data at WRITE and for verification.",
+  "scoring_normalization": "The TN matching-normalization table (tn_table.json, docred-tn v2) ships as a pinned artefact: TN-1/TN-2 frozen; TN-3 relation groups, TN-4 inverse expansions, TN-5 subsumptions adopted under registered evaluation RE-TN-1 (conformance DC-6) for the extended figure only, with the frozen figure always reported beside it."
+ },
+ "convention_notes": [
+  {
+   "id": "CN-1",
+   "note": "Dev gold contains world-knowledge triples not stated in the released text (concentrated in located-in / country / present-in-work): measured pair support 0.5859 on the stage-2 audit sample (58/99). Exact-match recall against this gold is capped near 0.59 at pair level; recall is therefore reported against the judged-supported denominator (the main-run design, §3).",
+   "status": "observed_not_in_force"
+  },
+  {
+   "id": "CN-2",
+   "note": "Gold occasionally uses a demonym adjective as a LOC cluster's only mention (e.g. 'Russian' as the tail of a located-in triple) — malformed under any convention. The pack's extraction side prohibits demonym endpoints; the scoring side does not credit them.",
+   "status": "observed_not_in_force"
+  },
+  {
+   "id": "CN-3",
+   "note": "Gold-side cluster splitting exists (7/49 sampled mentions, stage-2 audit step 3) but barely damages triple-level recall under surface matching: stage-3 decomposition bucket (f) = 1 of 1,098 misses. Recorded so a future entity-level measurement on this corpus inherits the warning.",
+   "status": "observed_not_in_force"
+  },
+  {
+   "id": "CN-4",
+   "note": "Dev/test gold received two revision rounds, train one (Re-DocRED paper). Scoring is dev-only, permanently; train is the fitting side for definitions, signatures, and examples.",
+   "status": "observed_not_in_force"
+  },
+  {
+   "id": "CN-5",
+   "note": "Renamed pre-release (2026-10-22): pack id 'general-documents' / display 'General Documents' -> 'open-domain' / 'Open Domain'. The old name collided with the 'General' baseline pack (itself renamed 'Core'): the baseline is a layer, this pack is the open-domain (general prose) domain. Manifest identity and internal paths were updated and the version bumped; the payload, candidate, and artefact bytes — and their pins — are unchanged.",
+   "status": "in_force"
+  }
+ ],
+ "design": "docs/PACK_DESIGN.md",
+ "display_name": "Open Domain",
+ "pack_format": 1,
+ "pack_id": "open-domain",
+ "pack_version": "0.8.0",
+ "payload": {
+  "kind": "setup_config",
+  "note": "In force. The fitted production configuration (stages 4c-12) runs on the v1 payload: the full v1 guidance is the extraction surface the fitting line adopted (J5s0/J3F/J3F2 all rejected; the v2 payload's cost ceilings sit below v1's, so v2 was never priced in the corrected configuration). Promotion binds the v1 bytes by this pin, per the main-run design (section 6). Pack 0.6.0 adds one key to the v1 bytes: relation_declarations_source, naming the pack's relation-declarations artefact (DC-7); no other payload content changes.",
+  "path": "packs/open-domain/profile/setup_config.json",
+  "profile_version": 1,
+  "sha256": "30419e82daf14af8d833443290820074da45e168dd2384fa2df7aea97945e9f5"
+ },
+ "profile_family": "redocred",
+ "status": "in_force",
+ "validated_on": "Re-DocRED"
 }

@@ -2147,10 +2147,17 @@ def stage_write(b: Batch, root: Path, stages: list[str],
         )
         dpath = Path(decl_src)
         if not dpath.is_absolute():
-            # Pack-declared artefact paths are workspace-relative,
-            # resolved against the batch state root (as for the
-            # JF-F1 symmetric source).
-            dpath = root / dpath
+            # Pack-declared artefact paths are workspace-relative.
+            # Resolve against the batch state root first (the
+            # checkout layout), then the packs trees a pack
+            # lookup consults — a fresh root or a wheel install
+            # carries no packs/ beside the root, and the run
+            # must not fail at WRITE on a path the pack binding
+            # already resolved at create.
+            from .profile_config import resolve_pack_artefact
+            resolved = resolve_pack_artefact(root, decl_src)
+            dpath = resolved if resolved is not None \
+                else root / dpath
         try:
             declarations = load_relation_declarations(dpath)
             declared_map = write_map(declarations)
