@@ -6,7 +6,9 @@ pins the metadata the proof depends on: the project
 identity, the console entry point, the package set, and —
 critically — that every pack file the metadata promises
 to ship actually exists in the tree (a data-files entry
-naming a missing file would silently ship a broken pack).
+naming a missing file — or, for the packs' glob patterns,
+a pattern matching nothing — would silently ship a
+broken pack).
 Also pins that the new B3 commands are registered in the
 unified CLI, and the launch metadata:
 classifiers, project URLs, and keywords — a metadata edit
@@ -112,10 +114,28 @@ class TestPyproject(unittest.TestCase):
              "app/logo-mark.svg"])
 
     def test_every_promised_pack_file_exists(self):
+        import glob as glob_module
+
         data_files = _pyproject()["tool"]["setuptools"][
             "data-files"]
-        shipped = [f for files in data_files.values()
-                   for f in files]
+        shipped = []
+        for target, files in data_files.items():
+            if target.startswith("share/ontosmith/packs"):
+                # Pack entries are per-directory glob
+                # patterns: each must match at least one
+                # real file (a pattern matching nothing is
+                # a stale promise), and the expansion is
+                # the shipped set.
+                for pattern in files:
+                    matched = glob_module.glob(
+                        pattern, root_dir=ROOT)
+                    self.assertTrue(
+                        matched,
+                        f"pack pattern matches nothing: "
+                        f"{pattern}")
+                    shipped.extend(matched)
+            else:
+                shipped.extend(files)
         self.assertGreater(len(shipped), 20)
         for rel in shipped:
             self.assertTrue((ROOT / rel).is_file(), rel)
