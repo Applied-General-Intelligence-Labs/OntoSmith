@@ -128,11 +128,13 @@ runs offline too. Profiling, inspecting, validating, and
 the verification math all run keyless; the full list is
 in [Connections](https://github.com/Dongbumlee/ontosmith/blob/main/docs/connections.md).
 
-Ask the shipped example build a question — retrieval
-over the recorded artefacts, still no key:
+Ask the shipped demo build a question — the full
+text of *Pride and Prejudice*, built by this pipeline
+and shipped as frozen records; retrieval over those
+records, still no key:
 
 ```console
-$ ontosmith search "Who founded Alder & Finch?"
+$ ontosmith search "What is Mr. Darcy's income?"
 ```
 
 And `profile` runs the same way on **your own** folder:
@@ -187,12 +189,24 @@ The flagship run's governing total prices at 3.8¢ per
 document over 500 documents — key-observed; the run's
 counted ledger reads 3.7¢ (whitepaper §5.6).
 
-Then the [hands-on guide](https://github.com/Dongbumlee/ontosmith/blob/main/docs/hands-on.md) (Track 1)
-walks a live build on your own documents end to end —
+With a key set and Neo4j running, the one-command
+door builds a graph from a single text file and
+serves it:
+
+```console
+$ ontosmith quickstart your-file.txt
+```
+
+It refuses up front — before creating anything —
+when the key is missing or no Neo4j answers, naming
+the remedy each time; the build it makes is a real
+batch, resumable like any other. For the full walk —
 profile, create, capped run, and the serve / search /
-inspect finish line. A run whose key is missing
-refuses before any stage starts, with the error naming
-the seat and the variable to set.
+inspect finish line — the [hands-on guide](https://github.com/Dongbumlee/ontosmith/blob/main/docs/hands-on.md)
+(Track 1) runs a live build on your own documents end
+to end. A run whose key is missing refuses before any
+stage starts, with the error naming the seat and the
+variable to set.
 
 Optional surfaces install as extras:
 `pip install "ontosmith[viz]"`.

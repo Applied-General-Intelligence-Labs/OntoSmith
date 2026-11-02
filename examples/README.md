@@ -7,7 +7,7 @@ Project Gutenberg 1342), all 58 chapters, built with the
 open-domain pack (0.8.0) under the reference profile —
 737 Tier-1 triples over 303 entities, every triple
 carrying its evidence quote, batch VERIFIED (all
-consistency checks passed), build cost $0.22. Two
+consistency checks passed). Two
 records quoting the edition's own 1894 illustration
 apparatus were dropped at freeze time; nothing else was
 edited. Serve it with no key and no database:
