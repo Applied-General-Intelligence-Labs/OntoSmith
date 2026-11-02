@@ -263,7 +263,11 @@ footer a{color:var(--cream)}
     </div>
     <p class="seatline">Plus a drafting seat you bind yourself, and an embedder
        (<code>text-embedding-3-large</code>) for the vector arm of search. Every seat is
-       configuration, never code. Underneath, <strong>Jev</strong> judges and <strong>Neo4j</strong>
+       configuration, never code. Identity is judged the same way: whether two mentions
+       name one entity is decided point by point, and a profile can freeze the verdicts
+       into one global decisions file — the same pair gets the same answer in every
+       document, and pairs the documents disagree on are held out as ambiguous for
+       review. Underneath, <strong>Jev</strong> judges and <strong>Neo4j</strong>
        stores, and a build requires both; setup is a first-class step in
        <a href="https://github.com/Dongbumlee/ontosmith/blob/main/docs/connections.md">Connections</a>.</p>
   </div>
@@ -410,7 +414,9 @@ footer a{color:var(--cream)}
     <h2 class="serif">Ontologies ship as data</h2>
     <p class="lede">Version-pinned packs, never domain code paths. Every domain pack stands on the
        same core baseline: core itself is not a domain pack, it is what the domain packs extend.
-       A document type with no pack yet can grow its own.</p>
+       A pack also declares its relations — the canonical name and direction each written
+       relation is normalized to — so the same fact lands under one relation whichever way
+       a document phrases it. A document type with no pack yet can grow its own.</p>
     <div class="packs">
       <span class="pack core">core, baseline</span>
       <span class="pack">open-domain</span>

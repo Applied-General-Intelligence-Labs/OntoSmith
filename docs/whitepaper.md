@@ -989,7 +989,7 @@ Its conformance record carries the earlier 30-document
 audit (raw precision 0.544, audit-corrected 0.987,
 machine judgment) that first priced this corpus family's
 gold incompleteness at pilot scale. The pack's full
-conformance entries (DC-1…DC-5) ship as data in the
+conformance entries (DC-1…DC-7) ship as data in the
 pack's `conformance.json`; §5.1–§5.6 above are this
 pack's flagship record.
 
