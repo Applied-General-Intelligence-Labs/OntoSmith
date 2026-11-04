@@ -284,10 +284,15 @@ def cmd_create(args) -> None:
         _model = _bindings.seat(_seat).model
         if _model is not None:
             cfg_kwargs[_field] = _model
-    if getattr(args, "no_cost_cap", False):
+    # The spend cap is an internal run guard, not a product
+    # parameter: its only home is the ONTOSMITH_MAX_COST_USD
+    # env var, read here. Unset (or "none") = no cap; the
+    # ledger still records what the run spent.
+    _cap_env = os.environ.get("ONTOSMITH_MAX_COST_USD")
+    if _cap_env is None or _cap_env.strip().lower() == "none":
         cfg_kwargs["max_cost_usd"] = None
-    elif getattr(args, "max_cost_usd", None) is not None:
-        cfg_kwargs["max_cost_usd"] = float(args.max_cost_usd)
+    else:
+        cfg_kwargs["max_cost_usd"] = float(_cap_env)
     config = BatchConfig(
         code_version=git_code_version(ROOT),
         **cfg_kwargs)
@@ -1023,20 +1028,12 @@ def main() -> None:
                         "+ this pack and frozen into the batch "
                         "directory (default: the pack bound to the "
                         "--profile family, if any)")
-    c.add_argument("--max-cost-usd", type=float, default=None,
-                   help="stop-line: hard spend cap for the batch "
-                        "(default: the BatchConfig default)")
-    c.add_argument("--no-cost-cap", action="store_true",
-                   help="run with no USD spend cap (the explicit "
-                        "way to run on a cost-less binding; the "
-                        "ledger then records tokens and marks "
-                        "cost not-provided)")
     c.set_defaults(fn=cmd_create)
 
     r = sub.add_parser("run", help="Run (or resume) a batch")
     r.add_argument("batch_id")
     r.add_argument("--reuse-run", action="store_true",
-                   help="keep run_id on retry (default: new run_id)")
+                   help=argparse.SUPPRESS)
     r.set_defaults(fn=cmd_run)
 
     s = sub.add_parser("status", help="Show batch status")

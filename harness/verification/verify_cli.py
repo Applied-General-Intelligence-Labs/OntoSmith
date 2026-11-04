@@ -30,7 +30,6 @@ import sys
 from pathlib import Path
 
 from .audit import build_audit_sets
-from .config import CountedProjection, StopLine, StopLineExceeded
 from .report import build_report, render_markdown
 from .scoring import NormalizationTable, match_records
 
@@ -119,15 +118,11 @@ def main(argv=None) -> int:
     p_audit.add_argument("--c-n", type=int, help=argparse.SUPPRESS)
 
     p_proj = sub.add_parser(
-        "project", help="counted cost projection vs a stop-line")
+        "project", help="counted workload projection")
     p_proj.add_argument("--counts", required=True,
                         help="unit=count,... for the base scenario")
     p_proj.add_argument("--scenario", action="append", default=[],
                         help="name:unit=count,... (extra scenario)")
-    p_proj.add_argument("--unit-cost", required=True,
-                        help="unit=usd,... caller-supplied prices")
-    p_proj.add_argument("--cap", type=float, required=True)
-    p_proj.add_argument("--stop-line", type=float)
 
     p_rep = sub.add_parser("report", help="full evaluation report")
     p_rep.add_argument("--predicted", required=True)
@@ -163,23 +158,21 @@ def main(argv=None) -> int:
             {"frame": sets["frame"],
              "sets": {t: len(sets[t]) for t in "ABC"}}, indent=1)
     elif args.cmd == "project":
+        # Counts-only projection: the counted workload per
+        # scenario, with the governing (largest) scenario
+        # named. Pricing a workload is the caller's own
+        # arithmetic, outside the product surface.
         scenarios = {"base": _kv_pairs(args.counts)}
         for spec in args.scenario:
             name, _, counts = spec.partition(":")
             scenarios[name.strip()] = _kv_pairs(counts)
-        proj = CountedProjection(
-            unit_costs=_kv_pairs(args.unit_cost), scenarios=scenarios)
-        stop = StopLine(cap_usd=args.cap, stop_line_usd=args.stop_line)
-        try:
-            governing = proj.assert_within(stop)
-            verdict = "within stop-line — the cell may start"
-        except StopLineExceeded as exc:
-            governing = proj.governing()
-            verdict = f"STOP: {exc}"
+        totals = {name: sum(items.values())
+                  for name, items in scenarios.items()}
+        governing = max(totals, key=totals.get) if totals else None
         payload = json.dumps(
-            {"scenarios": proj.totals(), "governing_usd": governing,
-             "cap_usd": args.cap, "stop_line_usd": stop.stop_line,
-             "verdict": verdict}, indent=1)
+            {"scenarios": scenarios,
+             "total_units": totals,
+             "governing_scenario": governing}, indent=1)
     else:  # report
         rep = build_report(load_jsonl(args.predicted),
                            load_jsonl(args.gold),

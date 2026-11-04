@@ -235,16 +235,32 @@ class TestCmdCreateProfileWiring(unittest.TestCase):
                 batch_cli.cmd_create(args)
 
     def test_cost_config_surface(self):
+        # The cap's only home is the internal env var.
         args = argparse.Namespace(
             source="src", collection="coll",
             docs=[str(self.tmp / "docs" / "*.txt")],
-            profile=None, pack="bio-medical", batch_id="testcfg",
-            max_cost_usd=3.25)
-        with mock.patch.object(batch_cli, "ROOT", self.tmp):
+            profile=None, pack="bio-medical", batch_id="testcfg")
+        with mock.patch.object(batch_cli, "ROOT", self.tmp), \
+                mock.patch.dict(
+                    "os.environ", {"ONTOSMITH_MAX_COST_USD": "3.25"}):
             batch_cli.cmd_create(args)
         from pipeline.batch import load_batch
         cfg = load_batch(self.tmp, "testcfg").config
         self.assertEqual(cfg.max_cost_usd, 3.25)
+
+    def test_cost_default_uncapped(self):
+        args = argparse.Namespace(
+            source="src", collection="coll",
+            docs=[str(self.tmp / "docs" / "*.txt")],
+            profile=None, pack="bio-medical", batch_id="testcfg2")
+        with mock.patch.object(batch_cli, "ROOT", self.tmp), \
+                mock.patch.dict("os.environ", {}, clear=False):
+            import os
+            os.environ.pop("ONTOSMITH_MAX_COST_USD", None)
+            batch_cli.cmd_create(args)
+        from pipeline.batch import load_batch
+        cfg = load_batch(self.tmp, "testcfg2").config
+        self.assertIsNone(cfg.max_cost_usd)
 
     def test_frontier_escalation_surface_removed(self):
         # The recorded-but-unwired frontier switch was deleted
