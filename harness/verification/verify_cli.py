@@ -24,6 +24,7 @@ through the same entry point.
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import sys
 from pathlib import Path
@@ -103,19 +104,19 @@ def main(argv=None) -> int:
     p_score = sub.add_parser("score", help="raw exact-match scores")
     p_score.add_argument("--predicted", required=True)
     p_score.add_argument("--gold", required=True)
-    p_score.add_argument("--normalization")
+    p_score.add_argument("--normalization", help=argparse.SUPPRESS)
     p_score.add_argument("--out")
 
     p_audit = sub.add_parser("audit-sets",
                              help="build the A/B/C judgment sets")
     p_audit.add_argument("--predicted", required=True)
     p_audit.add_argument("--gold", required=True)
-    p_audit.add_argument("--normalization")
+    p_audit.add_argument("--normalization", help=argparse.SUPPRESS)
     p_audit.add_argument("--out-dir", required=True)
-    p_audit.add_argument("--seed", type=int, default=0)
-    p_audit.add_argument("--a-n", type=int)
-    p_audit.add_argument("--b-n", type=int)
-    p_audit.add_argument("--c-n", type=int)
+    p_audit.add_argument("--seed", type=int, default=0, help=argparse.SUPPRESS)
+    p_audit.add_argument("--a-n", type=int, help=argparse.SUPPRESS)
+    p_audit.add_argument("--b-n", type=int, help=argparse.SUPPRESS)
+    p_audit.add_argument("--c-n", type=int, help=argparse.SUPPRESS)
 
     p_proj = sub.add_parser(
         "project", help="counted cost projection vs a stop-line")
@@ -131,11 +132,14 @@ def main(argv=None) -> int:
     p_rep = sub.add_parser("report", help="full evaluation report")
     p_rep.add_argument("--predicted", required=True)
     p_rep.add_argument("--gold", required=True)
-    p_rep.add_argument("--normalization")
+    p_rep.add_argument("--normalization", help=argparse.SUPPRESS)
     p_rep.add_argument("--out")
-    p_rep.add_argument("--title", default="Evaluation report")
+    p_rep.add_argument("--title", default="Evaluation report", help=argparse.SUPPRESS)
 
     args = ap.parse_args(argv)
+    if getattr(args, "normalization", None) is None:
+        args.normalization = os.environ.get(
+            "ONTOSMITH_NORMALIZATION_TABLE") or None
 
     if args.cmd == "score":
         m = match_records(load_jsonl(args.predicted),

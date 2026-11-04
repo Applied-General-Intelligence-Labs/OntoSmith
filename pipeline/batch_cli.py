@@ -288,14 +288,6 @@ def cmd_create(args) -> None:
         cfg_kwargs["max_cost_usd"] = None
     elif getattr(args, "max_cost_usd", None) is not None:
         cfg_kwargs["max_cost_usd"] = float(args.max_cost_usd)
-    if getattr(args, "frontier_escalation", False):
-        cfg_kwargs["frontier_escalation_enabled"] = True
-        if getattr(args, "escalation_band_lo", None) is not None:
-            cfg_kwargs["frontier_escalation_band_lo"] = float(
-                args.escalation_band_lo)
-        if getattr(args, "escalation_band_hi", None) is not None:
-            cfg_kwargs["frontier_escalation_band_hi"] = float(
-                args.escalation_band_hi)
     config = BatchConfig(
         code_version=git_code_version(ROOT),
         **cfg_kwargs)
@@ -303,11 +295,8 @@ def cmd_create(args) -> None:
     # binding could never trip — refuse the creation by name
     # (BindingCostError) instead of recording a guarded-looking
     # batch that is not guarded. Seats a batch run uses:
-    # proposer, judge, embedder (+ escalation when frontier
-    # escalation is enabled).
+    # proposer, judge, embedder.
     _cap_seats = ["proposer", "judge", "embedder"]
-    if config.frontier_escalation_enabled:
-        _cap_seats.append("escalation")
     connections.require_metered(
         _bindings, config.max_cost_usd, _cap_seats)
     b = Batch(batch_id=batch_id, run_id=new_run_id(),
@@ -1042,16 +1031,6 @@ def main() -> None:
                         "way to run on a cost-less binding; the "
                         "ledger then records tokens and marks "
                         "cost not-provided)")
-    c.add_argument("--frontier-escalation", action="store_true",
-                   help="enable frontier escalation for "
-                        "non-judging seats (default OFF; the judging "
-                        "seat never escalates)")
-    c.add_argument("--escalation-band-lo", type=float, default=None,
-                   help="shaky-band lower bound (with "
-                        "--frontier-escalation)")
-    c.add_argument("--escalation-band-hi", type=float, default=None,
-                   help="shaky-band upper bound (with "
-                        "--frontier-escalation)")
     c.set_defaults(fn=cmd_create)
 
     r = sub.add_parser("run", help="Run (or resume) a batch")

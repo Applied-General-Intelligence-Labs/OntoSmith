@@ -118,8 +118,7 @@ def main(argv=None) -> int:
         source="quickstart", collection="quickstart",
         docs=[str(path)], batch_id=batch_id, profile=None,
         pack="open-domain", max_cost_usd=args.max_cost_usd,
-        no_cost_cap=False, frontier_escalation=False,
-        escalation_band_lo=None, escalation_band_hi=None)
+        no_cost_cap=False)
     try:
         batch_cli.cmd_create(create_args)
         batch_cli.cmd_run(Namespace(
