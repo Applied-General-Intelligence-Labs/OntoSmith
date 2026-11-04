@@ -115,7 +115,8 @@ Per surface, concretely:
    batch record.
 
    **The framing exception.** The domain-framing keys
-   (`proposer_framing`, `slot_framing`, `slot_rules`,
+   (`proposer_framing`, `proposer_draw_framings`,
+   `slot_framing`, `slot_rules`,
    `pair_judge_generic_relation`) are profile data: the
    family's own generated profile —
    `profiles/<family>/setup_config.json` in the state

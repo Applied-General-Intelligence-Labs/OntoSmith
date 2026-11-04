@@ -50,8 +50,13 @@ folder of documents anywhere a corpus path appears.
 
 **There is exactly one candidate path.** A build
 gets its candidate triples from the proposer seat
-(a model call) — there is no candidate-source
-setting to choose. Every channel (free triples,
+(model calls) — there is no candidate-source
+setting to choose. The free-triple channel may
+run in passes when the binding pack declares
+them: the shipped open-domain pack declares a
+residual pass, a second read of each excerpt that
+is shown the facts the first pass extracted and
+asked only for stated facts not yet covered. Every channel (free triples,
 clause slots, and the profile-declared
 pair-enumeration, sweep and mention passes)
 proposes through the one guard funnel in
@@ -292,9 +297,7 @@ re-spending. Watch it with `ontosmith batch status
 demo-4docs`.
 
 A corpus this size — four documents —
-prices in cents of model spend (the README's $1–2
-figure for the same build counts the fixed overhead
-around it);
+prices in cents of model spend;
 `ontosmith verify project` counts and prices a larger
 run before it starts (appendix track).
 
@@ -922,19 +925,13 @@ created batch fibo-cuad-100-100docs with 100 docs
 ```
 
 The price discipline is the appendix track's: a
-hard cap, frozen at creation. For scale, the fitted
-Legal build's recorded governing total is 3.8¢ per
-document — at that rate 100 documents price near
-$3.80, inside the $10 cap with room. Treat that as a
-planning expectation, not a quote. The imported
-pack's own rate is now measured (the completed
-build is §7's record): **$0.85 for the 100
-documents provider-counted — 0.85¢ per document**,
-roughly a fifth of the planning figure. The cost is
-proposer-dominated; the decision model's judging of
-1,326 candidates cost three cents. One build, one
-subset: a measured rate for this pack and profile,
-not a universal one.
+hard cap, frozen at creation — for this track the
+cap is $10, a configuration value, not a price
+expectation. The cost is proposer-dominated; the
+decision model's judging is a small share of a
+build's spend. One build, one subset: the counted
+ledger of the completed build (§7) is the record
+for this pack and profile, not a universal rate.
 
 ### 7. Build — LIVE, and the finish line
 
@@ -979,10 +976,9 @@ onto a fresh store from the recorded judgments —
 the edge count held at exactly 1,155; entity
 resolution settled a few more merges (955 entity
 nodes) — INDEX completed (1,749 Tier-2 chunks),
-and **VERIFY passed all 7 checks**. Final spend:
-$0.8545 provider-counted for the 100 documents
-(batch counted ledger $0.7611), against the $10
-cap frozen at creation.
+and **VERIFY passed all 7 checks**. The build
+finished inside the cap frozen at creation; its
+counted ledger is part of the batch record.
 
 One serving note the finish exposed, and the fix
 it produced. As first recorded, a build's chunks

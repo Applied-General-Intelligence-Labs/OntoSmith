@@ -224,8 +224,7 @@ configure` and loaded from the `ontosmith-bindings.env`
 it writes, as in Track 1 §3 — and the same step runs
 under your custom binding instead.
 
-The flagship's realized rate
-puts 40 documents at roughly $1.49, and the batch's $2
+The batch's $2
 cap is ledger-enforced — the run stops at the cap rather
 than crossing it, and resumes with `ontosmith batch run
 redocred-dev-subset-40docs` after a top-up decision,

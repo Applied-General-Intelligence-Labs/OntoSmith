@@ -244,7 +244,9 @@ footer a{color:var(--cream)}
         <h3>The Proposer</h3>
         <div class="model">Claude Haiku 5.5</div>
         <p>Proposes candidate triples for the entity pairs the pipeline enumerates. The parsing
-           and roster work is local and deterministic. Fast, tireless, and not trusted:
+           and roster work is local and deterministic. Under the shipped open-domain pack it
+           reads each excerpt in two passes — the second is shown the first pass&rsquo;s facts
+           and asked only for what they miss. Fast, tireless, and not trusted:
            everything it proposes is checked.</p>
       </div>
       <div class="seat judge">
