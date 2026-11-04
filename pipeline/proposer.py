@@ -418,7 +418,8 @@ def _build_triple_prompt(chunk: str, guidance: str = "",
                          framing: str | None = None,
                          maxn: int | None = None,
                          mentions: bool = False,
-                         declared: bool = False) -> str:
+                         declared: bool = False,
+                         prior_block: str = "") -> str:
     """The proposer prompt for one chunk .
 
     The base is the domain-neutral TRIPLE_PROMPT template filled
@@ -437,15 +438,49 @@ def _build_triple_prompt(chunk: str, guidance: str = "",
     `mentions` (the profile's mention-layer declaration,
     issue #54) selects TRIPLE_PROMPT_MENTION instead of the
     base template; the default path is untouched.
+
+    `prior_block` (the complement pass) is appended last: it
+    carries the facts already extracted from this chunk and
+    narrows the task to what they do not cover. Absent =
+    byte-identical to the pre-complement prompt.
     """
     template = TRIPLE_PROMPT_MENTION if mentions else \
         TRIPLE_PROMPT_DECLARED if declared else TRIPLE_PROMPT
     base = template.format(
         framing=framing or TRIPLE_FRAMING_DEFAULT,
         maxn=MAX_PER_CHUNK if maxn is None else maxn, text=chunk)
-    if not guidance:
-        return base
-    return base + "\n\n" + guidance
+    out = base if not guidance else base + "\n\n" + guidance
+    if prior_block:
+        out += "\n\n" + prior_block
+    return out
+
+
+def _prior_block(prior_items: list) -> str:
+    """The complement pass's narrowing block: the facts the
+    earlier passes already extracted from THIS chunk, and the
+    instruction to return only what they do not cover. The
+    block is generated from the document's own extraction
+    state — never from a content category — which is what
+    keeps the pass domain-neutral. An empty prior list still
+    narrows (the pass then behaves as a claim-by-claim
+    re-read)."""
+    lines = [
+        "The facts below have ALREADY been extracted from "
+        "this excerpt. Do not repeat them, and do not restate "
+        "them in other words.",
+    ]
+    for it in prior_items:
+        lines.append(
+            f"- {it['subject']} | {it['relation']} | "
+            f"{it['object']}")
+    lines.append(
+        "Read the excerpt once more, sentence by sentence, "
+        "and extract ONLY the factual claims that are NOT "
+        "covered by the list above — including claims stated "
+        "only once, in passing, or inside narrative "
+        "sentences. If every claim is already covered, "
+        "return an empty list.")
+    return "\n".join(lines)
 
 
 def _mention_from_item(it: dict, ep: str) -> dict:
@@ -477,7 +512,8 @@ def propose_triples_for_doc(doc_id: str, text: str, key: str,
                             framing: str | None = None,
                             max_per_chunk: int | None = None,
                             mentions: bool = False,
-                            declared: bool = False) -> dict:
+                            declared: bool = False,
+                            prior: dict | None = None) -> dict:
     """Raw triple proposals for one document (unguarded).
 
     Returns {items, cost, calls, errors, chunks, chunks_at_cap};
@@ -502,6 +538,12 @@ def propose_triples_for_doc(doc_id: str, text: str, key: str,
     {span, type, antecedent?}) as proposed — span
     verification is guard_triples' job, as for typed
     endpoints above.
+
+    prior (the complement pass) maps chunk index -> the
+    items earlier passes already proposed for that chunk;
+    each chunk's prompt then carries the _prior_block
+    narrowing. Chunks absent from the map get an empty
+    prior list (a claim-by-claim re-read).
     """
     cap = MAX_PER_CHUNK if max_per_chunk is None else max_per_chunk
     tasks = _chunks(text)
@@ -510,9 +552,13 @@ def propose_triples_for_doc(doc_id: str, text: str, key: str,
         idx, chunk = task
         try:
             content, u = _chat(
-                _build_triple_prompt(chunk, guidance, framing,
-                                     maxn=cap, mentions=mentions,
-                                     declared=declared),
+                _build_triple_prompt(
+                    chunk, guidance, framing,
+                    maxn=cap, mentions=mentions,
+                    declared=declared,
+                    prior_block=(_prior_block(
+                        (prior or {}).get(idx, []))
+                        if prior is not None else "")),
                 model, 12000 if _is_haiku55(model) else 6000, key)
             items = _parse_array(content, salvage=True)
             err = None
@@ -2482,6 +2528,11 @@ def guard_triples(items: list[dict], doc_text: str,
                 tv = tv.strip()
                 if entity_types is None or tv in entity_types:
                     base[tk] = tv
+        # Multi-draw provenance (the pass index stage_candidates
+        # stamped on the raw item) rides the guard the same way
+        # the endpoint types do; absent = the base draw.
+        if it.get("draw"):
+            base["draw"] = it["draw"]
         if mentions and isinstance(it.get("mentions"), dict):
             # As proposed, for the blocked sidecar's audit;
             # replaced by the verified record below.
