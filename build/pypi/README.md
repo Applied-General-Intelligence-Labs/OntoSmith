@@ -166,8 +166,14 @@ prerequisites, gathered in one place:
    covers the seats it plugs into and the recommended
    models.
 2. **Nothing else to install** — candidates are
-   proposed by the proposer seat (a model call);
-   there is no local NLP stack. (A GLiNER+spaCy
+   proposed by the proposer seat (model calls);
+   there is no local NLP stack. A pack may declare
+   further proposer passes: extra framings, and a
+   final residual pass that is shown what the
+   earlier passes extracted and asked only for
+   facts not yet covered — the shipped open-domain
+   pack declares the residual pass, so its builds
+   propose in two passes. (A GLiNER+spaCy
    pipeline candidate source and its `ontosmith[nlp]`
    extra existed until 2026-10-29 and were retired —
    the LLM proposer is the only candidate source.)
@@ -181,13 +187,12 @@ prerequisites, gathered in one place:
    by name if it is not serving, so a missing store
    costs no spend.
 
-Cost, with its scope: the four-document demo subset
-prices at roughly $1–2 end to end, fixed overhead
-included. A full corpus prices from the counted
-projection before it runs (Cost guardrails, below).
-The flagship run's governing total prices at 3.8¢ per
-document over 500 documents — key-observed; the run's
-counted ledger reads 3.7¢ (whitepaper §5.6).
+Cost, with its scope: every build is priced from its
+own counted projection before it runs, and the
+ledger enforces the stop-line frozen at creation
+(Cost guardrails, below). No figure quoted in a
+document prices your corpus — the projection under
+your configuration does.
 
 With a key set and Neo4j running, the one-command
 door builds a graph from a single text file and
@@ -558,7 +563,7 @@ whose search runs the lexical and graph arms only
 
 ## Status
 
-Release 0.1.5, published on PyPI. The pipeline,
+Release 0.1.6, published on PyPI. The pipeline,
 profiler, ontology builder, inspect viewer,
 verification cores, packs, and the serving surface
 (search command + sample API) in this tree are

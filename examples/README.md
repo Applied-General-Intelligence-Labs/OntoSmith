@@ -5,6 +5,8 @@
 pipeline build of **Pride and Prejudice** (Jane Austen,
 Project Gutenberg 1342), all 58 chapters, built with the
 open-domain pack (0.8.0) under the reference profile —
+a frozen build that predates the current pack
+(0.10.0), kept as the shipped demonstration —
 737 Tier-1 triples over 303 entities, every triple
 carrying its evidence quote, batch VERIFIED (all
 consistency checks passed). Two

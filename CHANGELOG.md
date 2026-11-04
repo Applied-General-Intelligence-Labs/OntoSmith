@@ -7,6 +7,72 @@ and the project adheres to
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-11-03
+
+### Added
+
+- **Multi-draw proposer passes** — two profile
+  declarations for the free-proposer path:
+  `proposer_draw_framings` (extra passes, each under
+  its own additional framing) and
+  `proposer_complement_draw` (a residual pass: shown
+  the facts the earlier passes extracted, per chunk,
+  it is asked only for stated facts not yet covered).
+  Passes union before the guards run once; candidate
+  records carry their draw index. With neither key
+  declared, the proposer runs exactly one pass and
+  its prompt is byte-identical to before.
+- **Open-domain pack 0.10.0** — declares the residual
+  pass by default. Measured on general text
+  (2026-11-02/03): written records 103 → 234 on a
+  biography, 42 → 75 on a novel excerpt, 192 → 369
+  on a contract, at roughly double the proposer
+  cost; hand-extracted gold coverage on the
+  biography rises from 92/158 (single draw) to
+  127/158. The fiction build's ungrounded-block
+  share rises (6.3% → 16.7%) and stays inside the
+  guards; no genre regressed.
+
+### Changed
+
+- Product documents no longer state cost figures:
+  the README cost paragraph, the hands-on §6–§7
+  figures, and the appendix rate expectation are
+  removed. A build is priced by its own counted
+  projection before it runs.
+- `docs/connections.md`: the Recommended models
+  table drops its per-seat rationale column.
+
+## [0.1.5] - 2026-11-02
+
+### Added
+
+- **One-command first run** — `ontosmith quickstart
+  <file.txt>` builds a graph from a single text file
+  and serves it, refusing before any spend when the
+  file, the key, or the store is missing. A frozen,
+  verified full build of *Pride and Prejudice* (737
+  triples, 303 entities) ships as the demo that a
+  bare `ontosmith serve` opens.
+- **Open path** (open-domain pack 0.8.0): facts whose
+  relation matches no canonical relation are written
+  with the text's own verb phrase; only declared
+  surfaces fold to canonical relations.
+
+### Fixed
+
+- Wheel packaging: the wheel now ships the pack
+  files (a per-file list had silently omitted new
+  ones); a file-tree guard test pins the wheel
+  against the source tree.
+- Pack resolution honours the state root: a pack
+  placed in the state root's `packs/` was silently
+  ignored in favour of the code tree's copy.
+- Open-domain pack 0.9.0: proposer cap per chunk
+  25 → 40, measured on general text (biography
+  records +64% at 40; 60 breached the gate-block
+  band and was rejected).
+
 ## [0.1.4] - 2026-11-01
 
 ### Added
