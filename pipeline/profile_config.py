@@ -205,6 +205,24 @@ CONSUMED_KEYS: dict[str, str] = {
                               "proposer.propose_triples_for_doc "
                               "max_per_chunk; absent = the core "
                               "default MAX_PER_CHUNK)",
+    "proposer_draw_framings": "CANDIDATES free-proposer "
+                              "additional draws: one framing "
+                              "string per extra pass over every "
+                              "chunk, unioned with the base "
+                              "draw before the guards "
+                              "(stage_candidates -> "
+                              "proposer.propose_triples_for_doc "
+                              "per framing; absent = a single "
+                              "draw under proposer_framing)",
+    "proposer_complement_draw": "CANDIDATES free-proposer "
+                              "complement pass: one final pass "
+                              "that receives the earlier draws' "
+                              "items per chunk and extracts only "
+                              "what they do not cover "
+                              "(stage_candidates -> "
+                              "proposer.propose_triples_for_doc "
+                              "prior; absent/false = no "
+                              "complement pass)",
     "mention_layer": "CANDIDATES->GATES mention layer "
                      "(issue #54): the free proposer emits "
                      "per-endpoint mention spans + types + "
@@ -299,7 +317,8 @@ METADATA_KEYS: set[str] = {
 #: batch creation (docs/PACK_DESIGN.md §1.3, the framing
 #: exception). Every other key keeps the §1.3 precedence —
 #: the pack governs where it declares, the core elsewhere.
-FRAMING_KEYS = ("proposer_framing", "slot_framing",
+FRAMING_KEYS = ("proposer_framing", "proposer_draw_framings",
+                "slot_framing",
                 "slot_rules", "pair_judge_generic_relation")
 
 
@@ -490,11 +509,25 @@ def setup_config_errors(cfg: dict, *, merged: bool = False) -> list[str]:
                     "{'canonical': str, 'flipped': bool} "
                     "declaration object")
     for fkey in FRAMING_KEYS:
+        if fkey == "proposer_draw_framings":
+            continue  # list-typed; validated by its own rule below
         fv = cfg.get(fkey)
         if fv is not None and not (isinstance(fv, str) and fv.strip()):
             errors.append(
                 f"setup_config key {fkey!r} must be a non-empty "
                 f"string (domain framing carried as profile data)")
+    df = cfg.get("proposer_draw_framings")
+    if df is not None and not (
+            isinstance(df, list) and 1 <= len(df) <= 4 and all(
+                isinstance(x, str) and x.strip() for x in df)):
+        errors.append(
+            "setup_config key 'proposer_draw_framings' must be "
+            "a list of 1-4 non-empty framing strings")
+    cd = cfg.get("proposer_complement_draw")
+    if cd is not None and not isinstance(cd, bool):
+        errors.append(
+            "setup_config key 'proposer_complement_draw' must "
+            "be a boolean")
     pairs = cfg.get("merge_prohibited_type_pairs")
     if pairs is not None:
         ok = isinstance(pairs, list) and all(
@@ -1406,6 +1439,49 @@ def proposer_max_per_chunk(cfg: dict | None) -> int | None:
         raise ValueError(
             f"proposer_max_per_chunk must be a positive "
             f"integer, got {v!r} (fail closed)")
+    return v
+
+
+def proposer_draw_framings(cfg: dict | None) -> list:
+    """The family's declared ADDITIONAL free-proposer draws:
+    one framing string per extra pass over every chunk,
+    unioned with the base draw (proposer_framing) before the
+    guards. The 2026-11-02 draw measurement is the design's
+    evidence: extra passes recover facts a single pass
+    misses, but only a differently-framed pass reaches the
+    systematic blind spots — so a draw IS a framing, not a
+    repeat count. Absent = []. A declared value must be a
+    list of 1-4 non-empty strings — anything else fails
+    closed, like the other recipe declarations."""
+    v = (cfg or {}).get("proposer_draw_framings")
+    if v is None:
+        return []
+    if not isinstance(v, list) or not 1 <= len(v) <= 4 or \
+            any(not isinstance(x, str) or not x.strip()
+                for x in v):
+        raise ValueError(
+            f"proposer_draw_framings must be a list of 1-4 "
+            f"non-empty framing strings, got {v!r} "
+            f"(fail closed)")
+    return list(v)
+
+
+def proposer_complement_draw(cfg: dict | None) -> bool:
+    """The family's complement-pass declaration: one final
+    free-proposer pass that receives the earlier draws'
+    items per chunk and extracts only what they do not
+    cover. The pass is domain-neutral by construction —
+    its narrowing block is generated from the document's
+    own extraction state, never from a content category.
+    Absent = False. A declared value must be a boolean —
+    anything else fails closed."""
+    v = (cfg or {}).get("proposer_complement_draw")
+    if v is None:
+        return False
+    if not isinstance(v, bool):
+        raise ValueError(
+            f"proposer_complement_draw must be a boolean, "
+            f"got {v!r} (fail closed)")
     return v
 
 

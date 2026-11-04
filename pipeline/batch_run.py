@@ -308,6 +308,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
         entity_sweep_enabled,
         mention_layer_enabled,
         pair_judge_generic_relation,
+        proposer_complement_draw,
+        proposer_draw_framings,
         proposer_framing,
         proposer_max_per_chunk,
         slot_framing,
@@ -350,6 +352,24 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     # data; None (profile declares none) selects the builders'
     # domain-neutral core defaults.
     triple_framing = proposer_framing(setup_cfg)
+    # Free-proposer draws: the base draw under the family
+    # framing plus one pass per declared draw framing
+    # (profile_config.proposer_draw_framings). Guidance, the
+    # per-chunk cap and the model are shared; only the
+    # reading angle differs — the 2026-11-02 measurement
+    # showed extra passes recover misses, but identical
+    # repeats cannot reach the systematic blind spots.
+    draw_framings = [triple_framing,
+                     *proposer_draw_framings(setup_cfg)]
+    complement_on = proposer_complement_draw(setup_cfg)
+    pass_count = len(draw_framings) + (1 if complement_on
+                                       else 0)
+    if pass_count > 1:
+        _log(b.batch_id,
+             f"CANDIDATES: proposer draws ON "
+             f"({pass_count} passes per chunk"
+             f"{', last is the complement pass' if complement_on else ''}, "
+             f"unioned before the guards)")
     clause_framing = slot_framing(setup_cfg)
     clause_rules = slot_rules(setup_cfg)
     pair_generic_relation = pair_judge_generic_relation(
@@ -641,7 +661,7 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                       "slots_proposed": 0, "typed_kept": 0,
                       "types_dropped_unknown": 0,
                       "chunks": 0, "chunks_at_cap": 0,
-                      "max_per_chunk": 0,
+                      "max_per_chunk": 0, "draws": 1,
                       "mention_candidates": 0,
                       "mention_resolutions": 0,
                       "mention_fallback_subject": 0,
@@ -717,6 +737,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
     # Checkpoint for resume: track processed doc_ids
     ckpt_path = d / "candidates.ckpt.json"
     done_docs = set()
+    proposer_stats["draws"] = pass_count
+    per_draw_proposed = [0] * pass_count
     if ckpt_path.exists():
         try:
             ckpt = json.loads(ckpt_path.read_text())
@@ -727,6 +749,14 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
             for k in proposer_stats:
                 proposer_stats[k] = int(ckpt.get("proposer_stats", {})
                                         .get(k, 0))
+            _ckpt_per_draw = ckpt.get("proposer_per_draw")
+            if isinstance(_ckpt_per_draw, list) and \
+                    len(_ckpt_per_draw) == pass_count:
+                per_draw_proposed = [int(x)
+                                     for x in _ckpt_per_draw]
+            # draws is configuration truth, not accumulated
+            # state (a legacy checkpoint carries no such key).
+            proposer_stats["draws"] = pass_count
             for k in pair_stats:
                 pair_stats[k] = ckpt.get("pair_stats", {}).get(
                     k, pair_stats[k])
@@ -889,30 +919,56 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
             # Named refusal (BindingKeyError) — see the pair-enum
             # branch above.
             key = _conn.seat("proposer").require_key()
-            res = _prop.propose_triples_for_doc(
-                doc_id, text, key, model=b.config.llm_model,
-                guidance=guidance, framing=triple_framing,
-                max_per_chunk=proposer_cap,
-                mentions=mention_on)
-            proposer_cost = _conn_add_cost(
-                proposer_cost, res["cost"])
-            proposer_stats["proposed"] += res["proposed"]
-            proposer_stats["calls"] += res["calls"]
-            proposer_stats["errors"] += res["errors"]
-            proposer_stats["chunks"] += res["chunks"]
-            proposer_stats["chunks_at_cap"] += res["chunks_at_cap"]
-            proposer_stats["max_per_chunk"] = (
-                proposer_cap if proposer_cap is not None
-                else _prop.MAX_PER_CHUNK)
-            if endpoint_types:
-                proposer_stats["types_dropped_unknown"] += sum(
-                    1 for it in res["items"]
-                    for tk in ("subject_type", "object_type")
-                    if isinstance(it.get(tk), str)
-                    and it[tk].strip()
-                    and it[tk].strip() not in endpoint_types)
+            # Draws: one propose call per declared framing,
+            # then the complement pass when declared. Raw
+            # items are stamped with their pass index and
+            # unioned; the guards run once on the union, so
+            # cross-pass duplicates meet the same duplicate
+            # machinery as within-pass ones.
+            all_items = []
+            passes = [(fr, None) for fr in draw_framings]
+            if complement_on:
+                passes.append((triple_framing, "complement"))
+            for draw_idx, (draw_framing, kind) in \
+                    enumerate(passes):
+                prior = None
+                if kind == "complement":
+                    prior = {}
+                    for prev in all_items:
+                        prior.setdefault(
+                            prev["chunk_idx"], []).append(prev)
+                res = _prop.propose_triples_for_doc(
+                    doc_id, text, key, model=b.config.llm_model,
+                    guidance=guidance, framing=draw_framing,
+                    max_per_chunk=proposer_cap,
+                    mentions=mention_on, prior=prior)
+                proposer_cost = _conn_add_cost(
+                    proposer_cost, res["cost"])
+                per_draw_proposed[draw_idx] += res["proposed"]
+                proposer_stats["proposed"] += res["proposed"]
+                proposer_stats["calls"] += res["calls"]
+                proposer_stats["errors"] += res["errors"]
+                proposer_stats["chunks"] += res["chunks"]
+                proposer_stats["chunks_at_cap"] += \
+                    res["chunks_at_cap"]
+                proposer_stats["max_per_chunk"] = (
+                    proposer_cap if proposer_cap is not None
+                    else _prop.MAX_PER_CHUNK)
+                if endpoint_types:
+                    proposer_stats["types_dropped_unknown"] += \
+                        sum(
+                            1 for it in res["items"]
+                            for tk in ("subject_type",
+                                       "object_type")
+                            if isinstance(it.get(tk), str)
+                            and it[tk].strip()
+                            and it[tk].strip()
+                            not in endpoint_types)
+                for it in res["items"]:
+                    it["draw"] = draw_idx
+                    all_items.append(it)
             kept, blocked = _guard(
-                res["items"], text, role_words=role_words,
+                all_items, text, role_words=role_words,
                 entity_types=endpoint_types or None,
                 quote_punct_insensitive=quote_punct_insensitive,
                 theme_attest_chunk=theme_attest_chunk,
@@ -928,6 +984,11 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                     "context": _prop.quote_window(text, it["quote"]),
                     "method": "llm", "quote": it["quote"],
                     "attest": it["attest"]}
+                # Pass provenance: only passes after the base
+                # draw stamp the record (draw 0 = the legacy
+                # record shape).
+                if it.get("draw"):
+                    rec["draw"] = it["draw"]
                 # Validated endpoint types ride the
                 # candidate through GATES/ROUTE into WRITE. Absent
                 # keys = untyped candidate (legacy record shape).
@@ -963,6 +1024,8 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                     "context": _prop.quote_window(text, bl["quote"]),
                     "method": "llm", "quote": bl["quote"],
                     "reason": bl["reason"]}
+                if bl.get("draw"):
+                    rec["draw"] = bl["draw"]
                 for tk in ("subject_type", "object_type"):
                     if bl.get(tk):
                         rec[tk] = bl[tk]
@@ -1171,6 +1234,7 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
                 "done_docs": sorted(done_docs),
                 "proposer_cost_usd": _round_cost(proposer_cost),
                 "proposer_stats": proposer_stats,
+                "proposer_per_draw": per_draw_proposed,
                 "pair_stats": pair_stats,
                 "sweep_stats": sweep_stats,
                 "sweep_cost_usd": _round_cost(sweep_cost)}))
@@ -1227,6 +1291,7 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
         "by_method": by_method,
         "blocked": len(blocked_all), "blocked_reasons": blocked_reasons,
         "proposer": {**proposer_stats,
+                     "per_draw_proposed": per_draw_proposed,
                      "cost_usd": _round_cost(proposer_cost),
                      "model": b.config.llm_model}}
     if ckpt_reset is not None:
@@ -1325,6 +1390,11 @@ def stage_candidates(b: Batch, root: Path, stages: list[str]) -> None:
              f"{proposer_stats['chunks_at_cap']}/"
              f"{proposer_stats['chunks']} "
              f"(cap {proposer_stats['max_per_chunk']} per chunk)")
+    if proposer_stats.get("draws", 1) > 1:
+        _log(b.batch_id,
+             f"CANDIDATES draws: {proposer_stats['draws']} "
+             f"passes, per-pass proposed "
+             f"{'/'.join(str(n) for n in per_draw_proposed)}")
     fb_total = (proposer_stats.get("mention_fallback_subject", 0)
                 + proposer_stats.get("mention_fallback_object", 0))
     if fb_total:
