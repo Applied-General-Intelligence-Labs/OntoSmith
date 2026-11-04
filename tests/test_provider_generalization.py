@@ -347,16 +347,19 @@ class TestStopLineRefusal(unittest.TestCase):
         args = argparse.Namespace(
             docs=[str(doc)], collection="stubcoll",
             batch_id="cap-batch", source="test",
-            profile=None, pack=None, max_cost_usd=None,
-            frontier_escalation=False, escalation_band_lo=None,
-            escalation_band_hi=None,             no_cost_cap=False)
+            profile=None, pack=None)
         with binding_env(CUSTOM_ENV):
             with mock.patch.object(batch_cli, "ROOT", tmp), \
                     mock.patch.object(batch_cli, "state_root",
                                       return_value=tmp):
-                with self.assertRaises(BindingCostError):
-                    batch_cli.cmd_create(args)
-                args.no_cost_cap = True
+                # An internal cap (env home) on a cost-less
+                # binding refuses by name; uncapped, the
+                # same create proceeds.
+                with mock.patch.dict(
+                        "os.environ",
+                        {"ONTOSMITH_MAX_COST_USD": "10"}):
+                    with self.assertRaises(BindingCostError):
+                        batch_cli.cmd_create(args)
                 batch_cli.cmd_create(args)
         b = batch.load_batch(tmp, "cap-batch")
         self.assertIsNone(b.config.max_cost_usd)

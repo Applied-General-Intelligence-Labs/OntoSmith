@@ -516,26 +516,19 @@ little before pinning it into a pack.
 
 | Command | What it does |
 |---|---|
-| **Label** | |
-| `review` | interactive review-band labeling |
-| **Evaluate** | |
-| `evaluate` · `recalibrate` · `calibration` | |
+| **Core** | |
+| `configure` | declare the seat bindings (wizard / --from-file) |
+| `profile` | corpus profiler (deterministic, no LLM) |
+| `batch` | create / run / status / rollback + ER settlement |
 | `inspect` | triple + evidence + provenance |
 | `verify` | score / audit-sets / project / report |
-| **Models** | |
-| `llm` · `ollama` | candidate judges |
-| **Gates** | |
-| `triple` · `er` · `conflict` · `onto` · `cascade` | (Jev gates) |
-| **Connect** | |
-| `configure` | declare the seat bindings (wizard / --from-file) |
-| **Pipeline** | |
-| `identity-freeze` | freeze per-point identity-seat decisions into a global decisions file |
-| `batch` | create / run / status / rollback |
-| `profile` | corpus profiler (deterministic, no LLM) |
+| **Authoring** | |
 | `ontology` | draft / validate / approve / emit a pack |
+| `identity-freeze` | freeze per-point identity-seat decisions into a global decisions file |
 | **Serve** | |
 | `search` | hybrid search over a built graph |
 | `serve` | sample HTTP API (search / entity / neighborhood / triple-with-evidence) + the demo app at / |
+| `quickstart` | first run: build a graph from one text file and serve it |
 
 ## The store — Neo4j
 

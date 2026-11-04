@@ -24,8 +24,8 @@ through the same entry point.
 from __future__ import annotations
 
 import argparse
-import os
 import json
+import os
 import sys
 from pathlib import Path
 

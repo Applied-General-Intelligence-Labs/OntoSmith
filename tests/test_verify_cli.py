@@ -1,7 +1,7 @@
-import contextlib
 """verify CLI smoke tests: score / audit-sets / project /
 report over tiny JSONL fixtures (the R10 one-command forms).
 """
+import contextlib
 import io
 import json
 import tempfile

@@ -53,31 +53,34 @@ This is the records-file form; the batch-directory form
 of Track 1 §4 is the richer view. Try `--object
 "Priya Raman"` and `--json`.
 
-### A3. Price a build before spending anything
+### A3. Count a build's workload before running it
 
-A counted projection prices counted units at
-caller-supplied rates and refuses to bless a cell whose
-governing scenario crosses its stop-line. This is the
+A counted projection reports the workload a build
+will move through its stages, per scenario, and
+names the governing (largest) one. This is the
 flagship build's own counted input — 26,938 candidate
-pairs at its realized per-pair rate — against the
-stop-line it actually ran under:
+pairs:
 
 ```console
-$ ontosmith verify project --counts candidate_pairs=26938 \
-    --unit-cost candidate_pairs=0.0006683 --cap 21 --stop-line 21
+$ ontosmith verify project --counts candidate_pairs=26938
 {
  "scenarios": {
-  "base": 18.002665
+  "base": {
+   "candidate_pairs": 26938
+  }
  },
- "governing_usd": 18.002665,
- "cap_usd": 21.0,
- "stop_line_usd": 21.0,
- "verdict": "within stop-line — the cell may start"
+ "total_units": {
+  "base": 26938
+ },
+ "governing_scenario": "base"
 }
 ```
 
-In a live batch the same discipline is enforced by the
-run's spend ledger: a unit that would cross the cap is
+What the run spends is recorded in its own ledger
+as it goes; pricing that workload is the caller's
+arithmetic, at their own provider's rates. In a
+live batch the ledger is the discipline: a unit
+that would cross the recorded line is
 never started, and the run resumes from its ledger
 instead of re-spending.
 
@@ -186,20 +189,17 @@ run: python -m pipeline batch run redocred-dev-subset-40docs
 
 Creation froze the executed configuration into the
 batch (core baseline + pack overlay, pin-verified) and
-stamped the $2 stop-line into it. Nothing has been
-spent.
+Nothing has been spent.
 
 > **Note — creating under a custom binding.** This
 > appendix runs under the reference preset, whose
-> provider reports cost, so the $2 stop-line can
-> meter every seat. Under a custom binding whose
-> seats cannot meter cost (cost basis
+> provider reports cost, so every seat's spend is
+> metered in the batch's ledger. Under a custom
+> binding whose seats cannot meter cost (cost basis
 > `not-provided` — see
-> [connections.md](connections.md)), the same create
-> command **refuses by name**: a USD cap cannot guard
-> spend it cannot meter. Declare per-seat rates for
-> estimated costs, or create with `--no-cost-cap` to
-> run uncapped explicitly. Bindings themselves are
+> [connections.md](connections.md)), the ledger
+> records those seats' spend as unmetered rather
+> than estimating it. Bindings themselves are
 > declared with `ontosmith configure`.
 
 ### A8. Build — LIVE (reference preset)
@@ -224,22 +224,11 @@ configure` and loaded from the `ontosmith-bindings.env`
 it writes, as in Track 1 §3 — and the same step runs
 under your custom binding instead.
 
-The batch's $2
-cap is ledger-enforced — the run stops at the cap rather
-than crossing it, and resumes with `ontosmith batch run
-redocred-dev-subset-40docs` after a top-up decision,
+The run's spend is recorded in the batch's ledger
+as it goes. A stopped run resumes with
+`ontosmith batch run redocred-dev-subset-40docs`,
 never by silently re-spending. Watch it with
 `ontosmith batch status redocred-dev-subset-40docs`.
-
-One recorded-but-unwired switch, stated plainly:
-`--frontier-escalation` (and its band bounds) is written
-into the batch config at creation, but **no v1 pipeline
-stage consumes it** — review-band items route to the
-Tier-2 review queue, and frontier adjudication +
-promotion live in the verification harness, not the
-product (whitepaper §3.2). Setting it changes nothing
-in a v1 run; it is named here so the config record is
-never mistaken for a working switch.
 
 ### A9. Score and inspect your build
 
