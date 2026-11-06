@@ -44,7 +44,7 @@ claim-level index is [`benchmarks/README.md`](../benchmarks/README.md).
 | BioRED pilot readouts (§5.7) | conversion, grounding, per-type recall | Record — pack conformance entries in [`packs/bio-medical/`](../packs/bio-medical/); index in [`benchmarks/biored-cuad.md`](../benchmarks/biored-cuad.md) |
 | BioRED Tier-1-wide corrected precision (§5.7) | 0.9321 over all 2,058 Tier-1 rows | Record — the Stage D audit's finals are stated in the whitepaper; the audit's stratum-level record is not shipped in this tree, so the figure is not reader-recomputable from shipped artefacts |
 | CUAD retrieval delta (§5.8) | +0.080 recall@20 (adding the graph arm to hybrid retrieval: 0.6314 → 0.7115; 116 pinned questions) | Record — [`benchmarks/biored-cuad.md`](../benchmarks/biored-cuad.md); measured at zero on short abstracts (BioRED), stated wherever cited |
-| Demo profile hash | `sha256:7ae51d31fa9120ec…` | Recompute (no key): `ontosmith profile examples/corpus --family demo` — the profiler is deterministic, so the hash is the check |
+| Demo profile hash | `sha256:28ede2ab1b3e4fd2…` | Recompute (no key): `ontosmith profile examples/corpus --family demo` — the profiler is deterministic, so the hash is the check |
 
 ## What is *not* reproducible from this tree
 

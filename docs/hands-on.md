@@ -125,9 +125,9 @@ Corpus profile
   family          demo
   status          COMPLETE
   documents       4
-  claims          6
+  claims          7
   decision points 0
-  profile hash    sha256:7ae51d31fa9120ec
+  profile hash    sha256:28ede2ab1b3e4fd2
   spend           $0.0000
   written         profiles/demo (profile.json, setup_config.json, profile.md)
 ```
@@ -147,7 +147,7 @@ $ ontosmith batch create --source examples/corpus --collection demo \
     --docs "examples/corpus/*.txt" \
     --profile profiles/demo/profile.json \
     --max-cost-usd 2
-profile: demo sha256:7ae51d31fa9120ec
+profile: demo sha256:28ede2ab1b3e4fd2
 binding: reference
 setup_config: resolved (core baseline + profile 'demo', 32 keys) -> setup_config.resolved.json
 proposer_framing: Extract factual relations from the excerpt below.
@@ -594,7 +594,7 @@ shipped packs' records show.
 $ ontosmith batch create --source examples/corpus --collection demo-own \
     --docs "examples/corpus/*.txt" --profile profiles/demo/profile.json \
     --pack ./packs/demo-ceramics --max-cost-usd 2
-profile: demo sha256:7ae51d31fa9120ec
+profile: demo sha256:28ede2ab1b3e4fd2
 pack: demo-ceramics 0.1.0 (payload sha256:0e521c59d46b0db6…)
 binding: reference
 setup_config: resolved (core baseline + demo-ceramics, 26 keys) -> setup_config.resolved.json
@@ -893,7 +893,7 @@ Corpus profile
   family          fibo-cuad
   status          COMPLETE
   documents       100
-  claims          6
+  claims          7
   decision points 0
   profile hash    sha256:b54c32666bb16ea7
   spend           $0.0000

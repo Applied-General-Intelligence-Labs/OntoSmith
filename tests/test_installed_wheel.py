@@ -214,7 +214,7 @@ class TestInstalledWheel(unittest.TestCase):
                             "--family", "demo")
         self.assertEqual(r.returncode, 0,
                          f"{r.stdout[-1000:]}\n{r.stderr[-1000:]}")
-        self.assertIn("sha256:7ae51d31fa9120ec", r.stdout)
+        self.assertIn("sha256:28ede2ab1b3e4fd2", r.stdout)
         r = self._installed(
             "inspect", str(share / "examples" / "triples.jsonl"))
         self.assertEqual(r.returncode, 0,

@@ -13,7 +13,13 @@ missing builder:
 
   1. DRAFT. From a stage-0 corpus profile plus a domain brief,
      produce a draft schema document (kind
-     ``ontology_schema_draft``). Drafting assistance is a
+     ``ontology_schema_draft``). The draft context carries the
+     profile's measured census as lists (the semantic census:
+     recurring defined terms, binding names, clause headings)
+     and the profile's document survey (head and tail of each
+     sampled document), so the drafting seat decides about
+     recurring corpus terrain explicitly instead of never
+     seeing it. Drafting assistance is a
      *capability-tier role* (``drafting`` — the escalation
      tier): the caller binds it in the connection layer (the
      reference profile's preset is one such binding) and passes
@@ -102,6 +108,24 @@ Rules:
   the corpus supports them.
 - Every type needs a definition AND boundary material: boundary
   examples are what separate this type from its neighbours.
+- The context carries a semantic census (defined terms that
+  recur across documents, the names they bind to, recurring
+  clause/section headings) and a document survey — read the
+  survey TAILS as well as the heads; closing terrain (governing
+  law, venue, term, signatures) lives in tails. Treat every
+  recurring census family as terrain the schema must decide
+  about explicitly: cover it with a type or relation, or record
+  in "decision_points" why it is out of scope. Silence about a
+  recurring family is not a decision.
+- Boundary declarations: before finishing, walk every pair of
+  sibling types (entity-entity and relation-relation) whose
+  definitions could both match the same statement. For each
+  such pair, add a "decision_points" entry declaring the
+  boundary: what each side includes, what it excludes, the
+  test that separates them, and whether one includes the
+  other (a subtype relation) or the two are mutually
+  exclusive. A confusable pair with no declaration is an
+  undeclared boundary.
 - Definitions live ONLY in the schema_front entries — nowhere
   else in your output.
 - Be specific to THIS corpus and brief. No generic advice, no
@@ -245,17 +269,36 @@ def _brief_parts(brief) -> tuple[str, list[str], list[str], str]:
 def build_draft_context(profile: dict, brief) -> dict:
     """The deterministic context a drafting tier works from:
     the corpus profile's inventory + claim statements and the
-    brief. No model is consulted to build it."""
+    brief. Claims carry their measured detail with them — the
+    semantic census (defined-term lists, recurring binding
+    names, recurring clause/section headings) reaches the
+    drafter as lists, not as the counts the profile statements
+    summarize — and the profile's document survey (head AND
+    tail of each sampled document, with its heading
+    candidates) rides along as its own field. No model is
+    consulted to build it."""
     text, seed_e, seed_r, purpose = _brief_parts(brief)
-    claims = [{"section": c.get("section"),
-               "statement": c.get("statement"),
-               "kind": c.get("kind"),
-               "grade": c.get("grade")}
-              for c in profile.get("claims") or []]
+    claims = []
+    census = None
+    for c in profile.get("claims") or []:
+        entry = {"section": c.get("section"),
+                 "statement": c.get("statement"),
+                 "kind": c.get("kind"),
+                 "grade": c.get("grade")}
+        measured = c.get("measured")
+        if isinstance(measured, dict):
+            entry["measured_value"] = measured.get("value")
+            entry["measured_detail"] = measured.get("detail")
+            if (c.get("verify") or {}).get("scanner") == \
+                    "semantic_census":
+                census = measured.get("detail")
+        claims.append(entry)
     return {
         "family": profile.get("family"),
         "inventory": profile.get("inventory") or {},
         "claims": claims,
+        "semantic_census": census,
+        "document_survey": profile.get("document_survey") or [],
         "brief": text,
         "brief_purpose": purpose,
         "seed_entity_types": seed_e,
