@@ -253,17 +253,32 @@ class TestSeedLineageValidation(unittest.TestCase):
         draft = _seeded_draft({"schema_front": schema})
         self.assertIn("SEED_SIGNATURE_UNDECLARED",
                       _codes(ob.validate_schema_draft(draft)))
-        # An extend_signature record settles it.
+        # An extend_signature record settles it — with the
+        # evidence the pair rests on.
+        draft = _seeded_draft({
+            "schema_front": schema,
+            "decision_points": [
+                {"action": "extend_signature", "kind": "relation",
+                 "type": "WorksFor",
+                 "evidence": "the corpus states employment "
+                             "with person first and organisation "
+                             "second throughout ('Ada joined "
+                             "Acme in 2020')",
+                 "reason": "the definition already speaks of "
+                           "employment statements generally; "
+                           "the pair form names the same "
+                           "reading"}]})
+        self.assertEqual(ob.validate_schema_draft(draft), [])
+        # The same record without evidence justifies nothing.
         draft = _seeded_draft({
             "schema_front": schema,
             "decision_points": [
                 {"action": "extend_signature", "kind": "relation",
                  "type": "WorksFor",
                  "reason": "the definition already speaks of "
-                           "employment statements generally; "
-                           "the pair form names the same "
-                           "reading"}]})
-        self.assertEqual(ob.validate_schema_draft(draft), [])
+                           "employment statements generally"}]})
+        self.assertIn("BAD_SEED_CHANGE",
+                      _codes(ob.validate_schema_draft(draft)))
         # Or the definition revision itself, recorded.
         schema2 = _good_schema()
         schema2["relation_inventory"][0][

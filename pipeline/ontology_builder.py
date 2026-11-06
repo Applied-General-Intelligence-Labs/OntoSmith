@@ -63,7 +63,11 @@ missing builder:
   2. VALIDATE. Deterministic, fail-closed checks over the
      draft: every type carries a definition and boundary
      examples; no duplicate or colliding type names; no
-     overlapping types without a declared boundary; relation
+     overlapping types without a declared boundary (boundary
+     declarations are structured decision points, and a
+     revision that adds, re-signs or redefines a relation
+     must declare its boundary with every relation it
+     shares a signature pair with); relation
      endpoint signatures (type names or "TypeA~TypeB" pair
      strings, the shipped shape) stay inside the entity
      inventory;
@@ -151,15 +155,31 @@ Rules:
   about explicitly: cover it with a type or relation, or record
   in "decision_points" why it is out of scope. Silence about a
   recurring family is not a decision.
+- Signature attestation: every endpoint-signature pair you
+  declare must rest on an instance the survey or census
+  material attests. A pair with no attested instance is not
+  a harmless extra — it promises a structure the corpus
+  does not contain; leave it out, or (when a revision adds
+  it to an inherited relation) carry it on an
+  extend_signature record whose "evidence" states plainly
+  that it is declared without an attested instance, and why.
 - Boundary declarations: before finishing, walk every pair of
   sibling types (entity-entity and relation-relation) whose
   definitions could both match the same statement. For each
-  such pair, add a "decision_points" entry declaring the
-  boundary: what each side includes, what it excludes, the
-  test that separates them, and whether one includes the
-  other (a subtype relation) or the two are mutually
-  exclusive. A confusable pair with no declaration is an
-  undeclared boundary.
+  such pair, declare the boundary as a STRUCTURED decision
+  point: {"action": "declare_boundary", "kind":
+  "entity"|"relation", "types": [<name A>, <name B>],
+  "boundary": "distinct"|"includes"|"included_in",
+  "reason": <what each side includes and excludes, and the
+  test that separates them>} — "includes" states the first
+  type covers the second (a subtype relation),
+  "included_in" the reverse, "distinct" that the two are
+  mutually exclusive. Free text never settles a boundary.
+  In a revision, validation rejects the draft when a
+  relation you added, re-signed or redefined shares a
+  signature pair with another relation and no declaration
+  settles the two. A confusable pair with no declaration is
+  an undeclared boundary.
 - Definitions stay at the breadth the corpus attests: a
   boundary is won in "decision_points" and boundary
   examples, never by narrowing a definition. Do not add a
@@ -201,8 +221,12 @@ Rules:
   signature; if the existing definition already covers
   the added pair, say so in an {"action":
   "extend_signature", "kind": "relation", "type": <name>,
-  "reason": <why the definition already covers it>}
-  decision point instead.
+  "evidence": <the corpus instance the added pair rests
+  on — or an explicit statement that it is declared
+  without an attested instance, and why>, "reason":
+  <why the definition already covers it>} decision point
+  instead. An extend_signature record with no evidence
+  justifies nothing.
 - HOLE REPORT. When the context carries a "hole_report",
   it names families that processing reported holes for.
   Address each family in this revision as one bundle —
@@ -362,6 +386,16 @@ def _brief_parts(brief) -> tuple[str, list[str], list[str], str]:
 SEED_CHANGE_ACTIONS = ("remove_type", "remove_signature",
                        "revise_definition", "narrow_definition",
                        "extend_signature")
+
+#: The structured decision-point action that declares the
+#: boundary between two sibling types, and the boundary
+#: values it may state: the two are mutually exclusive
+#: ("distinct"), or the first type's coverage includes the
+#: second's ("includes", and its reverse "included_in").
+#: Validation matches confusable pairs against these
+#: records; free-text points never declare a boundary.
+BOUNDARY_DECLARATION_ACTION = "declare_boundary"
+BOUNDARY_KINDS = ("distinct", "includes", "included_in")
 
 
 def _published_pack_seed(pack_id: str):
@@ -884,26 +918,177 @@ def _seed_change_index(draft: dict,
     for i, point in enumerate(draft.get("decision_points") or []):
         if not isinstance(point, dict) or "action" not in point:
             continue
+        if point.get("action") == BOUNDARY_DECLARATION_ACTION:
+            continue  # the boundary index owns these records
         path = f"decision_points[{i}]"
         action = point.get("action")
         kind = point.get("kind")
         type_name = point.get("type")
         reason = point.get("reason")
+        # A pair addition on the strength of the existing
+        # definition must rest on evidence: the corpus
+        # instance the added pair is attested by, or an
+        # explicit statement that it is declared without one.
+        evidence_ok = action != "extend_signature" or \
+            _nonempty_str(point.get("evidence"))
         if action not in SEED_CHANGE_ACTIONS or \
                 kind not in ("entity", "relation") or \
                 not _nonempty_str(type_name) or \
-                not _nonempty_str(reason):
+                not _nonempty_str(reason) or \
+                not evidence_ok:
             findings.append(_finding(
                 "BAD_SEED_CHANGE", path,
                 f"seed-change record {point!r} is malformed — "
                 f"it needs an action in {SEED_CHANGE_ACTIONS}, "
                 f"a kind ('entity' or 'relation'), a type name "
-                f"and a non-empty reason; a malformed record "
-                f"justifies nothing"))
+                f"and a non-empty reason, and an "
+                f"extend_signature record additionally needs a "
+                f"non-empty 'evidence' (the corpus instance "
+                f"the added pair rests on, or an explicit "
+                f"statement that it is declared without one); "
+                f"a malformed record justifies nothing"))
             continue
         index.setdefault((action, kind, str(type_name)),
                          []).append(point)
     return index
+
+
+def _pair_atoms(entry: dict) -> set[str]:
+    """A relation's directed pair atoms — its signature
+    entries in "TypeA~TypeB" form. Two relations holding the
+    same pair atom can state the same typed fact, which is
+    what makes them a confusable (competing) pair; bare
+    type-name signature entries name no pair and compete
+    over nothing specific."""
+    return {a for a in _signature_atoms(entry) if "~" in a}
+
+
+def _boundary_declaration_index(
+        draft: dict, entities: dict, relations: dict,
+        findings: list[dict]) -> set:
+    """Index a draft's structured boundary declarations as
+    {(kind, (name_a, name_b))} with the names sorted. A
+    record carrying the declare_boundary action is held to
+    the record's shape — a kind, exactly two distinct type
+    names of that kind present in the inventory, a boundary
+    in BOUNDARY_KINDS and a non-empty reason; a malformed
+    record settles nothing and is itself a finding. Only
+    these records settle a boundary: free text can describe
+    one, it cannot declare it (the same principle as
+    seed-change records)."""
+    declared: set = set()
+    inventories = {"entity": entities, "relation": relations}
+    for i, point in enumerate(draft.get("decision_points")
+                              or []):
+        if not isinstance(point, dict) or \
+                point.get("action") != \
+                BOUNDARY_DECLARATION_ACTION:
+            continue
+        path = f"decision_points[{i}]"
+        kind = point.get("kind")
+        types = point.get("types")
+        boundary = point.get("boundary")
+        reason = point.get("reason")
+        ok = kind in inventories and \
+            isinstance(types, list) and len(types) == 2 and \
+            all(_nonempty_str(t) for t in types) and \
+            str(types[0]) != str(types[1]) and \
+            boundary in BOUNDARY_KINDS and \
+            _nonempty_str(reason)
+        if ok:
+            inventory = inventories[kind]
+            ok = all(str(t) in inventory for t in types)
+        if not ok:
+            findings.append(_finding(
+                "BAD_BOUNDARY_DECLARATION", path,
+                f"boundary declaration {point!r} is malformed "
+                f"— it needs a kind ('entity' or 'relation'), "
+                f"exactly two distinct type names of that "
+                f"kind present in the inventory, a boundary "
+                f"in {BOUNDARY_KINDS} and a non-empty reason; "
+                f"a malformed declaration settles nothing"))
+            continue
+        declared.add((kind, tuple(sorted(str(t)
+                                         for t in types))))
+    return declared
+
+
+def _check_boundary_declarations(
+        draft: dict, relations: dict, declared: set,
+        findings: list[dict]) -> None:
+    """Boundary settlement for seeded revisions. A relation
+    the revision adds, re-signs (a signature pair gained)
+    or redefines can compete — over every directed pair
+    atom it now shares with another relation — only under
+    a declared boundary: a declare_boundary decision point
+    settling the pair, or an inverse_of link between the
+    two (the pair is then one relation read in two
+    directions, not two competitors). An unsettled pair is
+    a finding naming both relations and the shared pairs.
+
+    The duty arises from change, exactly as the seed
+    lineage duties do: a relation the revision leaves
+    untouched owes no new declarations. (Consequence,
+    stated plainly: a confusable pair between two
+    untouched relations is not gated here — it is settled
+    the first time either side is next changed, and the
+    schema audit remains the net for pairs no revision
+    has touched.)"""
+    seed = draft.get("seed")
+    if not isinstance(seed, dict):
+        return
+    front = seed.get("schema_front")
+    if not isinstance(front, dict):
+        return  # the lineage check already reports BAD_SEED
+    seed_relations = {str(r["type"]): r
+                      for r in front.get("relation_inventory")
+                      or []
+                      if isinstance(r, dict)
+                      and _nonempty_str(r.get("type"))}
+    inverse_links = set()
+    for name, entry in relations.items():
+        inverse = entry.get("inverse_of")
+        if _nonempty_str(inverse):
+            inverse_links.add(tuple(sorted(
+                (name, str(inverse)))))
+    reported: set = set()
+    for name, entry in relations.items():
+        seed_entry = seed_relations.get(name)
+        if seed_entry is None:
+            touched = True
+        else:
+            touched = bool(
+                _pair_atoms(entry) - _pair_atoms(seed_entry)) \
+                or _norm_text(str(entry.get("definition")
+                                  or "")) != \
+                _norm_text(str(seed_entry.get("definition")
+                               or ""))
+        if not touched:
+            continue
+        atoms = _pair_atoms(entry)
+        for other, other_entry in relations.items():
+            if other == name:
+                continue
+            shared = atoms & _pair_atoms(other_entry)
+            if not shared:
+                continue
+            key = tuple(sorted((name, other)))
+            if key in reported or \
+                    ("relation", key) in declared or \
+                    key in inverse_links:
+                continue
+            reported.add(key)
+            findings.append(_finding(
+                "BOUNDARY_UNDECLARED", "relation_inventory",
+                f"relations {name!r} and {other!r} share "
+                f"signature pair(s) {sorted(shared)} and can "
+                f"state the same fact; this revision adds, "
+                f"re-signs or redefines {name!r}, and no "
+                f"declare_boundary decision point settles "
+                f"the pair (distinct, or one including the "
+                f"other) and neither declares the other its "
+                f"inverse — an undeclared boundary travels "
+                f"with the schema"))
 
 
 def _check_seed_lineage(draft: dict, entities: dict,
@@ -1210,7 +1395,11 @@ def validate_schema_draft(draft: dict) -> list[dict]:
             f"theme_attest_chunk {tac!r} is not a boolean — "
             f"the declaration is true (chunk-level theme "
             f"attestation) or absent (the quote-only test)"))
+    declared_boundaries = _boundary_declaration_index(
+        draft, entities, relations, findings)
     _check_seed_lineage(draft, entities, relations, findings)
+    _check_boundary_declarations(draft, relations,
+                                 declared_boundaries, findings)
     # Pack-contract conformance: the payload emission would
     # ship must pass the same fail-closed validation as any
     # profile config.
