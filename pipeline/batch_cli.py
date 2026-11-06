@@ -106,6 +106,20 @@ def cap_from_env(env=None) -> float | None:
     return cap
 
 
+def metered_default_cap(default_usd: float,
+                        bindings=None) -> float | None:
+    """`default_usd` when every seat a batch run uses can
+    meter cost, else None. Callers that build on a user's
+    behalf (quickstart, the document library) use it as
+    the cap when ONTOSMITH_MAX_COST_USD is unset: a cap on
+    a cost-less binding could never trip and would only
+    refuse the build."""
+    bindings = bindings or connections.resolve_bindings()
+    if bindings.cost_less_seats(list(CAP_SEATS)):
+        return None
+    return default_usd
+
+
 def cmd_create(args) -> None:
     """Create a batch: resolve doc globs, resolve the effective
     setup_config through the pack resolver (core baseline +

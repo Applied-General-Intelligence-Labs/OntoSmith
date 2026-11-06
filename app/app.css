@@ -310,3 +310,97 @@ dl.facts dd { margin: 0; font-family: var(--mono); word-break: break-word; }
   color: var(--muted);
   font-size: 0.9rem;
 }
+
+/* --- documents page (serve --library) ---------------------- */
+
+.topnav { display: flex; gap: 1rem; align-items: baseline; }
+.topnav a { color: var(--muted); text-decoration: none; }
+.topnav a:hover { color: var(--accent-dark); text-decoration: underline; }
+.topnav a[aria-current="page"] { color: var(--ink); font-weight: 650; }
+.topbar-right { display: flex; gap: 1rem; align-items: baseline; }
+
+.drop-zone {
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+  padding: 1.1rem 1rem;
+  text-align: center;
+  background: var(--paper);
+}
+.drop-zone p { margin: 0.2rem 0; }
+.drop-zone.over { border-color: var(--accent); background: var(--chip); }
+.drop-zone.disabled { opacity: 0.55; pointer-events: none; }
+.file-pick { display: inline; }
+
+.paste { margin-top: 0.8rem; }
+.paste summary { cursor: pointer; color: var(--accent-dark); }
+.paste-form { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.6rem; }
+.paste-form label { font-size: 0.85rem; color: var(--muted); }
+.paste-form input, .paste-form textarea {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+}
+.paste-form textarea { font-family: var(--mono); font-size: 0.88rem; resize: vertical; }
+.paste-form button, button.primary {
+  align-self: flex-start;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.paste-form button:hover, button.primary:hover { background: var(--accent-dark); }
+button.primary:disabled { background: var(--line); color: var(--muted); cursor: default; }
+
+.add-results { margin-top: 0.6rem; }
+.add-note { margin: 0.2rem 0; font-size: 0.9rem; padding: 0.3rem 0.6rem; border-radius: 6px; }
+.add-note.ok { background: var(--chip); color: var(--accent-dark); }
+.add-note.bad { background: var(--error-bg); color: var(--error-ink); }
+
+.doc-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.doc-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  padding: 0.3rem 0.4rem;
+}
+.doc-table td { border-bottom: 1px solid var(--line); padding: 0.4rem; vertical-align: top; }
+.doc-table .doc-name { font-family: var(--mono); word-break: break-all; }
+.doc-table .num { font-family: var(--mono); text-align: right; white-space: nowrap; }
+.doc-table .actions { text-align: right; }
+.linkish.danger { color: var(--error-ink); }
+.linkish:disabled { color: var(--muted); cursor: default; text-decoration: none; }
+
+.build-status { margin: 0.9rem 0 0.3rem; }
+.badge {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  background: var(--chip);
+  color: var(--accent-dark);
+}
+.build-status.running .badge { background: var(--warn-bg); color: var(--warn-ink); }
+.build-status.failed .badge { background: var(--error-bg); color: var(--error-ink); }
+.build-log summary { cursor: pointer; color: var(--muted); font-size: 0.88rem; }
+.build-log pre {
+  max-height: 22rem;
+  overflow: auto;
+  background: var(--ink);
+  color: #e8e6df;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

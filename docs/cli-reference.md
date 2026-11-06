@@ -730,7 +730,7 @@ options:
 ```text
 usage: ontosmith serve [-h] [--source SOURCE] [--batch BATCH]
                        [--store {auto,file,neo4j}] [--host HOST] [--port PORT]
-                       [--embed]
+                       [--library DIR] [--pack PACK] [--embed]
 
 Sample API server over the search/graph surface: /search, /entity,
 /neighborhood, /triple (with evidence)
@@ -746,6 +746,10 @@ options:
                         configured, else the file store (default: auto)
   --host HOST           bind host (default: 127.0.0.1)
   --port PORT           bind port (default: 8765)
+  --library DIR         manage a folder of .txt documents from the Documents
+                        page at /documents and rebuild the graph from it
+                        (localhost only; each rebuild spends, under a cap)
+  --pack PACK           the pack library rebuilds use (default: open-domain)
   --embed               activate the search vector arm via the connection
                         layer's default embedder (refuses if the embedder
                         seat's key is unset)
@@ -758,7 +762,7 @@ options:
 ```text
 usage: ontosmith serve [-h] [--source SOURCE] [--batch BATCH]
                        [--store {auto,file,neo4j}] [--host HOST] [--port PORT]
-                       [--embed]
+                       [--library DIR] [--pack PACK] [--embed]
 
 Sample API server over the search/graph surface: /search, /entity,
 /neighborhood, /triple (with evidence)
@@ -774,6 +778,10 @@ options:
                         configured, else the file store (default: auto)
   --host HOST           bind host (default: 127.0.0.1)
   --port PORT           bind port (default: 8765)
+  --library DIR         manage a folder of .txt documents from the Documents
+                        page at /documents and rebuild the graph from it
+                        (localhost only; each rebuild spends, under a cap)
+  --pack PACK           the pack library rebuilds use (default: open-domain)
   --embed               activate the search vector arm via the connection
                         layer's default embedder (refuses if the embedder
                         seat's key is unset)
@@ -786,7 +794,7 @@ options:
 ```text
 usage: ontosmith serve [-h] [--source SOURCE] [--batch BATCH]
                        [--store {auto,file,neo4j}] [--host HOST] [--port PORT]
-                       [--embed]
+                       [--library DIR] [--pack PACK] [--embed]
 
 Sample API server over the search/graph surface: /search, /entity,
 /neighborhood, /triple (with evidence)
@@ -802,6 +810,10 @@ options:
                         configured, else the file store (default: auto)
   --host HOST           bind host (default: 127.0.0.1)
   --port PORT           bind port (default: 8765)
+  --library DIR         manage a folder of .txt documents from the Documents
+                        page at /documents and rebuild the graph from it
+                        (localhost only; each rebuild spends, under a cap)
+  --pack PACK           the pack library rebuilds use (default: open-domain)
   --embed               activate the search vector arm via the connection
                         layer's default embedder (refuses if the embedder
                         seat's key is unset)
@@ -814,7 +826,7 @@ options:
 ```text
 usage: ontosmith serve [-h] [--source SOURCE] [--batch BATCH]
                        [--store {auto,file,neo4j}] [--host HOST] [--port PORT]
-                       [--embed]
+                       [--library DIR] [--pack PACK] [--embed]
 
 Sample API server over the search/graph surface: /search, /entity,
 /neighborhood, /triple (with evidence)
@@ -830,6 +842,10 @@ options:
                         configured, else the file store (default: auto)
   --host HOST           bind host (default: 127.0.0.1)
   --port PORT           bind port (default: 8765)
+  --library DIR         manage a folder of .txt documents from the Documents
+                        page at /documents and rebuild the graph from it
+                        (localhost only; each rebuild spends, under a cap)
+  --pack PACK           the pack library rebuilds use (default: open-domain)
   --embed               activate the search vector arm via the connection
                         layer's default embedder (refuses if the embedder
                         seat's key is unset)

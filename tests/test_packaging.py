@@ -111,6 +111,7 @@ class TestPyproject(unittest.TestCase):
             sorted(data_files["share/ontosmith/app"]),
             ["app/app.css", "app/app.js",
              "app/favicon.svg", "app/index.html",
+             "app/library.html", "app/library.js",
              "app/logo-mark.svg"])
 
     def test_every_promised_pack_file_exists(self):

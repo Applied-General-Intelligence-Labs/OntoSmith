@@ -273,6 +273,40 @@ explorer belongs to the fuller app (v1.1); on the
 file store, the walker above is the exploration
 path. The app is read-only, like the API under it.
 
+## Adding documents: `ontosmith serve --library`
+
+`--library DIR` turns on a **Documents** page at
+`/documents` for managing the documents a graph is built
+from. `DIR` is a folder of plain-text files; it is created
+if missing.
+
+```bash
+ontosmith serve --batch quickstart-mine --library library
+```
+
+On the page you can drop `.txt` files in (or paste text),
+see what the library holds, remove files, and **Rebuild
+graph**. Adding a file does not change the graph by
+itself. The Neo4j store holds one graph, and a batch's
+document list is fixed when it is created, so a rebuild
+creates a new batch over *every* document in the library,
+runs it, and, once it reaches VERIFIED, replaces the
+graph and serves the new one. A rebuild therefore costs
+in proportion to the whole library, not just the new
+files. The page streams the build log; a failed build
+leaves the previous graph served and names the batch to
+resume (`ontosmith batch run <id>`).
+
+Rebuilds run under a spend cap: `ONTOSMITH_MAX_COST_USD`
+when it is set, else $5 on a binding that meters cost (a
+cost-less binding runs uncapped). `--pack` picks the pack
+rebuilds use (default: `open-domain`).
+
+The library changes files and spends, so it only binds a
+loopback host, answers only to a loopback `Host` header,
+and accepts writes only as same-origin JSON. Without
+`--library` the sample API stays read-only.
+
 ## What serving does *not* do
 
 - **No generative answers.** Search returns ranked
@@ -280,8 +314,10 @@ path. The app is read-only, like the API under it.
   triples; composing a prose answer from them is the
   caller's job (the evaluation harness's answerer
   stays an evaluation tool, not a product surface).
-- **No writes.** Serving is read-only; builds happen
-  through the pipeline commands.
+- **No writes by default.** Serving is read-only;
+  builds happen through the pipeline commands, or
+  through the opt-in Documents page
+  (`ontosmith serve --library`).
 - **No auth, no TLS.** The sample API binds
   localhost for local demos. Put a real server in
   front of it before exposing it anywhere.
