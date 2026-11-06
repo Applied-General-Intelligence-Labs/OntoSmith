@@ -39,8 +39,7 @@ class TestLoadRecords(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / "r.json"
             p.write_text(json.dumps(rows))
-            recs = ev.load_records(str(p), "p_true", "label",
-                                   "doc_id")
+            recs = ev.load_records(str(p))
         self.assertEqual(len(recs), 2)
         self.assertEqual(recs[0]["p_true"], 0.7)
         self.assertEqual(recs[0]["doc_id"], "42")
@@ -69,6 +68,28 @@ class TestEvaluate(unittest.TestCase):
         dev_docs = {r["doc_id"] for r in dev}
         held_docs = {r["doc_id"] for r in held}
         self.assertFalse(dev_docs & held_docs)
+
+
+class TestCli(unittest.TestCase):
+    def test_compare_runs(self):
+        # Regression: --compare read the removed --p-field
+        # attributes and crashed with AttributeError.
+        import contextlib
+        import io
+        import sys
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as td:
+            a, b = Path(td) / "a.json", Path(td) / "b.json"
+            a.write_text(json.dumps({"records": _records()}))
+            b.write_text(json.dumps({"records": _records()[::-1]}))
+            argv = ["evaluate", "--result", str(a),
+                    "--compare", str(b), "--iters", "10"]
+            buf = io.StringIO()
+            with mock.patch.object(sys, "argv", argv), \
+                    contextlib.redirect_stdout(buf):
+                ev.main()
+        out = json.loads(buf.getvalue())
+        self.assertIn("compare_error_records_excluded", out)
 
 
 if __name__ == "__main__":

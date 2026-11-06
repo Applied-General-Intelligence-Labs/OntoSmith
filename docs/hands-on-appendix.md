@@ -57,7 +57,9 @@ of Track 1 §4 is the richer view. Try `--object
 
 A counted projection reports the workload a build
 will move through its stages, per scenario, and
-names the governing (largest) one. This is the
+names the governing (largest) scenario for each
+unit — counts of different units are never added
+together. This is the
 flagship build's own counted input — 26,938 candidate
 pairs:
 
@@ -69,8 +71,8 @@ $ ontosmith verify project --counts candidate_pairs=26938
    "candidate_pairs": 26938
   }
  },
- "total_units": {
-  "base": 26938
+ "governing_by_unit": {
+  "candidate_pairs": "base"
  },
  "governing_scenario": "base"
 }

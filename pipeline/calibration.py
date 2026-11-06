@@ -40,7 +40,7 @@ def analyze(recs: list[dict], n_bins: int = 10) -> dict:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(prog="ontosmith calibration")
+    ap = argparse.ArgumentParser(prog="python -m pipeline.calibration")
     ap.add_argument("--out", default="results/calibration.json")
     args = ap.parse_args()
     out = {}

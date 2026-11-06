@@ -10,3 +10,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _no_ambient_spend_cap(monkeypatch):
+    """The batch spend cap lives in ONTOSMITH_MAX_COST_USD; a
+    value exported in the developer's shell or CI must not
+    leak into tests. Tests that want a cap set it themselves."""
+    monkeypatch.delenv("ONTOSMITH_MAX_COST_USD", raising=False)

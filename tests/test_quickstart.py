@@ -42,6 +42,44 @@ class TestQuickstartPreflight(unittest.TestCase):
             self.assertEqual(rc, 1)
             self.assertFalse((Path(td) / "batches").exists())
 
+    def _captured_create(self, env):
+        """Run quickstart up to batch create; return the
+        create Namespace it built (nothing is created)."""
+        seen = {}
+
+        def fake_create(args):
+            seen["args"] = args
+            raise SystemExit(0)
+
+        from pipeline import batch_cli, quickstart
+        with tempfile.TemporaryDirectory() as td:
+            doc = Path(td) / "mine.txt"
+            doc.write_text("Some text.\n")
+            full = {"ONTOSMITH_ROOT": td,
+                    "PATH": os.environ.get("PATH", ""), **env}
+            with mock.patch.dict(os.environ, full, clear=True), \
+                    mock.patch.object(quickstart, "_neo4j_reachable",
+                                      return_value=True), \
+                    mock.patch.object(batch_cli, "cmd_create",
+                                      fake_create):
+                self.assertEqual(main([str(doc), "--no-serve"]), 0)
+        return seen["args"]
+
+    def test_metered_binding_gets_default_cap(self):
+        # The preset (OpenRouter) reports cost: a first run is
+        # capped at $2 unless ONTOSMITH_MAX_COST_USD says else.
+        from pipeline.quickstart import QUICKSTART_CAP_USD
+        args = self._captured_create({"OPENROUTER_API_KEY": "dummy"})
+        self.assertEqual(args.default_max_cost_usd, QUICKSTART_CAP_USD)
+
+    def test_cost_less_binding_runs_uncapped(self):
+        # A binding that cannot meter cost gets no default
+        # cap (it could never trip and would only refuse).
+        args = self._captured_create({
+            "ONTOSMITH_BASE_URL": "http://gw.example:9000/v1",
+            "OPENROUTER_API_KEY": "dummy"})
+        self.assertIsNone(args.default_max_cost_usd)
+
     def test_batch_id_derivation(self):
         self.assertEqual(
             _batch_id_for(Path("/x/My Notes (final).txt"), None),

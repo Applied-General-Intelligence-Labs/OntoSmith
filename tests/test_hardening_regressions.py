@@ -247,8 +247,7 @@ class TestEvaluateErrorRecords(TmpRoot):
         ]}
         p = self.root / "r.json"
         p.write_text(json.dumps(rows))
-        recs = evaluate.load_records(str(p), "p_true", "label",
-                                     "doc_id")
+        recs = evaluate.load_records(str(p))
         # The failed call (p_true=0.0, gold label 1) is not scored
         # as a judged negative; it is counted as an exclusion.
         self.assertEqual([r["doc_id"] for r in recs], ["a", "c"])

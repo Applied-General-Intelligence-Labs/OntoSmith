@@ -68,13 +68,14 @@ class BatchConfig:
     embed_model: str = EMBED_MODEL
     # The batch spend stop-line. The cost ledger
     # enforces this as a hard cap (pre-stage check + per-entry
-    # accounting in stages); the counted-projection tooling
-    # that prices a run BEFORE it starts lives in
-    # harness.verification (CountedProjection / StopLine).
-    # None = no USD cap: the explicit way to run
-    # on a cost-less binding — a cap set on such a binding
-    # refuses by name at create/run, because it could never
-    # trip (connections.require_metered).
+    # accounting in stages). The 10.0 here is the core pack's
+    # declared batch_cost_cap_usd mirror, NOT what a created
+    # batch gets: `batch create` always sets this field from
+    # ONTOSMITH_MAX_COST_USD (batch_cli.cap_from_env) — unset
+    # means None, no cap — and quickstart supplies a $2
+    # default on metered bindings. A cap set on a cost-less
+    # binding refuses by name at create/run, because it could
+    # never trip (connections.require_metered).
     max_cost_usd: float | None = 10.0
     # GATES claim lease (decided 2026-10-16): seconds a claimed
     # queue item stays claimed before a resumed run may reclaim it.

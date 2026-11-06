@@ -27,7 +27,7 @@ F1_DROP_DRIFT = 0.03
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(prog="ontosmith recalibrate")
+    ap = argparse.ArgumentParser(prog="python -m pipeline.recalibrate")
     ap.add_argument("--history", required=True)
     ap.add_argument("--deployed-threshold", type=float, required=True)
     ap.add_argument("--window", type=int, default=500)

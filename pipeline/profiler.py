@@ -115,7 +115,7 @@ def main(argv=None) -> int:
                else Path("profiles") / args.family)
     try:
         profile = profile_corpus(args.corpus_dir, args.family,
-                                 out_dir, sample_n=12)
+                                 out_dir)
     except ValueError as e:
         print(f"profile refused: {e}", file=sys.stderr)
         return 1
