@@ -650,7 +650,8 @@ options:
 usage: ontosmith ontology draft [-h] --profile PROFILE [--brief BRIEF]
                                 [--family FAMILY] --pack-id PACK_ID
                                 [--display-name DISPLAY_NAME] --out OUT
-                                [--llm] [--model MODEL]
+                                [--llm] [--model MODEL] [--from PACK]
+                                [--holes HOLES]
 
 options:
   -h, --help            show this help message and exit
@@ -667,6 +668,17 @@ options:
   --model MODEL         drafting-tier binding (connection layer); default: the
                         drafting seat's bound model (ONTOSMITH_DRAFTING_MODEL)
                         — the seat ships unbound
+  --from PACK           extension mode: extend the named existing pack — a
+                        pack id resolved under this repo's packs/ tree, or a
+                        path to a schema draft / pack payload JSON — revising
+                        its schema against this profile's documents (the new
+                        material) under the inheritance rules (removals and
+                        shrinks then need recorded reasons). Without --from
+                        the draft composes fresh, even when a published pack
+                        carries the same --pack-id
+  --holes HOLES         hole report JSON (a list of family records, or an
+                        object with a 'families' list) the revision must
+                        address
 ```
 
 #### `ontosmith ontology import`
