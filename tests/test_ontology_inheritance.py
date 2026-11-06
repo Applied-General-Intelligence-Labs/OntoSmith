@@ -13,7 +13,10 @@ seed-change records justify nothing and are findings
 themselves; the drift diff reports (never merges) removals,
 definition rewrites, signature changes and inverse
 candidates; and the CLI grows draft --seed/--holes and the
-diff subcommand.
+diff subcommand. With the measured adoption (fix-run4),
+the CLI also revises the published pack by default: a
+draft for an existing pack id inherits it unless --fresh
+is given, and an explicit --seed wins over the default.
 """
 from __future__ import annotations
 
@@ -22,6 +25,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from pipeline import ontology_builder as ob
 
@@ -375,6 +379,68 @@ class TestSeededCli(unittest.TestCase):
                           "--out", str(draft_path)])
             self.assertEqual(rc, 0)
             self.assertTrue(draft_path.exists())
+
+
+class TestCliDefaultRevision(unittest.TestCase):
+    """Drafting for a pack id that already exists in the
+    repo revises the published pack by default — the
+    measured standard path. The repo root is redirected
+    by pointing the module's __file__ at a scratch tree
+    holding a packs/ layout, so the real tree is never
+    touched."""
+
+    def _publish(self, td: Path) -> None:
+        cfg = (td / "packs" / "field-notes" / "profile"
+               / "setup_config.json")
+        cfg.parent.mkdir(parents=True)
+        cfg.write_text(json.dumps(
+            {"pack_id": "field-notes",
+             "schema_front": _good_schema()}))
+
+    def _run_draft(self, td: Path, *extra: str) -> dict:
+        profile_path = td / "profile.json"
+        profile_path.write_text(json.dumps(_profile()))
+        draft_path = td / "draft.json"
+        fake = str(td / "pipeline" / "ontology_builder.py")
+        with mock.patch.object(ob, "__file__", fake):
+            rc = ob.main(["draft", "--profile",
+                          str(profile_path),
+                          "--pack-id", "field-notes",
+                          "--out", str(draft_path), *extra])
+        self.assertEqual(rc, 0)
+        return json.loads(draft_path.read_text())
+
+    def test_draft_revises_published_pack_by_default(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            self._publish(td)
+            draft = self._run_draft(td)
+            self.assertIn("seed", draft)
+            self.assertEqual(draft["entity_types"],
+                             ["Person", "Organization"])
+
+    def test_draft_fresh_ignores_published_pack(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            self._publish(td)
+            draft = self._run_draft(td, "--fresh")
+            self.assertNotIn("seed", draft)
+
+    def test_explicit_seed_wins_over_published_pack(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            self._publish(td)
+            front = _good_schema()
+            front["entity_inventory"] = \
+                front["entity_inventory"][:1]
+            front["relation_inventory"] = []
+            seed_path = td / "seed.json"
+            seed_path.write_text(json.dumps(
+                {"schema_front": front}))
+            draft = self._run_draft(td, "--seed",
+                                    str(seed_path))
+            self.assertIn("seed", draft)
+            self.assertEqual(draft["entity_types"], ["Person"])
 
 
 class TestBriefLineage(unittest.TestCase):

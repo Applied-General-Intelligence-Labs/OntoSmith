@@ -41,7 +41,13 @@ missing builder:
      definition revision, definition consistency fix) or
      explicitly leave open with a decision point. That bundle
      is the augmentation loop's revision path: holes drive
-     seeded revisions, never fresh recompositions.
+     seeded revisions, never fresh recompositions. The CLI
+     makes revision the default path: drafting for a pack
+     id that already exists in the repo inherits the
+     published pack automatically (an explicit ``--seed``
+     wins; ``--fresh`` composes from scratch) — revision
+     steered by the hole report is the standard loop,
+     fresh composition the exception.
   2. VALIDATE. Deterministic, fail-closed checks over the
      draft: every type carries a definition and boundary
      examples; no duplicate or colliding type names; no
@@ -337,6 +343,27 @@ def _brief_parts(brief) -> tuple[str, list[str], list[str], str]:
 SEED_CHANGE_ACTIONS = ("remove_type", "remove_signature",
                        "revise_definition", "narrow_definition",
                        "extend_signature")
+
+
+def _published_pack_seed(pack_id: str):
+    """The published pack this id names, as a revision
+    seed — the CLI's default inheritance source.
+
+    Looks for packs/<pack_id>/profile/setup_config.json
+    under the repo root, the layout emit writes, and
+    returns (document, path); returns None when no such
+    pack exists — a genuinely new pack id composes
+    fresh. An id that is not a slug never resolves: the
+    draft's own validation reports the id, and a
+    malformed id must not become a path."""
+    if not _SLUG_RE.match(pack_id or ""):
+        return None
+    root = Path(__file__).resolve().parent.parent
+    published = (root / "packs" / pack_id / "profile"
+                 / "setup_config.json")
+    if not published.exists():
+        return None
+    return _load_json(str(published)), published
 
 
 def _front_hash(front: dict) -> str:
@@ -1624,7 +1651,13 @@ def main(argv=None) -> int:
                    help="revision seed: a schema draft or pack "
                         "payload JSON whose schema_front this "
                         "draft inherits (removals and shrinks "
-                        "then need recorded reasons)")
+                        "then need recorded reasons); default: "
+                        "the published pack with this --pack-id, "
+                        "when one exists")
+    p.add_argument("--fresh", action="store_true",
+                   help="compose from scratch, ignoring any "
+                        "published pack with this --pack-id "
+                        "(default: revise the existing pack)")
     p.add_argument("--holes", default=None,
                    help="hole report JSON (a list of family "
                         "records, or an object with a "
@@ -1731,12 +1764,24 @@ def main(argv=None) -> int:
                 return 2
             drafter = make_chat_drafter(draft_model, draft_key)
         seed = None
+        seed_from = args.seed
         if args.seed:
             try:
                 seed = _load_json(args.seed)
             except ValueError as e:
                 print(str(e), file=sys.stderr)
                 return 1
+        elif not args.fresh:
+            # The standard path: a draft for a pack id that
+            # already exists revises the published pack.
+            try:
+                found = _published_pack_seed(args.pack_id)
+            except ValueError as e:
+                print(str(e), file=sys.stderr)
+                return 1
+            if found is not None:
+                seed, published = found
+                seed_from = str(published)
         hole_report = None
         if args.holes:
             try:
@@ -1764,7 +1809,7 @@ def main(argv=None) -> int:
         if seed is not None:
             print(f"seeded revision: inherits "
                   f"{(draft.get('seed') or {}).get('schema_hash')} "
-                  f"from {args.seed}")
+                  f"from {seed_from}")
         _write_json(args.out, draft)
         findings = validate_schema_draft(draft)
         print(f"draft written: {args.out} "
