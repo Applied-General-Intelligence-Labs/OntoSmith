@@ -76,17 +76,6 @@ class BatchConfig:
     # refuses by name at create/run, because it could never
     # trip (connections.require_metered).
     max_cost_usd: float | None = 10.0
-    # Frontier escalation — product config,
-    # OFF by default. When enabled, only non-judging seats
-    # (drafting / audit adjudication) may escalate items whose
-    # first-pass score lands in the shaky band below; the
-    # judging seat itself never escalates (the policy object
-    # is harness.verification.FrontierEscalationConfig, whose
-    # JUDGING_ROLES guard is the enforcement; model bindings
-    # stay in the connection layer — reference_profile).
-    frontier_escalation_enabled: bool = False
-    frontier_escalation_band_lo: float = 0.25
-    frontier_escalation_band_hi: float = 0.50
     # GATES claim lease (decided 2026-10-16): seconds a claimed
     # queue item stays claimed before a resumed run may reclaim it.
     # Default 300 = the pre-decision hard-coded constant in

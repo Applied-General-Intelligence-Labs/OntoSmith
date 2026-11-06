@@ -909,9 +909,7 @@ def render_profile_md(profile: dict) -> str:
              f"**Status:** {profile['status']} · "
              f"**Profile hash:** `{profile['profile_hash']}`",
              f"**Corpus:** `{profile['corpus_dir']}` · "
-             f"**Draft model:** {profile.get('draft_model') or 'none'} · "
-             f"**Drafting spend:** "
-             f"{_fmt_spend(profile['spend']['total_usd'])}",
+             f"**Draft model:** {profile.get('draft_model') or 'none'}",
              "",
              "Evidence grades: [FULL] deterministic count over the "
              "whole corpus · [SAMPLE n=…] read from the dispersed "
@@ -1118,8 +1116,7 @@ def main(argv=None) -> int:
               f"status={profile['status']} "
               f"hash={profile['profile_hash']}")
         print(f"  claims={len(profile['claims'])} "
-              f"decision_points={len(profile['decision_points'])} "
-              f"spend={_fmt_spend(profile['spend']['total_usd'])}")
+              f"decision_points={len(profile['decision_points'])}")
         return 0
     return 1
 

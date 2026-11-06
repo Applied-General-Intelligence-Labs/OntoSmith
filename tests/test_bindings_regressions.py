@@ -315,17 +315,16 @@ class TestTryItBEndToEnd(unittest.TestCase):
         self.env = _stub_env(self.base)
         self.env["ONTOSMITH_ROOT"] = str(self.state)
 
-    def _create(self, **kw):
+    def _create(self, capped=False):
         args = argparse.Namespace(
             source="stubsrc", collection="stubcoll",
             docs=[self.docs_glob], batch_id="fe3-e2e",
-            profile=None, pack="core",
-            no_cost_cap=False, max_cost_usd=None,
-            frontier_escalation=False, escalation_band_lo=None,
-            escalation_band_hi=None)
-        for k, v in kw.items():
-            setattr(args, k, v)
-        with mock.patch.dict(os.environ, self.env):
+            profile=None, pack="core")
+        env = dict(self.env)
+        if capped:
+            # The cap's only home is the internal env var.
+            env["ONTOSMITH_MAX_COST_USD"] = "10"
+        with mock.patch.dict(os.environ, env):
             with redirect_stdout(io.StringIO()):
                 batch_cli.cmd_create(args)
         return load_batch(self.state, "fe3-e2e")
@@ -358,16 +357,15 @@ class TestTryItBEndToEnd(unittest.TestCase):
         # 1. A capped create on a cost-less binding refuses
         #    by name (the seats + the basis), before any
         #    batch exists.
-        with mock.patch.dict(os.environ, self.env):
-            with self.assertRaises(
-                    connections.BindingCostError) as cm:
-                self._create()
+        with self.assertRaises(
+                connections.BindingCostError) as cm:
+            self._create(capped=True)
         self.assertIn("not-provided", str(cm.exception))
         self.assertIn("proposer", str(cm.exception))
 
-        # 2. --no-cost-cap create freezes the seat models
+        # 2. An uncapped create freezes the seat models
         #    into the batch config.
-        b = self._create(no_cost_cap=True)
+        b = self._create()
         self.assertEqual(b.config.llm_model,
                          STUB_MODELS["proposer"])
         self.assertEqual(b.config.gate_model,

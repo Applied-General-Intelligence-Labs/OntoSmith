@@ -145,8 +145,7 @@ before a build spends anything.
 ```console
 $ ontosmith batch create --source examples/corpus --collection demo \
     --docs "examples/corpus/*.txt" \
-    --profile profiles/demo/profile.json \
-    --max-cost-usd 2
+    --profile profiles/demo/profile.json
 profile: demo sha256:28ede2ab1b3e4fd2
 binding: reference
 setup_config: resolved (core baseline + profile 'demo', 32 keys) -> setup_config.resolved.json
@@ -170,9 +169,9 @@ Three lines deserve a word:
   escalation, drafting, embedder) and the stamp
   becomes `custom`, and the record says what ran
   ([connections.md](connections.md)).
-- **`--max-cost-usd 2`** — the stop-line, frozen into
-  the batch. Nothing has been spent; creation is
-  keyless.
+- **Nothing has been spent** — creation is keyless
+  and spend-free; what a run later spends is recorded
+  in the batch's ledger.
 
 Checkpoint: the batch id ends in the document count
 (`demo-4docs`). If that count is not your corpus's,
@@ -408,7 +407,7 @@ $ ontosmith profile demo-data --family redocred
 
 $ ontosmith batch create --source demo --collection redocred-dev-subset \
     --docs "demo-data/doc_*.txt" --profile profiles/redocred/profile.json \
-    --pack open-domain --max-cost-usd 2
+    --pack open-domain
 profile: redocred sha256:aceac6fb15f59e38
 pack: open-domain 0.10.0 (payload sha256:d3015687392af075cf…)
 binding: reference
@@ -593,7 +592,7 @@ shipped packs' records show.
 ```console
 $ ontosmith batch create --source examples/corpus --collection demo-own \
     --docs "examples/corpus/*.txt" --profile profiles/demo/profile.json \
-    --pack ./packs/demo-ceramics --max-cost-usd 2
+    --pack ./packs/demo-ceramics
 profile: demo sha256:28ede2ab1b3e4fd2
 pack: demo-ceramics 0.1.0 (payload sha256:0e521c59d46b0db6…)
 binding: reference
@@ -914,8 +913,7 @@ $ ontosmith batch create --source cuad-subset-100 \
     --collection fibo-cuad-100 \
     --docs "cuad-subset-100/*.txt" \
     --profile profiles/fibo-cuad/profile.json \
-    --pack fibo-contracts \
-    --max-cost-usd 10
+    --pack fibo-contracts
 profile: fibo-cuad sha256:b54c32666bb16ea7
 pack: fibo-contracts 0.1.0 (payload sha256:0d77115fb79acf07…)
 binding: reference
@@ -924,14 +922,12 @@ proposer_framing: Extract factual relations from the excerpt below.
 created batch fibo-cuad-100-100docs with 100 docs
 ```
 
-The price discipline is the appendix track's: a
-hard cap, frozen at creation — for this track the
-cap is $10, a configuration value, not a price
-expectation. The cost is proposer-dominated; the
-decision model's judging is a small share of a
-build's spend. One build, one subset: the counted
-ledger of the completed build (§7) is the record
-for this pack and profile, not a universal rate.
+One build, one subset: the counted ledger of the
+completed build (§7) is the record for this pack
+and profile, not a universal rate. Spend
+concentrates in the proposer stage; the decision
+model's judging is a small share of a build's
+spend.
 
 ### 7. Build — LIVE, and the finish line
 
