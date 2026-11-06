@@ -403,6 +403,120 @@ class TestLibraryHttp(TmpDir):
         self.assertIn("/app/library.js", body)
 
 
+class _KindStore:
+    """A serving-store stand-in with a kind and a batch id."""
+
+    def __init__(self, kind, batch_id=""):
+        self.kind = kind
+        self.batch_id = batch_id
+
+    def describe(self):
+        return {"kind": self.kind, "batch_id": self.batch_id}
+
+
+class TestLibraryWiring(TmpDir):
+    """`serve --library`: the store swaps a finished rebuild
+    makes (api.server._library_service), with open_store
+    stubbed so no store is opened."""
+
+    def setUp(self):
+        super().setUp()
+        from argparse import Namespace
+        from unittest import mock
+        self.args = Namespace(library=str(self.tmp / "wired"),
+                              pack="open-domain", store="auto",
+                              batch=None)
+        self.opened = []
+        self.next_store = _KindStore("neo4j", "library-new")
+
+        def open_store(**kw):
+            self.opened.append(kw)
+            if isinstance(self.next_store, Exception):
+                raise self.next_store
+            return self.next_store
+
+        patcher = mock.patch("api.server._search.open_store",
+                             side_effect=open_store)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _wire(self, store):
+        from api.server import _library_service
+        service = SearchService(store)
+        service.library = _library_service(service, self.args)
+        return service
+
+    def test_verified_rebuild_is_served(self):
+        service = self._wire(_KindStore("file"))
+        service.library.rebuilder.on_verified("library-new")
+        self.assertEqual(self.opened,
+                         [{"batch": "library-new", "store": "auto"}])
+        self.assertIs(service.store, self.next_store)
+        self.assertEqual(service.library.served_batch, "library-new")
+        self.assertIsNone(service.unavailable())
+
+    def test_failed_rebuild_keeps_a_file_store(self):
+        old = _KindStore("file")
+        service = self._wire(old)
+        service.library.rebuilder.on_failed("library-x")
+        self.assertEqual(self.opened, [])
+        self.assertIs(service.store, old)
+
+    def test_failed_rebuild_rereads_a_neo4j_store(self):
+        service = self._wire(_KindStore("neo4j", "library-old"))
+        service.library.rebuilder.on_failed("library-new")
+        # No batch named: serve whatever graph the store's
+        # stamp names now (the failed build may have
+        # replaced it).
+        self.assertEqual(self.opened, [{"store": "auto"}])
+        self.assertIs(service.store, self.next_store)
+        self.assertEqual(service.library.served_batch, "library-new")
+        self.assertIsNone(service.unavailable())
+
+    def test_unservable_neo4j_store_refuses_by_name(self):
+        from pipeline.search import StoreError
+        service = self._wire(_KindStore("neo4j", "library-old"))
+        self.next_store = StoreError("holds no graph yet")
+        with self.assertRaises(StoreError):
+            service.library.rebuilder.on_failed("library-new")
+        reason = service.unavailable()
+        self.assertIn("library-new failed", reason)
+        self.assertIn("holds no graph yet", reason)
+        # A later verified rebuild clears the refusal.
+        self.next_store = _KindStore("neo4j", "library-next")
+        service.library.rebuilder.on_verified("library-next")
+        self.assertIsNone(service.unavailable())
+
+    def test_a_failing_failed_hook_is_reported(self):
+        self.library.add("a.txt", "Alice met Bob.")
+
+        def boom(batch_id):
+            raise RuntimeError("store gone")
+
+        rb = lib.Rebuilder(
+            self.library, pack="open-domain",
+            state_root=lambda: self.state, on_failed=boom,
+            run_cmd=_fake_build(self.state, final_status="GATES",
+                                run_rc=1))
+        rb.start()
+        rb.join(5)
+        st = rb.status()
+        self.assertEqual(st["status"], "failed")
+        self.assertIn("stopped at GATES", st["message"])
+        self.assertIn("then RuntimeError: store gone", st["message"])
+
+    def test_sigterm_takes_the_cleanup_path(self):
+        import signal
+
+        from api.server import _stop_on_sigterm
+        old = signal.getsignal(signal.SIGTERM)
+        self.addCleanup(signal.signal, signal.SIGTERM, old)
+        _stop_on_sigterm()
+        handler = signal.getsignal(signal.SIGTERM)
+        with self.assertRaises(KeyboardInterrupt):
+            handler(signal.SIGTERM, None)
+
+
 class TestLibraryOff(unittest.TestCase):
     def test_routes_refuse_by_name(self):
         server = build_server("127.0.0.1", 0, SearchService(_Store()))
