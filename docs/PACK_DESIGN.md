@@ -384,13 +384,16 @@ edited, or written by hand with no guesswork.
 | `provenance.corpus_family` | string | draft | The profile's family, as recorded at draft time |
 | `provenance.drafting_tier` | string (= `drafting`) | draft | The seat that drafted |
 | `provenance.drafting_source` | enum: `deterministic`, `llm` | draft | `deterministic`: the brief-seeded skeleton (no model). `llm`: the bound drafting seat wrote the schema front |
+| `provenance.mode` | enum: `fresh`, `extension` | draft | How the draft was composed: fresh from the brief, or an extension inheriting a seed pack's schema (`draft --from`) |
 | `provenance.brief` | string \| null | draft | The brief text the draft was seeded from |
+| `provenance.seed` | object | draft (extension only) | The seed's pack id and schema hash, as inherited |
 | `schema_front` | object | draft, then the author | The schema itself — the single source of every definition (below) |
 | `entity_types` | array of string | draft (derived) | Mirror of the entity inventory's type names, in declaration order; the schema front is normative |
 | `relation_types` | array of string | draft (derived) | Mirror of the relation inventory's type names |
 | `merge_prohibited_type_pairs` | array of [string, string] | brief / drafting / author | Operating declaration: entity type pairs the build's entity resolution must never merge (a prohibited pair is recorded to the ER review band instead). Rides the emitted payload; bound by the approval hash |
 | `theme_attest_chunk` | boolean | author | Operating declaration (opt-in, default off): formerly widened the candidate guard's theme-presence check from the quote to the proposal's chunk. Theme grading has subsumed it — a verb+preposition proposal whose object attests in the document but not in its quote is now kept with its evidence grade (`theme_grade`) for the judge, so the declaration no longer changes guard behavior; it remains accepted and still rides the emitted payload, bound by the approval hash. The guard itself is documented in the hands-on guide, Track 3 §5 |
-| `decision_points` | array of string | drafting | Open questions the drafter surfaced for the human approver |
+| `decision_points` | array of string \| object | drafting / author | Open questions the drafter surfaced for the human approver. Object entries are structured records: seed-change records (`remove_type`, `remove_signature`, `revise_definition`, `extend_signature`, …) that justify changing an inherited schema, and `declare_boundary` records that settle a confusable type pair — validation matches on the records; free text justifies nothing |
+| `seed` | object | draft (extension only) | The inherited schema: its source record, the seed front's content hash, and the seed `schema_front` itself. Validation holds the revision to the inheritance rules against it (no unjustified removal, signature shrinkage, or silent definition rewrite) |
 
 The `schema_front` object:
 

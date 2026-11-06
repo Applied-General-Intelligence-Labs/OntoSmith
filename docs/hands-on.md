@@ -484,6 +484,7 @@ $ cat brief.json
 $ ontosmith ontology draft --profile profiles/demo/profile.json \
     --brief brief.json --pack-id demo-ceramics \
     --display-name "Demo Ceramics" --out drafts/demo-ceramics.json
+mode: fresh composition — no seed; pack 'demo-ceramics' starts from a blank schema
 draft written: drafts/demo-ceramics.json (status DRAFT_NOT_APPROVED, 4 entity types, 4 relation types, schema hash sha256:98eb8b92a3b41be1…)
 validation findings (20) — the decision-point list approval must settle:
   [MISSING_DEFINITION] entity_inventory[0].definition: entity type 'Organization' has no definition

@@ -191,9 +191,11 @@ The USD stop-line follows from that: a batch whose
 again before a run — when any seat it will use is
 `not-provided`, naming the seats and the remedies
 (bind a cost-reporting route, declare rates, or run
-with `--no-cost-cap`, the explicit uncapped mode).
-A cap that could never trip is never silently
-recorded.
+uncapped). The cap's only home is the
+`ONTOSMITH_MAX_COST_USD` environment variable —
+unset (or `none`) means no cap; the ledger still
+records what a run spent. A cap that could never
+trip is never silently recorded.
 
 **Capabilities** replace model-name pattern matching.
 Two are declared today — `no-temperature` (the route

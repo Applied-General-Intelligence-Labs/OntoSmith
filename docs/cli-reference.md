@@ -335,13 +335,17 @@ options:
 
 ```text
 usage: ontosmith ontology [-h]
-                          {draft,import,validate,brief,approve,emit,check} ...
+                          {draft,import,validate,brief,approve,emit,check,diff}
+                          ...
 
 Ontology builder: draft -> validate -> approve -> emit a pack
 
 positional arguments:
-  {draft,import,validate,brief,approve,emit,check}
-    draft               Draft a schema from a corpus profile + brief
+  {draft,import,validate,brief,approve,emit,check,diff}
+    draft               Draft a schema from a corpus profile + brief (fresh by
+                        default; --from PACK extends an existing pack; a
+                        material guide warns under 30 documents of material,
+                        strongly under 10)
     import              Import an external ontology as a draft (BYO schema):
                         inventory + scoping spec -> draft + scoping record
     validate            Validate a schema draft
@@ -350,6 +354,9 @@ positional arguments:
     emit                Emit an approved draft as a pack
     check               Validate a pack directory against the pack schemas +
                         loader (contributor pre-submission check)
+    diff                Report the structural difference between two schemas
+                        (drafts or pack payloads) — the anchoring check; a
+                        report, never a merge
 
 options:
   -h, --help            show this help message and exit

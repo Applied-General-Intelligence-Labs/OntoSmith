@@ -84,7 +84,8 @@ $ ontosmith batch create --source examples/corpus --collection demo \
 $ ontosmith batch run demo-4docs
 ```
 
-The run is capped by a stop-line (`--max-cost-usd`, or
+The run is capped by a stop-line (the
+`ONTOSMITH_MAX_COST_USD` environment variable, or
 the pack's declared cap) enforced from the spend ledger,
 and `ontosmith verify project` prices a counted candidate
 set against that line before you commit to a run. The
