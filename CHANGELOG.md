@@ -7,6 +7,63 @@ and the project adheres to
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-11-05
+
+### Added
+
+- **Ontology drafting input: semantic census +
+  document survey** — the draft context now carries
+  the profiler's measured census as lists (recurring
+  defined terms, the names they bind to, recurring
+  clause/section headings) and the profile's document
+  survey (head and tail of each sampled document),
+  so the drafting seat decides about recurring corpus
+  terrain explicitly instead of never seeing it.
+- **Schema inheritance (seeded revision)** — a draft
+  can inherit an existing pack's schema_front as a
+  seed; validation holds the revision to the
+  inheritance rules: a dropped type, a dropped
+  signature pair, or a rewritten inherited definition
+  each needs a structured decision point recording
+  the reason, and a signature addition rides with its
+  definition revision or an `extend_signature`
+  record stating the existing definition already
+  covers it. A revision may also carry a hole report
+  naming the families it must address or explicitly
+  leave open. `ontology diff` reports the structural
+  difference between two schemas — a report, never
+  a merge.
+- **Structured boundary declarations** — a revision
+  that adds, re-signs or redefines a relation must
+  declare its boundary with every relation it shares
+  a signature pair with (`declare_boundary`:
+  distinct / includes / included_in); validation
+  rejects an undeclared boundary
+  (`BOUNDARY_UNDECLARED`), and a signature extension
+  must carry the evidence it rests on.
+
+### Changed
+
+- **Draft modes are explicit** — a plain `ontology
+  draft` now composes fresh from the brief, even when
+  a published pack carries the same pack id;
+  extending an existing pack is the explicit
+  `draft --from <pack id | schema document>` mode,
+  and a named target that cannot be extended is
+  refused rather than silently degrading into a
+  fresh composition. Every draft run prints its
+  mode. A material guide rides the output: a strong
+  warning under 10 documents of material and a
+  recommendation note at 10–29 documents; the guide
+  warns, it never blocks.
+- **CLI surface simplified** — the lab's measurement
+  commands no longer dispatch from the unified CLI;
+  they run from their module entries. The batch
+  create cost-cap flags are removed: the spend cap's
+  only home is the `ONTOSMITH_MAX_COST_USD`
+  environment variable (unset = no cap; the ledger
+  still records what a run spent).
+
 ## [0.1.6] - 2026-11-03
 
 ### Added

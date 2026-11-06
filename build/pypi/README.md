@@ -556,7 +556,7 @@ whose search runs the lexical and graph arms only
 
 ## Status
 
-Release 0.1.6, published on PyPI. The pipeline,
+Release 0.1.7, published on PyPI. The pipeline,
 profiler, ontology builder, inspect viewer,
 verification cores, packs, and the serving surface
 (search command + sample API) in this tree are
