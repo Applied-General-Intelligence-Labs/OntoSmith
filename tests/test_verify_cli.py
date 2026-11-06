@@ -1,6 +1,8 @@
 """verify CLI smoke tests: score / audit-sets / project /
 report over tiny JSONL fixtures (the R10 one-command forms).
 """
+import contextlib
+import io
 import json
 import tempfile
 import unittest
@@ -43,11 +45,15 @@ class TestVerifyCli(unittest.TestCase):
         self.assertEqual(frame["matched_predicted"], 1)
         self.assertTrue((out / "set_A.jsonl").exists())
 
-    def test_project_within_and_over(self):
-        rc = main(["project", "--counts", "pair=100",
-                   "--unit-cost", "pair=0.01", "--cap", "3.10",
-                   "--stop-line", "3.05"])
+    def test_project_counts_only(self):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = main(["project", "--counts", "pair=100",
+                       "--scenario", "wide:pair=250,doc=3"])
         self.assertEqual(rc, 0)
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(payload["total_units"]["base"], 100)
+        self.assertEqual(payload["governing_scenario"], "wide")
 
     def test_report_to_file(self):
         out = self.tmp / "report.md"

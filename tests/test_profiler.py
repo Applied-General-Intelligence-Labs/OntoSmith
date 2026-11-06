@@ -110,7 +110,7 @@ class TestProfilerCli(unittest.TestCase):
             with contextlib.redirect_stdout(buf):
                 rc = profiler.main(
                     [str(corpus), "--family", "fixfam",
-                     "--out", str(out), "--sample-n", "4"])
+                     "--out", str(out)])
             self.assertEqual(rc, 0)
             card = buf.getvalue()
             self.assertIn("Corpus profile", card)
@@ -121,7 +121,7 @@ class TestProfilerCli(unittest.TestCase):
             with contextlib.redirect_stdout(buf):
                 rc = profiler.main(
                     [str(corpus), "--family", "fixfam",
-                     "--out", str(out), "--sample-n", "4",
+                     "--out", str(out),
                      "--json"])
             self.assertEqual(rc, 0)
             summary = json.loads(buf.getvalue())

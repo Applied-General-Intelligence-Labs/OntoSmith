@@ -4,12 +4,14 @@ Usage:
     python -m pipeline <command> [options]
     python -m pipeline help <command>
 
-Commands are grouped below. Every command forwards its options
-to the underlying module, so `python -m pipeline review --help`
-works too. The gate/model evaluation commands (triple, er,
-conflict, onto, llm, ollama, cascade) dispatch into
-pipeline.gate_cli — the collapsed form of the lab's per-gate
-runner scripts.
+Commands are grouped below: Core (the build-and-serve
+product), Authoring (pack authoring), and Serve. Every
+command forwards its options to the underlying module, so
+`python -m pipeline batch --help` works too. The lab's
+measurement commands (review, evaluate, the gate runners,
+and friends) are not part of the product surface; they run
+from their module entries, e.g. `python -m
+pipeline.gate_cli triple`.
 """
 from __future__ import annotations
 
@@ -25,50 +27,30 @@ MAGENTA = "\033[95m"
 
 # name: (module, group, description, fixed leading args)
 COMMANDS: dict[str, tuple[str, str, str, tuple[str, ...]]] = {
-    "review": ("pipeline.review", "Label",
-               "Interactive review-band labeling (human)", ()),
-    "evaluate": ("pipeline.evaluate", "Evaluate",
-                 "Run gate evaluation with bootstrap CI", ()),
-    "recalibrate": ("pipeline.recalibrate", "Evaluate",
-                    "Re-tune thresholds; DRIFT alert on change", ()),
-    "calibration": ("pipeline.calibration", "Evaluate",
-                    "Calibration / ECE report", ()),
-    "llm": ("pipeline.gate_cli", "Models",
-            "Judge candidates via the judge seat's model",
-            ("llm",)),
-    "ollama": ("pipeline.gate_cli", "Models",
-               "Judge candidates via local Ollama", ("ollama",)),
-    "triple": ("pipeline.gate_cli", "Gates",
-               "Triple validation gate (Jev)", ("triple",)),
-    "er": ("pipeline.gate_cli", "Gates",
-           "Entity resolution gate (Jev)", ("er",)),
-    "conflict": ("pipeline.gate_cli", "Gates",
-                 "Conflict detection gate (Jev)", ("conflict",)),
-    "onto": ("pipeline.gate_cli", "Gates",
-             "Ontology gate (Jev)", ("onto",)),
-    "cascade": ("pipeline.gate_cli", "Gates",
-                "Choice-cascade dense graph builder", ("cascade",)),
-    "configure": ("pipeline.configure", "Pipeline",
+    "configure": ("pipeline.configure", "Core",
                   "Declare provider bindings for the seats "
                   "(interactive)", ()),
-    "identity-freeze": ("pipeline.identity_freeze",
-                        "Pipeline",
-                        "Freeze per-point identity-seat "
-                        "decisions into a global decisions "
-                        "file", ()),
-    "batch": ("pipeline.batch_cli", "Pipeline",
-              "Batch pipeline: create/run/status/rollback "
-              "+ ER settlement", ()),
-    "profile": ("pipeline.profiler", "Pipeline",
+    "profile": ("pipeline.profiler", "Core",
                 "Corpus profiler: stage-0 profile of a "
                 "corpus (deterministic, no LLM)", ()),
-    "ontology": ("pipeline.ontology_builder", "Pipeline",
+    "batch": ("pipeline.batch_cli", "Core",
+              "Batch pipeline: create/run/status/rollback "
+              "+ ER settlement", ()),
+    "inspect": ("pipeline.inspect", "Core",
+                "Evidence/provenance viewer: one triple, "
+                "its evidence + provenance", ()),
+    "verify": ("harness.verification.verify_cli", "Core",
+               "Verification cores: score/audit-sets/project/report",
+               ()),
+    "ontology": ("pipeline.ontology_builder", "Authoring",
                  "Ontology builder: draft/validate/approve/"
                  "emit a pack; check validates a pack "
                  "directory", ()),
-    "inspect": ("pipeline.inspect", "Evaluate",
-                "Evidence/provenance viewer: one triple, "
-                "its evidence + provenance", ()),
+    "identity-freeze": ("pipeline.identity_freeze",
+                        "Authoring",
+                        "Freeze per-point identity-seat "
+                        "decisions into a global decisions "
+                        "file", ()),
     "search": ("pipeline.search", "Serve",
                "Hybrid search over a built graph "
                "(chunks + triples)", ()),
@@ -78,13 +60,9 @@ COMMANDS: dict[str, tuple[str, str, str, tuple[str, ...]]] = {
     "quickstart": ("pipeline.quickstart", "Serve",
                    "First run: build a graph from one text "
                    "file and serve it", ()),
-    "verify": ("harness.verification.verify_cli", "Evaluate",
-               "Verification cores: score/audit-sets/project/report",
-               ()),
 }
 
-GROUPS = ["Label", "Evaluate", "Models", "Gates", "Pipeline",
-          "Serve"]
+GROUPS = ["Core", "Authoring", "Serve"]
 
 BANNER = r"""
    ___        _        ____            _ _   _

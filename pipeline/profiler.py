@@ -90,7 +90,7 @@ def render_card(summary: dict) -> str:
 
 def main(argv=None) -> int:
     """``ontosmith profile <corpus_dir> --family F [--out D]
-    [--sample-n N] [--json]`` — deterministic stage-0 census."""
+    [--json]`` — deterministic stage-0 census."""
     ap = argparse.ArgumentParser(
         prog="ontosmith profile",
         description="Corpus profiler: stage-0 "
@@ -106,9 +106,6 @@ def main(argv=None) -> int:
                     help="artefact directory (default: "
                          "profiles/<family> under the "
                          "current directory)")
-    ap.add_argument("--sample-n", type=int, default=12,
-                    help="dispersed sample size for "
-                         "sample-graded claims (default 12)")
     ap.add_argument("--json", action="store_true",
                     help="print the machine summary as JSON "
                          "instead of the report card")
@@ -118,7 +115,7 @@ def main(argv=None) -> int:
                else Path("profiles") / args.family)
     try:
         profile = profile_corpus(args.corpus_dir, args.family,
-                                 out_dir, sample_n=args.sample_n)
+                                 out_dir, sample_n=12)
     except ValueError as e:
         print(f"profile refused: {e}", file=sys.stderr)
         return 1

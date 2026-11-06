@@ -234,25 +234,40 @@ class TestCmdCreateProfileWiring(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 batch_cli.cmd_create(args)
 
-    def test_cost_and_escalation_config_surface(self):
+    def test_cost_config_surface(self):
+        # The cap's only home is the internal env var.
         args = argparse.Namespace(
             source="src", collection="coll",
             docs=[str(self.tmp / "docs" / "*.txt")],
-            profile=None, pack="bio-medical", batch_id="testcfg",
-            max_cost_usd=3.25, frontier_escalation=True,
-            escalation_band_lo=0.2, escalation_band_hi=0.6)
-        with mock.patch.object(batch_cli, "ROOT", self.tmp):
+            profile=None, pack="bio-medical", batch_id="testcfg")
+        with mock.patch.object(batch_cli, "ROOT", self.tmp), \
+                mock.patch.dict(
+                    "os.environ", {"ONTOSMITH_MAX_COST_USD": "3.25"}):
             batch_cli.cmd_create(args)
         from pipeline.batch import load_batch
         cfg = load_batch(self.tmp, "testcfg").config
         self.assertEqual(cfg.max_cost_usd, 3.25)
-        self.assertTrue(cfg.frontier_escalation_enabled)
-        self.assertEqual(cfg.frontier_escalation_band_lo, 0.2)
-        self.assertEqual(cfg.frontier_escalation_band_hi, 0.6)
 
-    def test_escalation_defaults_off(self):
+    def test_cost_default_uncapped(self):
+        args = argparse.Namespace(
+            source="src", collection="coll",
+            docs=[str(self.tmp / "docs" / "*.txt")],
+            profile=None, pack="bio-medical", batch_id="testcfg2")
+        with mock.patch.object(batch_cli, "ROOT", self.tmp), \
+                mock.patch.dict("os.environ", {}, clear=False):
+            import os
+            os.environ.pop("ONTOSMITH_MAX_COST_USD", None)
+            batch_cli.cmd_create(args)
+        from pipeline.batch import load_batch
+        cfg = load_batch(self.tmp, "testcfg2").config
+        self.assertIsNone(cfg.max_cost_usd)
+
+    def test_frontier_escalation_surface_removed(self):
+        # The recorded-but-unwired frontier switch was deleted
+        # in the CLI simplification: no config fields remain.
         batch = self._create()
-        self.assertFalse(batch.config.frontier_escalation_enabled)
+        self.assertFalse(hasattr(
+            batch.config, "frontier_escalation_enabled"))
 
     def test_no_profile_family_no_provenance(self):
         args = argparse.Namespace(

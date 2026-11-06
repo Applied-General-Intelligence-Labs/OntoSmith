@@ -67,9 +67,6 @@ def main(argv=None) -> int:
     ap.add_argument("--batch-id", default=None,
                     help="batch id (default: "
                          "quickstart-<file stem>)")
-    ap.add_argument("--max-cost-usd", type=float, default=2.0,
-                    help="hard spend cap for the build "
-                         "(default: 2.0)")
     ap.add_argument("--port", type=int, default=8765,
                     help="serve port (default: 8765)")
     ap.add_argument("--no-serve", action="store_true",
@@ -117,9 +114,8 @@ def main(argv=None) -> int:
     create_args = Namespace(
         source="quickstart", collection="quickstart",
         docs=[str(path)], batch_id=batch_id, profile=None,
-        pack="open-domain", max_cost_usd=args.max_cost_usd,
-        no_cost_cap=False, frontier_escalation=False,
-        escalation_band_lo=None, escalation_band_hi=None)
+        pack="open-domain", max_cost_usd=None,
+        no_cost_cap=False)
     try:
         batch_cli.cmd_create(create_args)
         batch_cli.cmd_run(Namespace(

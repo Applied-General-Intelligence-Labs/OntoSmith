@@ -1706,7 +1706,8 @@ def stage_gates(b: Batch, root: Path, stages: list[str],
     save_batch(b, root)
     advance(b, root, [*stages, "GATES"])
     _log(b.batch_id, f"GATES done: {len(judgments) - errs} ok, "
-                     f"cost={_fmt_cost(total_cost)}, {errs} errors")
+                     f"cost={'unmetered' if total_cost is None else 'metered'}, "
+                     f"{errs} errors")
 
 
 def _c1_whitelist(setup_cfg: dict | None) -> set | None:

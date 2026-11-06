@@ -7,7 +7,7 @@ Mandatory protocol (SPEC):
   4. optional paired McNemar vs a second result file
   5. optional --stability (bootstrap t*) and --calibration (ECE/bins)
 
-Record schema is configurable via --p-field/--label-field/--doc-field.
+Record schema is fixed: p_true / label / doc_id.
 Input files: {"records": [...]} JSON.
 
 Usage:
@@ -92,9 +92,7 @@ def main() -> None:
     ap.add_argument("--result", required=True)
     ap.add_argument("--compare", default=None,
                     help="second result file for paired McNemar")
-    ap.add_argument("--p-field", default="p_true")
-    ap.add_argument("--label-field", default="label")
-    ap.add_argument("--doc-field", default="doc_id")
+
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--iters", type=int, default=500)
     ap.add_argument("--stability", action="store_true")
@@ -102,8 +100,7 @@ def main() -> None:
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
-    recs = load_records(args.result, args.p_field, args.label_field,
-                        args.doc_field)
+    recs = load_records(args.result, "p_true", "label", "doc_id")
     if not recs:
         sys.exit("no usable records (check field names)")
     out = {"result": args.result, **evaluate(recs, args.seed, args.iters)}
