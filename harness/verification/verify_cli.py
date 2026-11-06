@@ -10,10 +10,12 @@ over JSONL inputs in the documented record shapes
         --gold G.jsonl --out-dir DIR [--seed N] \
         [--a-n N] [--b-n N] [--c-n N]
     python -m pipeline verify project --counts unit=n,... \
-        --unit-cost unit=usd,... [--scenario name:...] \
-        --cap USD [--stop-line USD]
+        [--scenario name:unit=n,...]
     python -m pipeline verify report --predicted P.jsonl \
         --gold G.jsonl [--out R.md] [--title T]
+
+The normalization table may also come from the
+ONTOSMITH_NORMALIZATION_TABLE environment variable.
 
 A normalization table file is JSON:
 ``{"symmetric": [...], "inverses": {"inv": "primary"}}`` —
@@ -159,19 +161,26 @@ def main(argv=None) -> int:
              "sets": {t: len(sets[t]) for t in "ABC"}}, indent=1)
     elif args.cmd == "project":
         # Counts-only projection: the counted workload per
-        # scenario, with the governing (largest) scenario
-        # named. Pricing a workload is the caller's own
+        # scenario. Counts of different units (pairs, docs)
+        # are never added together, so the governing scenario
+        # is named per unit; `governing_scenario` is the one
+        # that governs every unit, or null when units
+        # disagree. Pricing a workload is the caller's own
         # arithmetic, outside the product surface.
         scenarios = {"base": _kv_pairs(args.counts)}
         for spec in args.scenario:
             name, _, counts = spec.partition(":")
             scenarios[name.strip()] = _kv_pairs(counts)
-        totals = {name: sum(items.values())
-                  for name, items in scenarios.items()}
-        governing = max(totals, key=totals.get) if totals else None
+        units = sorted({u for items in scenarios.values()
+                        for u in items})
+        by_unit = {u: max(scenarios,
+                          key=lambda s, u=u: scenarios[s].get(u, 0))
+                   for u in units}
+        leaders = set(by_unit.values())
+        governing = leaders.pop() if len(leaders) == 1 else None
         payload = json.dumps(
             {"scenarios": scenarios,
-             "total_units": totals,
+             "governing_by_unit": by_unit,
              "governing_scenario": governing}, indent=1)
     else:  # report
         rep = build_report(load_jsonl(args.predicted),

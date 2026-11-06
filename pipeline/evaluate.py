@@ -30,11 +30,12 @@ from .analyze_hardened import (
     tune_threshold,
 )
 
+REQUIRED_FIELDS = ("p_true", "label", "doc_id")
 
-def load_records(path: str, p_field: str, label_field: str,
-                 doc_field: str) -> list[dict]:
+
+def load_records(path: str) -> list[dict]:
     """Load judgment records from a result file, keeping only
-    rows that carry all three fields (score, label, doc id);
+    rows that carry all three fields (p_true, label, doc_id);
     scores/labels are coerced to float/int and the doc id to
     str. The original row is kept under ``_raw``.
 
@@ -50,11 +51,11 @@ def load_records(path: str, p_field: str, label_field: str,
     for r in raw:
         if r.get("error"):
             continue
-        if p_field not in r or label_field not in r or doc_field not in r:
+        if any(f not in r for f in REQUIRED_FIELDS):
             continue
-        recs.append({"p_true": float(r[p_field]),
-                     "label": int(r[label_field]),
-                     "doc_id": str(r[doc_field]),
+        recs.append({"p_true": float(r["p_true"]),
+                     "label": int(r["label"]),
+                     "doc_id": str(r["doc_id"]),
                      "_raw": r})
     return recs
 
@@ -88,11 +89,10 @@ def main() -> None:
     """CLI: evaluate one result file; optionally compare two
     (paired McNemar), add threshold-stability and calibration
     reports. See the module docstring for usage."""
-    ap = argparse.ArgumentParser(prog="ontosmith evaluate")
+    ap = argparse.ArgumentParser(prog="python -m pipeline.evaluate")
     ap.add_argument("--result", required=True)
     ap.add_argument("--compare", default=None,
                     help="second result file for paired McNemar")
-
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--iters", type=int, default=500)
     ap.add_argument("--stability", action="store_true")
@@ -100,15 +100,15 @@ def main() -> None:
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
-    recs = load_records(args.result, "p_true", "label", "doc_id")
+    recs = load_records(args.result)
     if not recs:
-        sys.exit("no usable records (check field names)")
+        sys.exit("no usable records: each record needs "
+                 + ", ".join(REQUIRED_FIELDS))
     out = {"result": args.result, **evaluate(recs, args.seed, args.iters)}
     out["n_error_records_excluded"] = error_record_count(args.result)
 
     if args.compare:
-        recs_b = load_records(args.compare, args.p_field, args.label_field,
-                              args.doc_field)
+        recs_b = load_records(args.compare)
         out["compare_error_records_excluded"] = error_record_count(
             args.compare)
         dev_a, _ = split_by_doc(recs, seed=args.seed)

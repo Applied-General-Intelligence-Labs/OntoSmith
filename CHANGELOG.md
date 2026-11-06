@@ -7,6 +7,30 @@ and the project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- **Spend cap parsing** — `ONTOSMITH_MAX_COST_USD` now
+  refuses by name a value that is not a finite,
+  non-negative number (`nan`, `inf`, `-1`, `10usd`)
+  instead of recording a cap that could never trip or
+  crashing with a traceback; an empty value means no
+  cap, like unset.
+- **Quickstart spend cap restored** — on a binding that
+  meters cost, `quickstart` caps the build at $2 unless
+  `ONTOSMITH_MAX_COST_USD` is set; a cost-less binding
+  runs uncapped.
+- **`python -m pipeline.evaluate --compare`** no longer
+  crashes on the removed `--p-field` options.
+- **`verify project`** no longer adds counts of
+  different units together: the payload names the
+  governing scenario per unit (`governing_by_unit`), and
+  `governing_scenario` is null when units disagree
+  (`total_units` is removed).
+- The GATES log line shows the stage's dollar spend
+  again; retired top-level commands (`ontosmith triple`,
+  `ontosmith evaluate`, …) name the module entry that
+  runs them.
+
 ## [0.1.7] - 2026-11-05
 
 ### Added

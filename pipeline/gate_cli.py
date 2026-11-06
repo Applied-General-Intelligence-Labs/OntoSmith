@@ -723,7 +723,7 @@ def main(argv=None) -> None:
     """Dispatch one gate/model evaluation subcommand. Argument
     surfaces and defaults are the collapsed lab runners' own."""
     ap = argparse.ArgumentParser(
-        prog="ontosmith",
+        prog="python -m pipeline.gate_cli",
         description="Gate + model evaluation runners")
     sub = ap.add_subparsers(dest="gate", required=True)
 

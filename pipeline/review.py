@@ -170,7 +170,7 @@ def _label_row(r: dict, label, pass_no: int, **extra) -> dict:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(prog="ontosmith review")
+    ap = argparse.ArgumentParser(prog="python -m pipeline.review")
     ap.add_argument("--input", required=True, help="scored run JSON")
     ap.add_argument("--out", default="results/review_labels.jsonl")
     ap.add_argument("--p-lo", type=float, default=0.30)

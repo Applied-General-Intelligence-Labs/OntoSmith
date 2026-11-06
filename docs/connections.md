@@ -193,8 +193,11 @@ again before a run — when any seat it will use is
 (bind a cost-reporting route, declare rates, or run
 uncapped). The cap's only home is the
 `ONTOSMITH_MAX_COST_USD` environment variable —
-unset (or `none`) means no cap; the ledger still
-records what a run spent. A cap that could never
+unset, empty or `none` means no cap (anything else
+must be a finite, non-negative USD amount); the ledger
+still records what a run spent. `quickstart` caps a
+first run at $2 when every seat meters cost and the
+variable is unset. A cap that could never
 trip is never silently recorded.
 
 **Capabilities** replace model-name pattern matching.

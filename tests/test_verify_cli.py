@@ -52,8 +52,24 @@ class TestVerifyCli(unittest.TestCase):
                        "--scenario", "wide:pair=250,doc=3"])
         self.assertEqual(rc, 0)
         payload = json.loads(buf.getvalue())
-        self.assertEqual(payload["total_units"]["base"], 100)
+        self.assertEqual(payload["scenarios"]["base"], {"pair": 100})
+        self.assertEqual(payload["governing_by_unit"],
+                         {"doc": "wide", "pair": "wide"})
         self.assertEqual(payload["governing_scenario"], "wide")
+
+    def test_project_never_sums_across_units(self):
+        # wide has fewer pairs but more docs: no single
+        # scenario governs, and pairs+docs are never added.
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = main(["project", "--counts", "pair=100",
+                       "--scenario", "wide:pair=50,doc=60"])
+        self.assertEqual(rc, 0)
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(payload["governing_by_unit"],
+                         {"doc": "wide", "pair": "base"})
+        self.assertIsNone(payload["governing_scenario"])
+        self.assertNotIn("total_units", payload)
 
     def test_report_to_file(self):
         out = self.tmp / "report.md"

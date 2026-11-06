@@ -253,14 +253,55 @@ class TestCmdCreateProfileWiring(unittest.TestCase):
             source="src", collection="coll",
             docs=[str(self.tmp / "docs" / "*.txt")],
             profile=None, pack="bio-medical", batch_id="testcfg2")
-        with mock.patch.object(batch_cli, "ROOT", self.tmp), \
-                mock.patch.dict("os.environ", {}, clear=False):
-            import os
-            os.environ.pop("ONTOSMITH_MAX_COST_USD", None)
+        # conftest scrubs any ambient ONTOSMITH_MAX_COST_USD.
+        with mock.patch.object(batch_cli, "ROOT", self.tmp):
             batch_cli.cmd_create(args)
         from pipeline.batch import load_batch
         cfg = load_batch(self.tmp, "testcfg2").config
         self.assertIsNone(cfg.max_cost_usd)
+
+    def test_cap_env_parsing(self):
+        env = batch_cli.CAP_ENV
+        self.assertIsNone(batch_cli.cap_from_env({}))
+        for blank in ("", "  ", "none", "None"):
+            self.assertIsNone(batch_cli.cap_from_env({env: blank}))
+        self.assertEqual(batch_cli.cap_from_env({env: "2.5"}), 2.5)
+        self.assertEqual(batch_cli.cap_from_env({env: "0"}), 0.0)
+        # A cap that could never trip, or is not a number,
+        # refuses by name rather than recording a fake guard.
+        for bad in ("nan", "inf", "-1", "10usd"):
+            with self.assertRaises(ValueError) as cm:
+                batch_cli.cap_from_env({env: bad})
+            self.assertIn(env, str(cm.exception))
+
+    def test_bad_cap_env_refuses_create_cleanly(self):
+        args = argparse.Namespace(
+            source="src", collection="coll",
+            docs=[str(self.tmp / "docs" / "*.txt")],
+            profile=None, pack="bio-medical", batch_id="testcfg3")
+        err = io.StringIO()
+        with mock.patch.object(batch_cli, "ROOT", self.tmp), \
+                mock.patch.dict(
+                    "os.environ", {"ONTOSMITH_MAX_COST_USD": "nan"}), \
+                contextlib.redirect_stderr(err):
+            with self.assertRaises(SystemExit) as cm:
+                batch_cli.cmd_create(args)
+        self.assertEqual(cm.exception.code, 2)
+        self.assertIn("ONTOSMITH_MAX_COST_USD", err.getvalue())
+        self.assertFalse(
+            (self.tmp / "batches" / "testcfg3").exists())
+
+    def test_caller_default_cap_applies_when_env_unset(self):
+        args = argparse.Namespace(
+            source="src", collection="coll",
+            docs=[str(self.tmp / "docs" / "*.txt")],
+            profile=None, pack="bio-medical", batch_id="testcfg4",
+            default_max_cost_usd=2.0)
+        with mock.patch.object(batch_cli, "ROOT", self.tmp):
+            batch_cli.cmd_create(args)
+        from pipeline.batch import load_batch
+        cfg = load_batch(self.tmp, "testcfg4").config
+        self.assertEqual(cfg.max_cost_usd, 2.0)
 
     def test_frontier_escalation_surface_removed(self):
         # The recorded-but-unwired frontier switch was deleted

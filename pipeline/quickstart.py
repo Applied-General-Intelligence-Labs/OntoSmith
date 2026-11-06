@@ -14,7 +14,9 @@ pack, then serve — sequenced for a first run:
    ``quickstart-<stem>`` unless overridden). The batch is a
    real batch: it keeps the full stage record, can be resumed
    with ``ontosmith batch run``, and is served from the same
-   state root as any other build.
+   state root as any other build. On a binding that meters
+   cost, the build is capped at $2 unless
+   ONTOSMITH_MAX_COST_USD says otherwise.
 3. Serve the batch and open the demo app in a browser.
 
 The command adds no pipeline behavior of its own; every step
@@ -32,6 +34,10 @@ import threading
 import urllib.request
 import webbrowser
 from pathlib import Path
+
+# Default first-run spend cap (USD) on a metered binding;
+# ONTOSMITH_MAX_COST_USD overrides it.
+QUICKSTART_CAP_USD = 2.0
 
 
 def _neo4j_url() -> str:
@@ -110,11 +116,20 @@ def main(argv=None) -> int:
     batch_id = _batch_id_for(path, args.batch_id)
     from argparse import Namespace
 
-    from . import batch_cli
+    from . import batch_cli, connections
+    # A first run should not spend without limit: when the
+    # seats can meter cost and no ONTOSMITH_MAX_COST_USD is
+    # set, cap the build at QUICKSTART_CAP_USD. A cost-less
+    # binding (e.g. local Ollama) runs uncapped, since a cap
+    # there could never trip and would only refuse.
+    default_cap = None
+    if not connections.resolve_bindings().cost_less_seats(
+            list(batch_cli.CAP_SEATS)):
+        default_cap = QUICKSTART_CAP_USD
     create_args = Namespace(
         source="quickstart", collection="quickstart",
         docs=[str(path)], batch_id=batch_id, profile=None,
-        pack="open-domain")
+        pack="open-domain", default_max_cost_usd=default_cap)
     try:
         batch_cli.cmd_create(create_args)
         batch_cli.cmd_run(Namespace(

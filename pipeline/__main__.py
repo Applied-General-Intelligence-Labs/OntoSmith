@@ -64,6 +64,28 @@ COMMANDS: dict[str, tuple[str, str, str, tuple[str, ...]]] = {
 
 GROUPS = ["Core", "Authoring", "Serve"]
 
+# Lab measurement commands that left the unified CLI in 0.1.7,
+# mapped to the module entry that still runs them.
+RETIRED: dict[str, str] = {
+    "review": "python -m pipeline.review",
+    "evaluate": "python -m pipeline.evaluate",
+    "recalibrate": "python -m pipeline.recalibrate",
+    "calibration": "python -m pipeline.calibration",
+    **{g: f"python -m pipeline.gate_cli {g}"
+       for g in ("llm", "ollama", "triple", "er", "conflict",
+                 "onto", "cascade")},
+}
+
+
+def _unknown_command(name: str) -> None:
+    if name in RETIRED:
+        print(f"{MAGENTA}`{name}` is no longer part of the "
+              f"ontosmith CLI; run it as: {RETIRED[name]}{RESET}",
+              file=sys.stderr)
+        return
+    print(f"{MAGENTA}Unknown command: {name}{RESET}\n")
+    print_help()
+
 BANNER = r"""
    ___        _        ____            _ _   _
   / _ \ _ __ | |_ ___ / ___| _ __ ___ (_) |_| |__
@@ -117,14 +139,12 @@ def main() -> None:
         if name in COMMANDS:
             print_command_help(name)
         else:
-            print(f"{MAGENTA}Unknown command: {name}{RESET}")
-            print_help()
+            _unknown_command(name)
         return
 
     name = sys.argv[1]
     if name not in COMMANDS:
-        print(f"{MAGENTA}Unknown command: {name}{RESET}\n")
-        print_help()
+        _unknown_command(name)
         sys.exit(2)
 
     mod_name, _, _, fixed = COMMANDS[name]

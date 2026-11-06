@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import glob
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -74,6 +75,35 @@ def state_root() -> Path:
     if (ROOT / "packs").is_dir():
         return ROOT
     return Path.cwd()
+
+
+# The spend cap's only home. Unset, empty or "none" = no cap.
+CAP_ENV = "ONTOSMITH_MAX_COST_USD"
+# Seats a batch run uses; a cap must be able to meter each.
+CAP_SEATS = ("proposer", "judge", "embedder")
+
+
+def cap_from_env(env=None) -> float | None:
+    """The USD spend cap from ONTOSMITH_MAX_COST_USD.
+
+    Returns None when the variable is unset, empty or
+    "none". Anything else must be a finite, non-negative
+    number: a NaN or infinite cap could never trip, so it
+    raises ValueError rather than recording a batch that
+    looks guarded but is not."""
+    raw = (os.environ if env is None else env).get(CAP_ENV)
+    if raw is None or raw.strip().lower() in ("", "none"):
+        return None
+    try:
+        cap = float(raw)
+    except ValueError:
+        cap = None
+    if cap is None or not math.isfinite(cap) or cap < 0:
+        raise ValueError(
+            f"{CAP_ENV}={raw!r} is not a usable spend cap: "
+            f"set a finite, non-negative USD amount (e.g. 10), "
+            f"or leave it unset for no cap")
+    return cap
 
 
 def cmd_create(args) -> None:
@@ -286,24 +316,26 @@ def cmd_create(args) -> None:
             cfg_kwargs[_field] = _model
     # The spend cap is an internal run guard, not a product
     # parameter: its only home is the ONTOSMITH_MAX_COST_USD
-    # env var, read here. Unset (or "none") = no cap; the
-    # ledger still records what the run spent.
-    _cap_env = os.environ.get("ONTOSMITH_MAX_COST_USD")
-    if _cap_env is None or _cap_env.strip().lower() == "none":
-        cfg_kwargs["max_cost_usd"] = None
-    else:
-        cfg_kwargs["max_cost_usd"] = float(_cap_env)
+    # env var, read here. Unset = no cap, unless the caller
+    # (quickstart) supplies a default; the ledger still
+    # records what the run spent.
+    try:
+        _cap = cap_from_env()
+    except ValueError as e:
+        print(f"batch create refused: {e}", file=sys.stderr)
+        sys.exit(2)
+    if _cap is None:
+        _cap = getattr(args, "default_max_cost_usd", None)
+    cfg_kwargs["max_cost_usd"] = _cap
     config = BatchConfig(
         code_version=git_code_version(ROOT),
         **cfg_kwargs)
     # Stop-line rule: a USD cap set on a cost-less
     # binding could never trip — refuse the creation by name
     # (BindingCostError) instead of recording a guarded-looking
-    # batch that is not guarded. Seats a batch run uses:
-    # proposer, judge, embedder.
-    _cap_seats = ["proposer", "judge", "embedder"]
+    # batch that is not guarded.
     connections.require_metered(
-        _bindings, config.max_cost_usd, _cap_seats)
+        _bindings, config.max_cost_usd, list(CAP_SEATS))
     b = Batch(batch_id=batch_id, run_id=new_run_id(),
               source=args.source, collection=args.collection,
               doc_ids=[],  # filled at INGEST

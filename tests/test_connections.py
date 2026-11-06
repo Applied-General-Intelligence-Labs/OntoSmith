@@ -580,13 +580,10 @@ class TestBatchProvenanceStamp(unittest.TestCase):
         args = argparse.Namespace(
             docs=[str(doc)], collection="stubcoll",
             batch_id="stub-batch", source="test",
-            profile=None, pack=None, max_cost_usd=None,
-            frontier_escalation=False, escalation_band_lo=None,
-            escalation_band_hi=None,             # The custom gateway binding is cost-less (portable
-            # dialect, no declared rates): creating under a USD
-            # cap would refuse by name, so this
-            # provenance-focused creation declares no cap.
-            no_cost_cap=True)
+            # The custom gateway binding is cost-less (portable
+            # dialect, no declared rates); with no cap set
+            # (ONTOSMITH_MAX_COST_USD unset) the create proceeds.
+            profile=None, pack=None)
         with binding_env({
                 "ONTOSMITH_BASE_URL": "http://gw.example:9000/v1"}):
             with mock.patch.object(batch_cli, "ROOT", tmp):
