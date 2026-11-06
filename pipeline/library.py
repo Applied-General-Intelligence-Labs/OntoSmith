@@ -16,6 +16,7 @@ transport-free, so it is testable without a socket.
 """
 from __future__ import annotations
 
+import glob
 import hashlib
 import json
 import os
@@ -80,23 +81,44 @@ class DocumentLibrary:
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
+        # name -> ((mtime_ns, size), facts): a file is read
+        # again only when it changes on disk.
+        self._cache: dict[str, tuple[tuple[int, int], dict]] = {}
 
     def _paths(self) -> list[Path]:
         return sorted(p for p in self.root.glob("*.txt")
                       if p.is_file() and not p.name.startswith("."))
 
+    def _facts(self, p: Path) -> dict:
+        """chars, words, digest and modified time of one
+        file, from the cache while the file is unchanged."""
+        st = p.stat()
+        key = (st.st_mtime_ns, st.st_size)
+        hit = self._cache.get(p.name)
+        if hit is not None and hit[0] == key:
+            return hit[1]
+        text = p.read_text(encoding="utf-8", errors="replace")
+        facts = {
+            "chars": len(text),
+            "words": len(text.split()),
+            "digest": _digest(text),
+            "modified": datetime.fromtimestamp(
+                st.st_mtime, UTC).isoformat(timespec="seconds"),
+        }
+        self._cache[p.name] = (key, facts)
+        return facts
+
     def documents(self) -> list[dict]:
+        paths = self._paths()
         out = []
-        for p in self._paths():
-            text = p.read_text(encoding="utf-8", errors="replace")
-            out.append({
-                "name": p.name,
-                "chars": len(text),
-                "words": len(text.split()),
-                "modified": datetime.fromtimestamp(
-                    p.stat().st_mtime, UTC).isoformat(
-                        timespec="seconds"),
-            })
+        for p in paths:
+            f = self._facts(p)
+            out.append({"name": p.name, "chars": f["chars"],
+                        "words": f["words"],
+                        "modified": f["modified"]})
+        names = {p.name for p in paths}
+        for gone in [n for n in self._cache if n not in names]:
+            self._cache.pop(gone, None)
         return out
 
     def add(self, name: str, text: str) -> dict:
@@ -119,8 +141,7 @@ class DocumentLibrary:
                     f"it first or rename the new file")
             digest = _digest(text)
             for other in self._paths():
-                if _digest(other.read_text(
-                        encoding="utf-8", errors="replace")) == digest:
+                if self._facts(other)["digest"] == digest:
                     raise LibraryError(
                         409, "duplicate_text",
                         f"{fname} has the same text as "
@@ -131,14 +152,22 @@ class DocumentLibrary:
                 "words": len(text.split())}
 
     def remove(self, name: str) -> dict:
-        fname = safe_name(name)
+        """Remove a document by the name the library lists
+        it under. Files copied into the folder by hand keep
+        their own names, which safe_name might rewrite, so
+        an exact listed name is matched first; safe_name is
+        only the fallback for a name typed loosely."""
         with self._lock:
-            path = self.root / fname
-            if not path.is_file():
+            listed = {p.name: p for p in self._paths()}
+            path = listed.get(str(name or ""))
+            if path is None:
+                path = listed.get(safe_name(name))
+            if path is None:
                 raise LibraryError(404, "not_found",
-                                   f"no document named {fname}")
+                                   f"no document named {name!r}")
             path.unlink()
-        return {"removed": fname}
+            self._cache.pop(path.name, None)
+        return {"removed": path.name}
 
 
 def effective_cap(env=None) -> tuple[float | None, str]:
@@ -159,34 +188,50 @@ def effective_cap(env=None) -> tuple[float | None, str]:
 
 
 def _run_streaming(argv: list[str], env: dict,
-                   on_line: Callable[[str], None]) -> int:
+                   on_line: Callable[[str], None],
+                   on_proc: Callable[[subprocess.Popen | None],
+                                     None] | None = None) -> int:
     """Run `argv`, feeding each output line to `on_line`;
-    returns the exit code."""
+    returns the exit code. `on_proc` is told the running
+    process (and None once it exits), so its owner can stop
+    it."""
     proc = subprocess.Popen(
         argv, env=env, stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT, text=True, bufsize=1)
-    assert proc.stdout is not None
-    for line in proc.stdout:
-        on_line(line.rstrip("\n"))
-    return proc.wait()
+    if on_proc is not None:
+        on_proc(proc)
+    try:
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            on_line(line.rstrip("\n"))
+        return proc.wait()
+    finally:
+        if on_proc is not None:
+            on_proc(None)
 
 
 class Rebuilder:
     """Rebuilds the graph from the whole library in a
     background thread, one build at a time. `on_verified`
     is called with the new batch id once the build reaches
-    VERIFIED (the server switches its store there).
-    `run_cmd` is injectable so tests never spend."""
+    VERIFIED (the server switches its store there);
+    `on_failed` with the batch id when it does not (the
+    server re-reads what the store now holds). `run_cmd` is
+    injectable so tests never spend."""
 
     def __init__(self, library: DocumentLibrary, pack: str,
                  state_root: Callable[[], Path],
                  on_verified: Callable[[str], None] | None = None,
-                 run_cmd=_run_streaming):
+                 on_failed: Callable[[str], None] | None = None,
+                 run_cmd=None):
         self.library = library
         self.pack = pack
         self.state_root = state_root
         self.on_verified = on_verified
-        self.run_cmd = run_cmd
+        self.on_failed = on_failed
+        self.run_cmd = run_cmd or self._run_tracked
+        self._proc: subprocess.Popen | None = None
+        self._stopping = False
         self._lock = threading.Lock()
         self._thread: threading.Thread | None = None
         self._log: deque[str] = deque(maxlen=LOG_LINES)
@@ -218,8 +263,8 @@ class Rebuilder:
                     "the library has no documents — add at "
                     "least one .txt file first")
             cap, cap_source = effective_cap()
-            batch_id = "library-" + datetime.now(UTC).strftime(
-                "%Y%m%d-%H%M%S")
+            batch_id = self._new_batch_id()
+            self._stopping = False
             self._log.clear()
             self.state = {
                 "status": "running", "batch_id": batch_id,
@@ -238,6 +283,46 @@ class Rebuilder:
         if self._thread is not None:
             self._thread.join(timeout)
 
+    def stop(self, timeout: float = 10.0) -> None:
+        """Stop a running build: its batch command is
+        terminated (the batch stays resumable with `ontosmith
+        batch run`). The server calls this on shutdown, so a
+        build never outlives the page that started it and
+        keeps spending unseen."""
+        with self._lock:
+            self._stopping = True
+            proc = self._proc
+        if proc is not None and proc.poll() is None:
+            proc.terminate()
+            try:
+                proc.wait(timeout)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+        self.join(timeout)
+
+    def _new_batch_id(self) -> str:
+        """A fresh batch id: the time to the second, with a
+        counter when that id is already taken (a fast failure
+        retried within the same second)."""
+        base = "library-" + datetime.now(UTC).strftime(
+            "%Y%m%d-%H%M%S")
+        batches = self.state_root() / "batches"
+        batch_id, n = base, 1
+        while (batches / batch_id).exists():
+            n += 1
+            batch_id = f"{base}-{n}"
+        return batch_id
+
+    def _track(self, proc: subprocess.Popen | None) -> None:
+        with self._lock:
+            self._proc = proc
+        if proc is not None and self._stopping:
+            proc.terminate()
+
+    def _run_tracked(self, argv, env, on_line) -> int:
+        return _run_streaming(argv, env, on_line,
+                              on_proc=self._track)
+
     # -- the build -------------------------------------------
     def _line(self, text: str) -> None:
         with self._lock:
@@ -253,37 +338,50 @@ class Rebuilder:
             env.pop(batch_cli.CAP_ENV, None)
         else:
             env[batch_cli.CAP_ENV] = repr(cap)
-        cli = [sys.executable, "-m", "pipeline", "batch"]
         try:
-            rc = self.run_cmd(
-                [*cli, "create", "--source", "library",
-                 "--collection", "library",
-                 "--docs", str(self.library.root / "*.txt"),
-                 "--pack", self.pack, "--batch-id", batch_id],
-                env, self._line)
-            if rc != 0:
-                self._finish("failed", batch_id,
-                             f"batch create exited with {rc}")
-                return
-            self._set(message="building (this re-processes "
-                              "every document)")
-            rc = self.run_cmd([*cli, "run", batch_id], env,
-                              self._line)
-            status = self._batch_status(batch_id)
-            if rc != 0 or status != "VERIFIED":
-                self._finish(
-                    "failed", batch_id,
-                    f"the build stopped at {status or 'unknown'}"
-                    f" (exit {rc}); resume it with: ontosmith "
-                    f"batch run {batch_id}")
-                return
-            if self.on_verified is not None:
+            ok, message = self._create_and_run(batch_id, env)
+            if ok and self.on_verified is not None:
                 self.on_verified(batch_id)
-            self._finish("succeeded", batch_id,
-                         "built and now being served")
         except Exception as e:  # reported on the page
-            self._finish("failed", batch_id,
-                         f"{type(e).__name__}: {e}")
+            ok, message = False, f"{type(e).__name__}: {e}"
+        if not ok and self.on_failed is not None:
+            try:
+                self.on_failed(batch_id)
+            except Exception as e:  # reported on the page
+                message += f"; then {type(e).__name__}: {e}"
+        self._finish("succeeded" if ok else "failed", batch_id,
+                     "built and now being served" if ok
+                     else message)
+
+    def _create_and_run(self, batch_id: str,
+                        env: dict) -> tuple[bool, str]:
+        """`batch create` then `batch run`: (reached
+        VERIFIED, what to tell the page)."""
+        cli = [sys.executable, "-m", "pipeline", "batch"]
+        # The library path is escaped: create expands the
+        # pattern with glob, and a folder named like
+        # "notes [2026]" would otherwise match nothing.
+        docs = os.path.join(glob.escape(str(self.library.root)),
+                            "*.txt")
+        rc = self.run_cmd(
+            [*cli, "create", "--source", "library",
+             "--collection", "library", "--docs", docs,
+             "--pack", self.pack, "--batch-id", batch_id],
+            env, self._line)
+        if rc != 0:
+            return False, f"batch create exited with {rc}"
+        if self._stopping:
+            return False, "stopped before the build started"
+        self._set(message="building (this re-processes "
+                          "every document)")
+        rc = self.run_cmd([*cli, "run", batch_id], env, self._line)
+        status = self._batch_status(batch_id)
+        if rc != 0 or status != "VERIFIED":
+            return False, (
+                f"the build stopped at {status or 'unknown'} "
+                f"(exit {rc}); resume it with: ontosmith batch "
+                f"run {batch_id}")
+        return True, ""
 
     def _batch_json(self, batch_id: str) -> dict | None:
         p = self.state_root() / "batches" / batch_id / "batch.json"

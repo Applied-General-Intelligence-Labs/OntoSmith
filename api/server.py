@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 import sys
 import sysconfig
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -89,6 +90,25 @@ class SearchService:
         self.embedder = embedder
         # LibraryService when `serve --library` is on.
         self.library = library
+        # Set when the store could not be re-read after a
+        # failed library rebuild: the API refuses by name.
+        self.store_error: str | None = None
+
+    def unavailable(self) -> str | None:
+        """Why the graph routes can't answer right now, or
+        None. Neo4j holds ONE graph and a rebuild replaces it
+        before it is VERIFIED, so while one runs the store's
+        live graph and this server's records disagree; the
+        routes refuse rather than mix two builds. (The file
+        store reads the served batch's own artifacts, which a
+        rebuild never touches.)"""
+        lib = self.library
+        if lib is not None and lib.rebuilder.running \
+                and getattr(self.store, "kind", None) == "neo4j":
+            return ("the graph is being rebuilt from the document "
+                    "library; the Neo4j store holds one graph, so "
+                    "the API answers again when the rebuild ends")
+        return self.store_error
 
     # -- endpoints -------------------------------------------
     def health(self) -> dict:
@@ -273,11 +293,23 @@ class LibraryService:
             "build": self.rebuilder.status(),
         }
 
+    def _refuse_while_building(self) -> None:
+        # A rebuild's document set is fixed when its batch is
+        # created; a change mid-build would silently be in or
+        # out of the new graph depending on timing.
+        if self.rebuilder.running:
+            raise _library.LibraryError(
+                409, "build_running",
+                "a rebuild is running — add or remove documents "
+                "once it finishes")
+
     def add(self, body: dict) -> dict:
+        self._refuse_while_building()
         return self.library.add(body.get("name", ""),
                                 body.get("text", ""))
 
     def remove(self, params: dict) -> dict:
+        self._refuse_while_building()
         return self.library.remove(_required(params, "name"))
 
     def rebuild(self) -> dict:
@@ -391,6 +423,12 @@ class _Handler(BaseHTTPRequestHandler):
                 "code": "not_found",
                 "message": f"no such endpoint: "
                            f"{parsed.path}"}})
+            return
+        reason = (self.service.unavailable()
+                  if parsed.path != "/health" else None)
+        if reason:
+            self._send(503, {"error": {
+                "code": "graph_unavailable", "message": reason}})
             return
         try:
             self._send(200, route())
@@ -608,21 +646,7 @@ def main(argv=None) -> int:
         return 1
     service = SearchService(store, embedder=embedder)
     if args.library:
-        from pipeline.batch_cli import state_root
-        lib_service = LibraryService(None, None, args.batch)
-
-        def serve_new_batch(batch_id: str) -> None:
-            # The rebuild reached VERIFIED: serve its graph.
-            service.store = _search.open_store(
-                batch=batch_id, store=args.store)
-            lib_service.served_batch = batch_id
-
-        lib_service.library = _library.DocumentLibrary(
-            Path(args.library))
-        lib_service.rebuilder = _library.Rebuilder(
-            lib_service.library, pack=args.pack,
-            state_root=state_root, on_verified=serve_new_batch)
-        service.library = lib_service
+        service.library = _library_service(service, args)
     server = build_server(args.host, args.port, service)
     host, port = server.server_address[:2]
     desc = store.describe()
@@ -647,13 +671,71 @@ def main(argv=None) -> int:
     else:
         print("ontosmith serve: demo app assets not "
               "found — JSON API only")
+    if service.library is not None:
+        _stop_on_sigterm()
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
         server.server_close()
+        if service.library is not None:
+            # A build must not outlive the server: it would
+            # keep spending with no page to show it.
+            service.library.rebuilder.stop()
     return 0
+
+
+def _library_service(service: SearchService,
+                     args) -> LibraryService:
+    """The `--library` wiring: a DocumentLibrary, its
+    Rebuilder, and the store swaps a finished rebuild
+    makes."""
+    from pipeline.batch_cli import state_root
+
+    def serve_new_batch(batch_id: str) -> None:
+        # The rebuild reached VERIFIED: serve its graph.
+        service.store = _search.open_store(batch=batch_id,
+                                           store=args.store)
+        service.store_error = None
+        lib_service.served_batch = batch_id
+
+    def reread_store(batch_id: str) -> None:
+        # The rebuild failed. A Neo4j store may already hold
+        # its (partial) graph, so re-read whatever graph the
+        # store's stamp names now; the file store still
+        # serves its own batch's artifacts, unchanged.
+        if getattr(service.store, "kind", None) != "neo4j":
+            return
+        try:
+            service.store = _search.open_store(store=args.store)
+        except _search.StoreError as e:
+            service.store_error = (
+                f"the rebuild {batch_id} failed and the Neo4j "
+                f"store can't be served: {e}")
+            raise
+        service.store_error = None
+        lib_service.served_batch = (
+            service.store.describe().get("batch_id") or None)
+
+    library = _library.DocumentLibrary(Path(args.library))
+    rebuilder = _library.Rebuilder(
+        library, pack=args.pack, state_root=state_root,
+        on_verified=serve_new_batch, on_failed=reread_store)
+    lib_service = LibraryService(library, rebuilder, args.batch)
+    return lib_service
+
+
+def _stop_on_sigterm() -> None:
+    """Turn SIGTERM into the KeyboardInterrupt path, so
+    `main`'s cleanup (stopping a running build) runs on a
+    plain `kill` too."""
+    def _raise(*_):
+        raise KeyboardInterrupt
+    try:
+        signal.signal(signal.SIGTERM, _raise)
+    except ValueError:  # not the main thread (tests)
+        pass
 
 
 if __name__ == "__main__":

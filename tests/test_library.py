@@ -9,6 +9,7 @@ import http.client
 import json
 import re
 import shutil
+import sys
 import tempfile
 import threading
 import unittest
@@ -73,6 +74,28 @@ class TestDocumentLibrary(TmpDir):
             self.library.remove("missing.txt")
         self.assertEqual(cm.exception.code, "not_found")
 
+    def test_remove_a_hand_placed_file_by_its_listed_name(self):
+        # safe_name would rewrite these names; remove must
+        # still find the file the page lists.
+        for name in ("Chapter 1 (draft).txt", "résumé.txt"):
+            (self.library.root / name).write_text("Some text.")
+            listed = [d["name"] for d in self.library.documents()]
+            self.assertIn(name, listed)
+            self.assertEqual(self.library.remove(name),
+                             {"removed": name})
+        self.assertEqual(self.library.documents(), [])
+
+    def test_listing_follows_edits_on_disk(self):
+        self.library.add("a.txt", "Alice met Bob.")
+        self.assertEqual(self.library.documents()[0]["words"], 3)
+        (self.library.root / "a.txt").write_text(
+            "Alice met Bob in Paris today.")
+        self.assertEqual(self.library.documents()[0]["words"], 6)
+        # The duplicate check sees the edited text too.
+        with self.assertRaises(lib.LibraryError) as cm:
+            self.library.add("b.txt", "Alice met Bob in Paris today.")
+        self.assertEqual(cm.exception.code, "duplicate_text")
+
 
 def _fake_build(state: Path, final_status="VERIFIED", run_rc=0,
                 calls=None, gate=None):
@@ -103,12 +126,14 @@ def _fake_build(state: Path, final_status="VERIFIED", run_rc=0,
 
 
 class TestRebuilder(TmpDir):
-    def _rebuilder(self, run_cmd, verified=None):
+    def _rebuilder(self, run_cmd, verified=None, failed=None):
         return lib.Rebuilder(
             self.library, pack="open-domain",
             state_root=lambda: self.state,
             on_verified=(verified.append if verified is not None
                          else None),
+            on_failed=(failed.append if failed is not None
+                       else None),
             run_cmd=run_cmd)
 
     def test_success_serves_the_new_batch(self):
@@ -148,6 +173,62 @@ class TestRebuilder(TmpDir):
         self.assertIn(f"batch run {bid}", st["message"])
         self.assertEqual(verified, [])
 
+    def test_failed_hook_runs_only_on_failure(self):
+        self.library.add("a.txt", "Alice met Bob.")
+        verified, failed = [], []
+        rb = self._rebuilder(
+            _fake_build(self.state, final_status="GATES", run_rc=1),
+            verified, failed)
+        bid = rb.start()["batch_id"]
+        rb.join(5)
+        self.assertEqual((verified, failed), ([], [bid]))
+        verified, failed = [], []
+        rb = self._rebuilder(_fake_build(self.state), verified, failed)
+        bid = rb.start()["batch_id"]
+        rb.join(5)
+        self.assertEqual((verified, failed), ([bid], []))
+
+    def test_library_path_with_glob_characters(self):
+        import glob
+        library = lib.DocumentLibrary(self.tmp / "notes [2026]")
+        library.add("a.txt", "Alice met Bob.")
+        calls = []
+        rb = lib.Rebuilder(library, pack="open-domain",
+                           state_root=lambda: self.state,
+                           run_cmd=_fake_build(self.state, calls=calls))
+        rb.start()
+        rb.join(5)
+        argv = calls[0][0]
+        pattern = argv[argv.index("--docs") + 1]
+        self.assertEqual(glob.glob(pattern),
+                         [str(library.root / "a.txt")])
+
+    def test_batch_ids_never_collide(self):
+        rb = self._rebuilder(_fake_build(self.state))
+        first = rb._new_batch_id()
+        (self.state / "batches" / first).mkdir(parents=True)
+        self.assertNotEqual(rb._new_batch_id(), first)
+
+    def test_stop_terminates_the_build_process(self):
+        self.library.add("a.txt", "Alice met Bob.")
+        sleeper = [sys.executable, "-c",
+                   "import time; print('started', flush=True); "
+                   "time.sleep(60)"]
+        started = threading.Event()
+
+        def run(argv, env, on_line):
+            def line(text):
+                on_line(text)
+                started.set()
+            return rb._run_tracked(sleeper, env, line)
+
+        rb = self._rebuilder(run)
+        rb.start()
+        self.assertTrue(started.wait(10))
+        rb.stop(timeout=10)
+        self.assertFalse(rb.running)
+        self.assertEqual(rb.status()["status"], "failed")
+
     def test_refusals(self):
         rb = self._rebuilder(_fake_build(self.state))
         with self.assertRaises(lib.LibraryError) as cm:
@@ -181,6 +262,8 @@ class TestRebuilder(TmpDir):
 
 class _Store:
     """The library routes never touch the serving store."""
+
+    kind = "stub"
 
     def describe(self):
         return {"kind": "stub"}
@@ -281,6 +364,38 @@ class TestLibraryHttp(TmpDir):
                             {"Origin": f"http://127.0.0.1:{self.port}"})
         self.assertEqual(st, 200)
         self.assertEqual(len(self.library.documents()), 1)
+
+    def test_documents_are_fixed_while_a_rebuild_runs(self):
+        self.req("POST", "/library/documents",
+                 {"name": "a.txt", "text": "Alice met Bob."})
+        self.req("POST", "/library/rebuild", {})
+        st, body = self.req("POST", "/library/documents",
+                            {"name": "b.txt", "text": "Carol."})
+        self.assertEqual((st, body["error"]["code"]),
+                         (409, "build_running"))
+        st, body = self.req("DELETE", "/library/documents?name=a.txt")
+        self.assertEqual((st, body["error"]["code"]),
+                         (409, "build_running"))
+        self.gate.set()
+        self.rebuilder.join(5)
+        st, _ = self.req("POST", "/library/documents",
+                         {"name": "b.txt", "text": "Carol."})
+        self.assertEqual(st, 200)
+
+    def test_neo4j_graph_routes_refuse_while_rebuilding(self):
+        self.req("POST", "/library/documents",
+                 {"name": "a.txt", "text": "Alice met Bob."})
+        self.req("POST", "/library/rebuild", {})
+        # The file store keeps answering: a rebuild never
+        # touches the served batch's artifacts.
+        self.assertIsNone(self.service.unavailable())
+        self.service.store.kind = "neo4j"
+        st, body = self.req("GET", "/search?q=alice")
+        self.assertEqual((st, body["error"]["code"]),
+                         (503, "graph_unavailable"))
+        self.gate.set()
+        self.rebuilder.join(5)
+        self.assertIsNone(self.service.unavailable())
 
     def test_documents_page_serves(self):
         st, body = self.req("GET", "/documents")
