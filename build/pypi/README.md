@@ -98,9 +98,9 @@ Corpus profile
   family          demo
   status          COMPLETE
   documents       4
-  claims          6
+  claims          7
   decision points 0
-  profile hash    sha256:7ae51d31fa9120ec
+  profile hash    sha256:28ede2ab1b3e4fd2
   spend           $0.0000
   written         profiles/demo (profile.json, setup_config.json, profile.md)
 

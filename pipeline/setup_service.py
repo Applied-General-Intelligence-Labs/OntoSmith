@@ -413,6 +413,158 @@ def scan_amendment_titles(docs, gold, csv_path, params):
         "docs_with_amendment_in_title": len(hits), "examples": hits[:5]}}
 
 
+# ------------------------------------------------- semantic census
+# The census scanners above measure COUNTS (how many defined
+# terms, how many recurring parties). The ontology drafting
+# seat, however, decides from LISTS: which defined terms recur,
+# which names they bind to, which clause/section headings the
+# corpus repeats. Those lists existed inside the scanners'
+# workings and never reached a claim's measured detail, so the
+# draft context carried the count and dropped the census
+# itself. This scanner returns the lists (recurrence-filtered,
+# capped) as measured detail; scan_defined_term_scope keeps
+# the counts view.
+
+_HEADING_NUM_RE = re.compile(r"^\s*\d+(?:\.\d+)*\.?\s+(.+?)\s*$")
+_PAGE_NUM_TAIL_RE = re.compile(r"\s+\d{1,4}$")
+
+
+def _heading_like(text: str) -> str | None:
+    """Normalize a heading surface, or None when the text is a
+    sentence fragment rather than a heading: short, few words,
+    mostly capitalized-initial or all-caps words, no trailing
+    clause punctuation. A trailing page number (table-of-
+    contents form) is stripped first."""
+    text = _PAGE_NUM_TAIL_RE.sub("", text.strip())
+    if not 3 <= len(text) <= 80:
+        return None
+    words = text.split()
+    if not 1 <= len(words) <= 10:
+        return None
+    if text.endswith((",", ";", ":")):
+        return None
+    alpha_words = [w for w in words
+                   if any(c.isalpha() for c in w)]
+    if not alpha_words:
+        return None
+    if len(words) == 1:
+        # A lone word is a heading only in heading dress:
+        # ALL-CAPS (DEFINITIONS, TERM) or a capitalized word
+        # of some length (Definitions) — not a stray token.
+        word = alpha_words[0]
+        letters = [c for c in word if c.isalpha()]
+        if len(letters) < 3 or not (word.isupper()
+                                    or word[0].isupper()):
+            return None
+        return re.sub(r"\s+", " ", text)
+    cap = sum(1 for w in alpha_words
+              if w[0].isupper() or w.isupper())
+    if cap / len(alpha_words) < 0.6:
+        return None
+    return re.sub(r"\s+", " ", text)
+
+
+def _doc_headings(text: str) -> list[str]:
+    """One document's heading candidates, in order, deduped:
+    numbered clause lead-ins ("11.4. GOVERNING LAW.") and
+    standalone short heading lines (titles, ALL-CAPS section
+    heads). Sentence lines fail the heading test by shape."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for line in text.split("\n"):
+        s = line.strip()
+        if not s:
+            continue
+        cand = None
+        m = _HEADING_NUM_RE.match(s)
+        if m:
+            cand = _heading_like(m.group(1))
+        elif len(s) <= 80 and not s.endswith("."):
+            cand = _heading_like(s)
+        if cand and cand.casefold() not in seen:
+            seen.add(cand.casefold())
+            out.append(cand)
+    return out
+
+
+def scan_semantic_census(docs, gold, csv_path, params):
+    """The semantic census as lists: defined terms recurring
+    in >=2 documents (with the names they bind to), binding
+    names recurring across documents, and clause/section
+    headings recurring in >=2 documents. Recurrence is the
+    filter — a one-document form is that document's business;
+    a recurring form is corpus terrain the schema must decide
+    about. Lists are capped; pre-cap counts ride along."""
+    term_docs: dict[str, set] = {}
+    term_names: dict[str, set] = {}
+    name_docs: dict[str, set] = {}
+    for d in docs:
+        for raw_name, term in _defined_term_captures(d.text):
+            term_docs.setdefault(term, set()).add(d.name)
+            if raw_name:
+                term_names.setdefault(term, set()).add(raw_name)
+                norm = normalize_party_name(raw_name)
+                if len(norm) >= 3:
+                    name_docs.setdefault(norm, set()).add(d.name)
+    recurring_terms = [
+        {"term": term, "n_docs": len(dset),
+         "bindings": sorted(term_names.get(term, set()))[:3]}
+        for term, dset in term_docs.items() if len(dset) >= 2]
+    recurring_terms.sort(key=lambda e: (-e["n_docs"], e["term"]))
+    recurring_names = [
+        {"name": name, "n_docs": len(dset)}
+        for name, dset in name_docs.items() if len(dset) >= 2]
+    recurring_names.sort(key=lambda e: (-e["n_docs"], e["name"]))
+    heading_docs: dict[str, set] = {}
+    heading_surface: dict[str, str] = {}
+    for d in docs:
+        for h in _doc_headings(d.text):
+            key = h.casefold()
+            heading_docs.setdefault(key, set()).add(d.name)
+            heading_surface.setdefault(key, h)
+    recurring_headings = [
+        {"heading": heading_surface[k], "n_docs": len(v)}
+        for k, v in heading_docs.items() if len(v) >= 2]
+    recurring_headings.sort(key=lambda e: (-e["n_docs"],
+                                          e["heading"]))
+    detail = {
+        "defined_terms_total": len(term_docs),
+        "defined_terms_recurring": recurring_terms[:100],
+        "defined_terms_recurring_count": len(recurring_terms),
+        "binding_names_recurring": recurring_names[:30],
+        "headings_distinct": len(heading_docs),
+        "headings_recurring": recurring_headings[:60],
+        "headings_recurring_count": len(recurring_headings),
+    }
+    value = (len(detail["defined_terms_recurring"])
+             + len(detail["binding_names_recurring"])
+             + len(detail["headings_recurring"]))
+    return {"value": value, "detail": detail}
+
+
+def survey_documents(docs, head_chars: int = 1500,
+                     tail_chars: int = 1500) -> list[dict]:
+    """Per-document survey for the ontology draft context:
+    head AND tail plus the document's heading candidates.
+    Head-only survey never reaches closing terrain (governing
+    law, venue, term and signature blocks live in tails), so
+    the tail is half the survey, not an extra."""
+    out = []
+    for d in docs:
+        text = d.text
+        head = text[:head_chars]
+        if len(text) <= head_chars:
+            tail = ""
+        elif len(text) <= head_chars + tail_chars:
+            tail = text[head_chars:]
+        else:
+            tail = text[-tail_chars:]
+        out.append({"name": d.name, "n_chars": d.n_chars,
+                    "head": head, "tail": tail,
+                    "headings": _doc_headings(text)[:40]})
+    return out
+
+
 SCANNERS = {
     "inventory": scan_inventory,
     "annotation_titles": scan_annotation_titles,
@@ -424,6 +576,7 @@ SCANNERS = {
     "party_recurrence": scan_party_recurrence,
     "date_parse_rate": scan_date_parse_rate,
     "amendment_titles": scan_amendment_titles,
+    "semantic_census": scan_semantic_census,
 }
 
 
@@ -501,7 +654,11 @@ Rules:
   "spot_check": [normalized names]; value = parties in >=2 docs),
   date_parse_rate (params: {"category": ...}; value = deterministic
   parse rate of gold spans), amendment_titles (value = docs with
-  'Amendment' in the title).
+  'Amendment' in the title), semantic_census (value = census
+  entries delivered; its measured detail carries the LISTS:
+  defined terms recurring in >=2 documents with their binding
+  names, recurring binding names, recurring clause/section
+  headings).
 - Numeric "expected" ONLY when you actually counted it in the sample;
   say the scope in the statement (e.g. "in the 12-doc sample").
 - Identity rules, role words that are never identities, traps, and
@@ -659,6 +816,18 @@ def _add_scanner_claims(claims: list[dict], docs, gold, csv_path,
          None),
         ("families", "amendment_titles", {}, None),
         ("labels", "annotation_titles", {}, None),
+        ("identity", "semantic_census", {},
+         lambda r: f"Semantic census: "
+                   f"{r['detail']['defined_terms_total']} defined "
+                   f"terms corpus-wide "
+                   f"({r['detail']['defined_terms_recurring_count']}"
+                   f" recurring in >=2 documents), "
+                   f"{r['detail']['headings_recurring_count']} "
+                   f"recurring clause/section headings, "
+                   f"{len(r['detail']['binding_names_recurring'])} "
+                   f"recurring binding names; the lists themselves "
+                   f"ride this claim's measured detail into the "
+                   f"ontology draft context."),
     ]
     out = []
     for section, scanner, params, stmt_fn in census:
@@ -900,6 +1069,7 @@ def run_setup(corpus_dir: Path, family: str, out_dir: Path,
                      "rule": "length-quartile strata, even spread",
                      "sample_docs": [d.name for d in sample]},
         "inventory": inv["detail"],
+        "document_survey": survey_documents(sample),
         "excluded_meta_files": excluded,
         "gold": gold_note, "derived_files": csv_note,
         "claims": claims,
