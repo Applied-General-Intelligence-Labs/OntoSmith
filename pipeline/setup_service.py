@@ -943,13 +943,6 @@ def render_profile_md(profile: dict) -> str:
     return "\n".join(lines)
 
 
-def _fmt_spend(usd) -> str:
-    """Drafting-spend display: unmetered (None) reads as such."""
-    if usd is None:
-        return "not metered (provider reports no cost)"
-    return f"${usd:.4f}"
-
-
 def run_setup(corpus_dir: Path, family: str, out_dir: Path,
               sample_n: int = 12, model: str | None = None,
               draft: bool = True) -> dict:

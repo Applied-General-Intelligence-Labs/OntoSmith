@@ -315,7 +315,7 @@ class ProbeCase(unittest.TestCase):
     def test_cost_note_surfaces_for_costless_binding(self):
         rc, _out, stdout, _ = self._run(self._stub_env())
         self.assertEqual(rc, 0)
-        self.assertIn("--no-cost-cap", stdout)
+        self.assertIn("ONTOSMITH_MAX_COST_USD", stdout)
 
 
 if __name__ == "__main__":

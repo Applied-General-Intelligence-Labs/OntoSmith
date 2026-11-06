@@ -598,4 +598,4 @@ def require_metered(bindings: Bindings, cap_usd: float | None,
         f"per-seat rates (ONTOSMITH_<SEAT>_PRICE_IN_PER_MTOK "
         f"and ONTOSMITH_<SEAT>_PRICE_OUT_PER_MTOK, USD per "
         f"million tokens), or remove the cap "
-        f"(--no-cost-cap).")
+        f"(unset ONTOSMITH_MAX_COST_USD).")

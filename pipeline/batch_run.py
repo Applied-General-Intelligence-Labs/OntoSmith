@@ -51,11 +51,6 @@ def _round_cost(usd):
     return None if usd is None else round(usd, 4)
 
 
-def _fmt_cost(usd) -> str:
-    # Log-line spend: unmetered reads as such, not $0.0000.
-    return "unmetered" if usd is None else f"${usd:.4f}"
-
-
 def _record_cost(b: Batch, stage: str, usd: float | None) -> None:
     """Cost ledger (§3): per-stage API spend in batch metrics.
 
@@ -91,7 +86,7 @@ def _record_cost(b: Batch, stage: str, usd: float | None) -> None:
             f"${cap:.2f} is set; a USD cap cannot guard spend "
             f"it cannot meter — bind a cost-reporting route, "
             f"declare per-seat rates, or remove the cap "
-            f"(--no-cost-cap)")
+            f"(unset ONTOSMITH_MAX_COST_USD)")
     ledger = dict(b.metrics.get("cost_ledger") or {})
     ledger[stage] = None if usd is None else round(float(usd), 4)
     stage_values = [v for k, v in ledger.items()
@@ -1642,7 +1637,7 @@ def stage_gates(b: Batch, root: Path, stages: list[str],
                         "cap cannot guard spend it cannot meter — "
                         "bind a cost-reporting route, declare "
                         "per-seat rates, or remove the cap "
-                        "(--no-cost-cap)")
+                        "(unset ONTOSMITH_MAX_COST_USD)")
                 if (b.config.max_cost_usd is not None
                         and prior_total + spent_before + total_cost
                         > b.config.max_cost_usd):

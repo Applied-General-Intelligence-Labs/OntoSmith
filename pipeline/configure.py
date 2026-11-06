@@ -318,7 +318,8 @@ def print_cost_notes(bindings: connections.Bindings) -> None:
               "run under a USD cap (max_cost_usd) will refuse "
               "by name on this binding — declare per-seat "
               "rates (ONTOSMITH_<SEAT>_PRICE_IN_PER_MTOK / "
-              "_OUT) or run with --no-cost-cap.")
+              "_OUT) or run without a cap (leave "
+              "ONTOSMITH_MAX_COST_USD unset).")
 
 
 # ----------------------------------------------------------------------

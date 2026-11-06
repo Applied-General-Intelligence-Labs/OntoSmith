@@ -318,7 +318,7 @@ class TestStopLineRefusal(unittest.TestCase):
         msg = str(cm.exception)
         self.assertIn("proposer", msg)
         self.assertIn("not-provided", msg)
-        self.assertIn("--no-cost-cap", msg)
+        self.assertIn("ONTOSMITH_MAX_COST_USD", msg)
 
     def test_require_metered_passes_when_metered_or_uncapped(self):
         with binding_env({"OPENROUTER_API_KEY": CAPTURE_KEY}):

@@ -114,8 +114,7 @@ def main(argv=None) -> int:
     create_args = Namespace(
         source="quickstart", collection="quickstart",
         docs=[str(path)], batch_id=batch_id, profile=None,
-        pack="open-domain", max_cost_usd=None,
-        no_cost_cap=False)
+        pack="open-domain")
     try:
         batch_cli.cmd_create(create_args)
         batch_cli.cmd_run(Namespace(
