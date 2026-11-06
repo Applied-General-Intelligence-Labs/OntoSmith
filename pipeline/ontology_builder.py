@@ -26,28 +26,40 @@ missing builder:
      a drafter callable in. This module names no model; with no
      drafter it seeds a deterministic skeleton from the brief,
      whose gaps validation then names one by one.
-     A draft after the first is a REVISION, not a fresh
-     composition: the caller may pass the previous pack
-     version's schema_front as a *seed*, and the draft then
-     carries the seed with it (see ``draft_schema``). The
-     drafting rules inherit the seed's types, relations and
-     signature pairs; removing one, shrinking a signature, or
-     rewriting an inherited definition is allowed only with a
-     structured decision point recording the reason, and
-     validation enforces that (stage 2). A revision may also
-     carry a *hole report* — named families that processing
-     reported holes for — which the revision must address as
-     one bundle (new relation, signature extension with its
-     definition revision, definition consistency fix) or
-     explicitly leave open with a decision point. That bundle
-     is the augmentation loop's revision path: holes drive
-     seeded revisions, never fresh recompositions. The CLI
-     makes revision the default path: drafting for a pack
-     id that already exists in the repo inherits the
-     published pack automatically (an explicit ``--seed``
-     wins; ``--fresh`` composes from scratch) — revision
-     steered by the hole report is the standard loop,
-     fresh composition the exception.
+     A draft after the first may be a REVISION of an
+     existing pack rather than a fresh composition: the
+     caller may pass the previous pack version's
+     schema_front as a *seed*, and the draft then carries
+     the seed with it (see ``draft_schema``). The drafting
+     rules inherit the seed's types, relations and
+     signature pairs; removing one, shrinking a signature,
+     or rewriting an inherited definition is allowed only
+     with a structured decision point recording the reason,
+     and validation enforces that (stage 2). A revision may
+     also carry a *hole report* — named families that
+     processing reported holes for — which the revision
+     must address as one bundle (new relation, signature
+     extension with its definition revision, definition
+     consistency fix) or explicitly leave open with a
+     decision point. That bundle is the augmentation loop's
+     revision path.
+     The CLI names the two situations as modes, because a
+     pack id is a technical coincidence, not an intention:
+     a plain ``draft`` composes fresh from the brief — even
+     when a published pack carries the same id — and
+     ``draft --from <pack>`` extends the pack the caller
+     names (a pack id resolved in the repo's packs/ tree,
+     or a path to a schema document). Extension is the
+     only path that inherits: the seed is the existing map,
+     the profile's material (claims, semantic census,
+     document survey) is the NEW documents the map must
+     grow to cover, and the run prints which mode it is in.
+     A material guide rides the draft command's output —
+     under 10 documents of material a strong warning, at
+     10–29 a recommendation note (the measured composition
+     trajectory is still growing through that range and
+     settles around 30 documents); the guide warns, it
+     never blocks.
   2. VALIDATE. Deterministic, fail-closed checks over the
      draft: every type carries a definition and boundary
      examples; no duplicate or colliding type names; no
@@ -183,7 +195,14 @@ Rules:
   pair is extracted once and read in both directions.
 - SEED INHERITANCE. When the context carries a
   "seed_schema_front", this draft is a revision of that
-  schema, not a fresh composition. Inherit every seed
+  schema, not a fresh composition. The profile, claims,
+  semantic census and document survey in the context
+  describe the NEW documents this revision extends the
+  schema to cover; the seed is the existing map. Terrain
+  the seed already covers needs no new declarations —
+  the revision's work is what the new material shows
+  that the seed does not cover, decided against the
+  seed. Inherit every seed
   entity type, relation type and endpoint-signature pair.
   Additions are free. A removal or shrinkage is allowed
   only with a structured decision point recording the
@@ -381,15 +400,21 @@ BOUNDARY_KINDS = ("distinct", "includes", "included_in")
 
 def _published_pack_seed(pack_id: str):
     """The published pack this id names, as a revision
-    seed — the CLI's default inheritance source.
+    seed — the resolver behind the CLI's explicit
+    extension mode (``--from <pack_id>``).
 
     Looks for packs/<pack_id>/profile/setup_config.json
     under the repo root, the layout emit writes, and
     returns (document, path); returns None when no such
-    pack exists — a genuinely new pack id composes
-    fresh. An id that is not a slug never resolves: the
-    draft's own validation reports the id, and a
-    malformed id must not become a path."""
+    pack exists, or when its payload carries no
+    schema_front to inherit (a hand-authored profile
+    config is a pack, but not an extendable seed) — the
+    CLI then refuses, because an explicitly named
+    extension target that cannot be extended is an
+    error, never a silent fresh composition. An id that
+    is not a slug never resolves: the draft's own
+    validation reports the id, and a malformed id must
+    not become a path."""
     if not _SLUG_RE.match(pack_id or ""):
         return None
     root = Path(__file__).resolve().parent.parent
@@ -397,7 +422,10 @@ def _published_pack_seed(pack_id: str):
                  / "setup_config.json")
     if not published.exists():
         return None
-    return _load_json(str(published)), published
+    document = _load_json(str(published))
+    if not isinstance(document.get("schema_front"), dict):
+        return None
+    return document, published
 
 
 def _front_hash(front: dict) -> str:
@@ -406,6 +434,65 @@ def _front_hash(front: dict) -> str:
     lineage stays checkable after the seed pack moves on."""
     blob = json.dumps(front, sort_keys=True, ensure_ascii=False)
     return "sha256:" + hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+# ------------------------------------------------------------------
+# material-size guide (warns, never blocks)
+
+#: Material-guide thresholds, from the measured composition
+#: trajectory (the builder-measure runs): the drafted
+#: inventory keeps growing through the first documents of
+#: corpus material and settles around 30 documents, so
+#: under 10 the map is still in its fast-growing range,
+#: and at 10-29 more material is still likely to deepen
+#: it. The guide is a printed warning, never a gate.
+MATERIAL_WARN_BELOW = 10
+MATERIAL_SETTLES_AROUND = 30
+
+
+def _material_doc_count(profile: dict) -> int | None:
+    """How many documents of material a profile carries —
+    the guide's yardstick. Unique content first (a
+    duplicated file is not more material), then the raw
+    file count, then the surveyed documents. None when the
+    profile carries no count at all — the guide stays
+    silent rather than guessing."""
+    inventory = profile.get("inventory") or {}
+    for key in ("n_unique_content", "n_files"):
+        value = inventory.get(key)
+        if isinstance(value, int) and value >= 0:
+            return value
+    survey = profile.get("document_survey")
+    if isinstance(survey, list) and survey:
+        return len(survey)
+    return None
+
+
+def material_guidance(profile: dict) -> str | None:
+    """The material-size guide line for a draft run, or
+    None when the material is at/above the settling range
+    (or uncountable). In extension mode the yardstick is
+    the profile being drafted from — the NEW material the
+    pack is extended to cover; the seed is an existing
+    map, not material."""
+    n = _material_doc_count(profile)
+    if n is None or n >= MATERIAL_SETTLES_AROUND:
+        return None
+    if n < MATERIAL_WARN_BELOW:
+        return (f"material warning: this draft rests on "
+                f"{n} document(s) of material — under "
+                f"{MATERIAL_WARN_BELOW} documents the "
+                f"schema is still in its fast-growing "
+                f"range, so this map will likely be "
+                f"shallow; treat it as a first sketch and "
+                f"plan an extension pass once more "
+                f"material is in")
+    return (f"material guidance: this draft rests on {n} "
+            f"document(s) of material — in the measured "
+            f"composition trajectory the schema is still "
+            f"growing through this range and settles "
+            f"around {MATERIAL_SETTLES_AROUND} documents; "
+            f"more material may still deepen the map")
 
 
 def _seed_parts(seed) -> tuple[dict, dict]:
@@ -486,7 +573,11 @@ def build_draft_context(profile: dict, brief, *, seed=None,
     candidates) rides along as its own field. A revision
     additionally carries its seed schema_front (the schema
     being revised — the drafting rules inherit it) and the
-    hole report the revision must address. No model is
+    hole report the revision must address. The context names
+    its own mode (``draft_mode``): "extension" when a seed
+    rides — the profile material then describes the NEW
+    documents the extension must cover, against the seed as
+    the existing map — and "fresh" otherwise. No model is
     consulted to build it."""
     text, seed_e, seed_r, purpose = _brief_parts(brief)
     claims = []
@@ -517,6 +608,8 @@ def build_draft_context(profile: dict, brief, *, seed=None,
         "brief_purpose": purpose,
         "seed_entity_types": seed_e,
         "seed_relation_types": seed_r,
+        "draft_mode": "extension" if seed is not None
+                      else "fresh",
         "seed_schema_front": seed_front,
         "hole_report": _hole_report_entries(hole_report),
     }
@@ -676,6 +769,8 @@ def draft_schema(profile: dict, brief, *, family: str, pack_id: str,
             "corpus_family": profile.get("family"),
             "drafting_tier": DRAFTING_TIER,
             "drafting_source": source,
+            "mode": "extension" if seed_front is not None
+                    else "fresh",
             "brief": text or None,
         },
         "schema_front": sf,
@@ -1814,7 +1909,14 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("draft", help="Draft a schema from a "
-                                     "corpus profile + brief")
+                                     "corpus profile + brief "
+                                     "(fresh by default; "
+                                     "--from PACK extends an "
+                                     "existing pack; a "
+                                     "material guide warns "
+                                     "under 30 documents of "
+                                     "material, strongly "
+                                     "under 10)")
     p.add_argument("--profile", required=True,
                    help="stage-0 profile.json (setup_service)")
     p.add_argument("--brief", default=None,
@@ -1836,17 +1938,20 @@ def main(argv=None) -> int:
                         "layer); default: the drafting seat's "
                         "bound model (ONTOSMITH_DRAFTING_MODEL) "
                         "— the seat ships unbound")
-    p.add_argument("--seed", default=None,
-                   help="revision seed: a schema draft or pack "
-                        "payload JSON whose schema_front this "
-                        "draft inherits (removals and shrinks "
-                        "then need recorded reasons); default: "
-                        "the published pack with this --pack-id, "
-                        "when one exists")
-    p.add_argument("--fresh", action="store_true",
-                   help="compose from scratch, ignoring any "
-                        "published pack with this --pack-id "
-                        "(default: revise the existing pack)")
+    p.add_argument("--from", dest="from_pack", default=None,
+                   metavar="PACK",
+                   help="extension mode: extend the named "
+                        "existing pack — a pack id resolved "
+                        "under this repo's packs/ tree, or a "
+                        "path to a schema draft / pack payload "
+                        "JSON — revising its schema against "
+                        "this profile's documents (the new "
+                        "material) under the inheritance rules "
+                        "(removals and shrinks then need "
+                        "recorded reasons). Without --from the "
+                        "draft composes fresh, even when a "
+                        "published pack carries the same "
+                        "--pack-id")
     p.add_argument("--holes", default=None,
                    help="hole report JSON (a list of family "
                         "records, or an object with a "
@@ -1953,24 +2058,45 @@ def main(argv=None) -> int:
                 return 2
             drafter = make_chat_drafter(draft_model, draft_key)
         seed = None
-        seed_from = args.seed
-        if args.seed:
-            try:
-                seed = _load_json(args.seed)
-            except ValueError as e:
-                print(str(e), file=sys.stderr)
-                return 1
-        elif not args.fresh:
-            # The standard path: a draft for a pack id that
-            # already exists revises the published pack.
-            try:
-                found = _published_pack_seed(args.pack_id)
-            except ValueError as e:
-                print(str(e), file=sys.stderr)
-                return 1
-            if found is not None:
+        seed_from = None
+        if args.from_pack:
+            # Extension mode: the caller names the pack to
+            # extend — a schema document path, or a pack id
+            # resolved in this repo's packs/ tree. A named
+            # target that does not resolve refuses loudly:
+            # extension intent must never degrade silently
+            # into a fresh composition.
+            if Path(args.from_pack).exists():
+                try:
+                    seed = _load_json(args.from_pack)
+                except ValueError as e:
+                    print(str(e), file=sys.stderr)
+                    return 1
+                seed_from = args.from_pack
+            elif _SLUG_RE.match(args.from_pack):
+                try:
+                    found = _published_pack_seed(args.from_pack)
+                except ValueError as e:
+                    print(str(e), file=sys.stderr)
+                    return 1
+                if found is None:
+                    print(f"--from names pack "
+                          f"{args.from_pack!r}, but no "
+                          f"extendable published pack with "
+                          f"that id exists in this repo — the "
+                          f"pack is missing, or its payload "
+                          f"carries no schema_front to "
+                          f"inherit; compose without --from "
+                          f"to start a new one",
+                          file=sys.stderr)
+                    return 1
                 seed, published = found
                 seed_from = str(published)
+            else:
+                print(f"--from {args.from_pack!r} is neither "
+                      f"a schema document path nor a pack id",
+                      file=sys.stderr)
+                return 1
         hole_report = None
         if args.holes:
             try:
@@ -1996,9 +2122,20 @@ def main(argv=None) -> int:
             print(str(e), file=sys.stderr)
             return 1
         if seed is not None:
-            print(f"seeded revision: inherits "
-                  f"{(draft.get('seed') or {}).get('schema_hash')} "
-                  f"from {seed_from}")
+            seed_block = draft.get("seed") or {}
+            seed_name = (seed_block.get("source") or {}).get(
+                "pack_id") or args.from_pack
+            print(f"mode: extension — extends pack "
+                  f"{seed_name!r} (inherits "
+                  f"{seed_block.get('schema_hash')} from "
+                  f"{seed_from})")
+        else:
+            print(f"mode: fresh composition — no seed; "
+                  f"pack {args.pack_id!r} starts from a "
+                  f"blank schema")
+        guide = material_guidance(profile)
+        if guide is not None:
+            print(guide)
         _write_json(args.out, draft)
         findings = validate_schema_draft(draft)
         print(f"draft written: {args.out} "

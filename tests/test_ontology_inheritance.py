@@ -12,15 +12,24 @@ declaration, and free-text points never justify; malformed
 seed-change records justify nothing and are findings
 themselves; the drift diff reports (never merges) removals,
 definition rewrites, signature changes and inverse
-candidates; and the CLI grows draft --seed/--holes and the
-diff subcommand. With the measured adoption (fix-run4),
-the CLI also revises the published pack by default: a
-draft for an existing pack id inherits it unless --fresh
-is given, and an explicit --seed wins over the default.
+candidates; and the CLI grows draft --from/--holes and the
+diff subcommand. The CLI names the two drafting
+situations as modes: a plain draft composes fresh even
+when a published pack carries the same pack id (no
+automatic inheritance), and only an explicit --from
+extends the named pack — by id or by document path —
+while a --from that resolves to nothing refuses loudly.
+A material guide rides the draft output: a strong
+warning under 10 documents of material, a recommendation
+note at 10–29, silence at 30 and above, in fresh and
+extension mode alike (the yardstick is the profile being
+drafted from — the new material).
 """
 from __future__ import annotations
 
+import contextlib
 import copy
+import io
 import json
 import tempfile
 import unittest
@@ -110,6 +119,13 @@ class TestSeedContext(unittest.TestCase):
         ctx = ob.build_draft_context(_profile(), "brief")
         self.assertIsNone(ctx["seed_schema_front"])
         self.assertEqual(ctx["hole_report"], [])
+
+    def test_context_names_its_mode(self):
+        fresh = ob.build_draft_context(_profile(), "brief")
+        self.assertEqual(fresh["draft_mode"], "fresh")
+        extension = ob.build_draft_context(
+            _profile(), "brief", seed=_seed_payload())
+        self.assertEqual(extension["draft_mode"], "extension")
 
     def test_bad_seed_and_bad_hole_report_refuse_loudly(self):
         with self.assertRaises(ValueError):
@@ -349,7 +365,7 @@ class TestDriftDiff(unittest.TestCase):
 
 class TestSeededCli(unittest.TestCase):
 
-    def test_cli_draft_with_seed_and_diff(self):
+    def test_cli_draft_extends_from_path_and_diff(self):
         with tempfile.TemporaryDirectory() as td:
             td = Path(td)
             profile_path = td / "profile.json"
@@ -360,7 +376,7 @@ class TestSeededCli(unittest.TestCase):
             rc = ob.main(["draft", "--profile",
                           str(profile_path),
                           "--pack-id", "field-notes",
-                          "--seed", str(seed_path),
+                          "--from", str(seed_path),
                           "--out", str(draft_path)])
             self.assertEqual(rc, 0)
             draft = json.loads(draft_path.read_text())
@@ -396,10 +412,13 @@ class TestSeededCli(unittest.TestCase):
             self.assertTrue(draft_path.exists())
 
 
-class TestCliDefaultRevision(unittest.TestCase):
-    """Drafting for a pack id that already exists in the
-    repo revises the published pack by default — the
-    measured standard path. The repo root is redirected
+class TestCliModes(unittest.TestCase):
+    """The CLI names its two drafting situations as modes:
+    a plain draft composes fresh — a published pack
+    carrying the same pack id is a technical coincidence,
+    not an intention, and is never inherited silently —
+    while an explicit --from extends the named pack, by
+    id or by document path. The repo root is redirected
     by pointing the module's __file__ at a scratch tree
     holding a packs/ layout, so the real tree is never
     touched."""
@@ -412,36 +431,48 @@ class TestCliDefaultRevision(unittest.TestCase):
             {"pack_id": "field-notes",
              "schema_front": _good_schema()}))
 
-    def _run_draft(self, td: Path, *extra: str) -> dict:
+    def _run_draft(self, td: Path, *extra: str):
         profile_path = td / "profile.json"
         profile_path.write_text(json.dumps(_profile()))
         draft_path = td / "draft.json"
         fake = str(td / "pipeline" / "ontology_builder.py")
-        with mock.patch.object(ob, "__file__", fake):
+        out = io.StringIO()
+        with mock.patch.object(ob, "__file__", fake), \
+                contextlib.redirect_stdout(out):
             rc = ob.main(["draft", "--profile",
                           str(profile_path),
                           "--pack-id", "field-notes",
                           "--out", str(draft_path), *extra])
         self.assertEqual(rc, 0)
-        return json.loads(draft_path.read_text())
+        return json.loads(draft_path.read_text()), \
+            out.getvalue()
 
-    def test_draft_revises_published_pack_by_default(self):
+    def test_existing_pack_id_alone_composes_fresh(self):
         with tempfile.TemporaryDirectory() as td:
             td = Path(td)
             self._publish(td)
-            draft = self._run_draft(td)
+            draft, output = self._run_draft(td)
+            self.assertNotIn("seed", draft)
+            self.assertEqual(draft["entity_types"], [])
+            self.assertEqual(draft["provenance"]["mode"],
+                             "fresh")
+            self.assertIn("mode: fresh composition", output)
+
+    def test_from_pack_id_extends_published_pack(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            self._publish(td)
+            draft, output = self._run_draft(
+                td, "--from", "field-notes")
             self.assertIn("seed", draft)
             self.assertEqual(draft["entity_types"],
                              ["Person", "Organization"])
+            self.assertEqual(draft["provenance"]["mode"],
+                             "extension")
+            self.assertIn("mode: extension", output)
+            self.assertIn("field-notes", output)
 
-    def test_draft_fresh_ignores_published_pack(self):
-        with tempfile.TemporaryDirectory() as td:
-            td = Path(td)
-            self._publish(td)
-            draft = self._run_draft(td, "--fresh")
-            self.assertNotIn("seed", draft)
-
-    def test_explicit_seed_wins_over_published_pack(self):
+    def test_from_path_extends_the_named_document(self):
         with tempfile.TemporaryDirectory() as td:
             td = Path(td)
             self._publish(td)
@@ -452,10 +483,168 @@ class TestCliDefaultRevision(unittest.TestCase):
             seed_path = td / "seed.json"
             seed_path.write_text(json.dumps(
                 {"schema_front": front}))
-            draft = self._run_draft(td, "--seed",
-                                    str(seed_path))
+            draft, output = self._run_draft(
+                td, "--from", str(seed_path))
             self.assertIn("seed", draft)
             self.assertEqual(draft["entity_types"], ["Person"])
+            self.assertIn("mode: extension", output)
+
+    def test_from_unknown_pack_refuses_loudly(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            self._publish(td)
+            profile_path = td / "profile.json"
+            profile_path.write_text(json.dumps(_profile()))
+            draft_path = td / "draft.json"
+            fake = str(td / "pipeline" / "ontology_builder.py")
+            with mock.patch.object(ob, "__file__", fake):
+                rc = ob.main(["draft", "--profile",
+                              str(profile_path),
+                              "--pack-id", "field-notes",
+                              "--from", "no-such-pack",
+                              "--out", str(draft_path)])
+            self.assertEqual(rc, 1)
+            self.assertFalse(draft_path.exists())
+
+    def test_from_pack_without_schema_front_refuses(self):
+        # A published pack whose payload is a hand-authored
+        # profile config (no schema_front) exists, but it
+        # is not an extendable seed: --from refuses rather
+        # than degrading, while a plain draft for the same
+        # id still composes fresh.
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            cfg = (td / "packs" / "field-notes" / "profile"
+                   / "setup_config.json")
+            cfg.parent.mkdir(parents=True)
+            cfg.write_text(json.dumps(
+                {"pack_id": "field-notes",
+                 "family": "fieldnotes"}))
+            profile_path = td / "profile.json"
+            profile_path.write_text(json.dumps(_profile()))
+            draft_path = td / "draft.json"
+            fake = str(td / "pipeline" / "ontology_builder.py")
+            with mock.patch.object(ob, "__file__", fake):
+                rc = ob.main(["draft", "--profile",
+                              str(profile_path),
+                              "--pack-id", "field-notes",
+                              "--from", "field-notes",
+                              "--out", str(draft_path)])
+            self.assertEqual(rc, 1)
+            self.assertFalse(draft_path.exists())
+            draft, _output = self._run_draft(td)
+            self.assertNotIn("seed", draft)
+
+    def test_removed_flags_are_refused(self):
+        # --fresh and --seed belonged to the auto-inherit
+        # design; the mode split retires both spellings.
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            profile_path = td / "profile.json"
+            profile_path.write_text(json.dumps(_profile()))
+            base = ["draft", "--profile", str(profile_path),
+                    "--pack-id", "field-notes",
+                    "--out", str(td / "draft.json")]
+            for extra in (["--fresh"], ["--seed", "x.json"]):
+                with self.assertRaises(SystemExit):
+                    with contextlib.redirect_stderr(
+                            io.StringIO()):
+                        ob.main(base + extra)
+
+
+class TestMaterialGuidance(unittest.TestCase):
+    """The material guide warns, never blocks: a strong
+    warning under 10 documents of material, a note at
+    10–29, silence at 30+. The yardstick is the profile
+    being drafted from — in extension mode, the NEW
+    material."""
+
+    def _profile_n(self, n: int) -> dict:
+        profile = _profile()
+        profile["inventory"] = {
+            "n_files": n, "n_unique_content": n,
+            "total_chars": 3000 * n}
+        return profile
+
+    def test_guidance_boundaries(self):
+        self.assertIn("material warning",
+                      ob.material_guidance(self._profile_n(9)))
+        note = ob.material_guidance(self._profile_n(10))
+        self.assertIn("material guidance", note)
+        self.assertNotIn("warning", note)
+        self.assertIn("material guidance",
+                      ob.material_guidance(self._profile_n(29)))
+        self.assertIsNone(
+            ob.material_guidance(self._profile_n(30)))
+        self.assertIsNone(
+            ob.material_guidance(self._profile_n(100)))
+
+    def test_guidance_silent_without_a_count(self):
+        profile = _profile()
+        profile["inventory"] = {}
+        self.assertIsNone(ob.material_guidance(profile))
+
+    def _run_cli(self, td: Path, profile: dict,
+                 *extra: str) -> tuple[int, str, Path]:
+        profile_path = td / "profile.json"
+        profile_path.write_text(json.dumps(profile))
+        draft_path = td / "draft.json"
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = ob.main(["draft", "--profile",
+                          str(profile_path),
+                          "--pack-id", "field-notes",
+                          "--out", str(draft_path), *extra])
+        return rc, out.getvalue(), draft_path
+
+    def test_cli_warns_but_still_drafts_under_10(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            rc, output, draft_path = self._run_cli(
+                td, self._profile_n(5))
+            self.assertEqual(rc, 0)
+            self.assertTrue(draft_path.exists())
+            self.assertIn("material warning", output)
+
+    def test_cli_notes_at_10_to_29_and_silent_at_30(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            _rc, output, _p = self._run_cli(
+                td, self._profile_n(20))
+            self.assertIn("material guidance", output)
+            self.assertNotIn("material warning", output)
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            _rc, output, _p = self._run_cli(
+                td, self._profile_n(40))
+            self.assertNotIn("material guidance", output)
+            self.assertNotIn("material warning", output)
+
+    def test_extension_mode_guides_on_the_new_material(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            cfg = (td / "packs" / "field-notes" / "profile"
+                   / "setup_config.json")
+            cfg.parent.mkdir(parents=True)
+            cfg.write_text(json.dumps(
+                {"pack_id": "field-notes",
+                 "schema_front": _good_schema()}))
+            profile_path = td / "profile.json"
+            profile_path.write_text(json.dumps(
+                self._profile_n(5)))
+            draft_path = td / "draft.json"
+            fake = str(td / "pipeline" / "ontology_builder.py")
+            out = io.StringIO()
+            with mock.patch.object(ob, "__file__", fake), \
+                    contextlib.redirect_stdout(out):
+                rc = ob.main(["draft", "--profile",
+                              str(profile_path),
+                              "--pack-id", "field-notes",
+                              "--from", "field-notes",
+                              "--out", str(draft_path)])
+            self.assertEqual(rc, 0)
+            self.assertIn("mode: extension", out.getvalue())
+            self.assertIn("material warning", out.getvalue())
 
 
 class TestBriefLineage(unittest.TestCase):
