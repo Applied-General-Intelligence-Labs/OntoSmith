@@ -38,12 +38,23 @@ async function call(method, url, body) {
 const fmt = new Intl.NumberFormat();
 let state = null;
 let pollTimer = null;
+// Why adding is off right now (library off, or a rebuild
+// running), or null. Checked by every add path, not just
+// shown: a CSS class alone doesn't stop a drop or a submit.
+let addBlocked = "Loading…";
+
+function setAddBlocked(reason) {
+  addBlocked = reason;
+  $("#drop-zone").classList.toggle("disabled", !!reason);
+  $("#file-input").disabled = !!reason;
+  $("#paste-form button[type=submit]").disabled = !!reason;
+}
 
 /* ------------------------------------------------ rendering */
 
 function renderDisabled(message) {
   $("#library-meta").replaceChildren(el("span", "error-box", message));
-  $("#drop-zone").classList.add("disabled");
+  setAddBlocked("the document library is off");
   $("#rebuild-btn").disabled = true;
 }
 
@@ -152,6 +163,8 @@ async function refresh() {
       : `Couldn't load the library: ${err.message}`);
     return;
   }
+  setAddBlocked(isRunning(state)
+    ? "a rebuild is running — add documents once it finishes" : null);
   renderDocs(state);
   renderRebuild(state);
   clearTimeout(pollTimer);
@@ -177,6 +190,10 @@ async function addOne(name, text) {
 }
 
 async function addFiles(files) {
+  if (addBlocked) {
+    note("bad", `Not added: ${addBlocked}`);
+    return;
+  }
   let added = 0;
   for (const f of files) {
     const isText = f.name.toLowerCase().endsWith(".txt") || f.type === "text/plain";
@@ -219,6 +236,11 @@ async function rebuild() {
 
 /* ------------------------------------------------ wiring */
 
+// A file dropped outside the zone (or on it while it is
+// disabled) must not make the browser open it instead.
+for (const type of ["dragover", "drop"]) {
+  window.addEventListener(type, (ev) => ev.preventDefault());
+}
 const zone = $("#drop-zone");
 zone.addEventListener("dragover", (ev) => { ev.preventDefault(); zone.classList.add("over"); });
 zone.addEventListener("dragleave", () => zone.classList.remove("over"));
@@ -233,6 +255,10 @@ $("#file-input").addEventListener("change", (ev) => {
 });
 $("#paste-form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
+  if (addBlocked) {
+    note("bad", `Not added: ${addBlocked}`);
+    return;
+  }
   const name = $("#paste-name").value.trim() || "pasted.txt";
   const text = $("#paste-text").value;
   if (await addOne(name, text)) {
