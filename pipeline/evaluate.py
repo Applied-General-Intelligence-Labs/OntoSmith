@@ -30,7 +30,6 @@ from .analyze_hardened import (
     tune_threshold,
 )
 
-
 REQUIRED_FIELDS = ("p_true", "label", "doc_id")
 
 
