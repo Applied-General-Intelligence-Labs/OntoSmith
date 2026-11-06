@@ -126,6 +126,15 @@ Rules:
   other (a subtype relation) or the two are mutually
   exclusive. A confusable pair with no declaration is an
   undeclared boundary.
+- Definitions stay at the breadth the corpus attests: a
+  boundary is won in "decision_points" and boundary
+  examples, never by narrowing a definition. Do not add a
+  membership condition (a named originator, a form, a
+  provenance) that would exclude instances the corpus
+  itself treats as the type, unless that condition IS the
+  test separating a declared pair — an extra condition is
+  over-narrowing, and every instance it excludes becomes
+  a silent extraction hole.
 - Definitions live ONLY in the schema_front entries — nowhere
   else in your output.
 - Be specific to THIS corpus and brief. No generic advice, no

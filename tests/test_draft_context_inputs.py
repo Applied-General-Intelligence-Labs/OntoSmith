@@ -202,6 +202,19 @@ class TestDraftingPrompt(unittest.TestCase):
         self.assertIn("decision_points", ob._SCHEMA_DRAFT_SYSTEM)
         self.assertIn("TAILS", ob._SCHEMA_DRAFT_SYSTEM)
 
+    def test_prompt_forbids_definition_over_narrowing(self):
+        # The boundary pass once sharpened a definition with
+        # a condition its own declared pair test never used
+        # (Concept gained "with named originators"), silently
+        # excluding corpus-attested instances. The rule that
+        # definitions stay at corpus breadth pins against a
+        # repeat.
+        self.assertIn("breadth the corpus attests",
+                      ob._SCHEMA_DRAFT_SYSTEM)
+        self.assertIn("over-narrowing", ob._SCHEMA_DRAFT_SYSTEM)
+        self.assertIn("never by narrowing a definition",
+                      ob._SCHEMA_DRAFT_SYSTEM)
+
 
 if __name__ == "__main__":
     unittest.main()
