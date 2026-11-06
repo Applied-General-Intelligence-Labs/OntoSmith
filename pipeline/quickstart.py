@@ -116,16 +116,12 @@ def main(argv=None) -> int:
     batch_id = _batch_id_for(path, args.batch_id)
     from argparse import Namespace
 
-    from . import batch_cli, connections
+    from . import batch_cli
     # A first run should not spend without limit: when the
     # seats can meter cost and no ONTOSMITH_MAX_COST_USD is
     # set, cap the build at QUICKSTART_CAP_USD. A cost-less
-    # binding (e.g. local Ollama) runs uncapped, since a cap
-    # there could never trip and would only refuse.
-    default_cap = None
-    if not connections.resolve_bindings().cost_less_seats(
-            list(batch_cli.CAP_SEATS)):
-        default_cap = QUICKSTART_CAP_USD
+    # binding (e.g. local Ollama) runs uncapped.
+    default_cap = batch_cli.metered_default_cap(QUICKSTART_CAP_USD)
     create_args = Namespace(
         source="quickstart", collection="quickstart",
         docs=[str(path)], batch_id=batch_id, profile=None,

@@ -106,6 +106,8 @@ pipeline = ["bindings-template.env"]
     "app/app.js",
     "app/favicon.svg",
     "app/index.html",
+    "app/library.html",
+    "app/library.js",
     "app/logo-mark.svg",
 ]
 # The shipped example build: the sample serving path's

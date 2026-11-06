@@ -21,6 +21,19 @@ A reference HTTP API over the hybrid search
                      report + neighborhood walker
   GET /app/<file>    the app's static assets
 
+With ``--library DIR`` (opt-in; localhost only) the server
+also manages a document library and rebuilds the graph
+from it (:mod:`pipeline.library`):
+
+  GET    /documents          the Documents page
+  GET    /library            documents, cap, build status
+  POST   /library/documents  add one {name, text} document
+  DELETE /library/documents  remove one (``?name=...``)
+  POST   /library/rebuild    rebuild the graph from every
+                             document; served once VERIFIED
+
+Without the flag the sample API stays read-only.
+
 Framework: the Python standard library
 (``http.server.ThreadingHTTPServer``) — a deliberate
 choice for a *reference* server: the product's dependency
@@ -52,6 +65,7 @@ from urllib.parse import parse_qs, urlparse
 
 from pipeline import connections as _connections
 from pipeline import inspect as _inspect
+from pipeline import library as _library
 from pipeline import search as _search
 
 
@@ -70,9 +84,11 @@ class SearchService:
     Transport-free: the handler below is a thin shell, so
     the contract is testable without a socket."""
 
-    def __init__(self, store, embedder=None):
+    def __init__(self, store, embedder=None, library=None):
         self.store = store
         self.embedder = embedder
+        # LibraryService when `serve --library` is on.
+        self.library = library
 
     # -- endpoints -------------------------------------------
     def health(self) -> dict:
@@ -218,6 +234,66 @@ def _int_param(params: dict, name: str, default: int,
 
 
 # ----------------------------------------------------------------------
+# Document library — opt-in write surface (serve --library)
+# ----------------------------------------------------------------------
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "localhost", "::1"})
+#: Largest request body the library accepts (bytes): one
+#: document at the character limit, UTF-8, plus JSON framing.
+MAX_BODY_BYTES = _library.MAX_DOC_CHARS * 4 + 4096
+
+
+class LibraryService:
+    """The library endpoints over one DocumentLibrary and
+    its Rebuilder. `served_batch` names the batch the
+    server currently serves (None: whatever the store
+    holds)."""
+
+    def __init__(self, library, rebuilder,
+                 served_batch: str | None = None):
+        self.library = library
+        self.rebuilder = rebuilder
+        self.served_batch = served_batch
+
+    def status(self) -> dict:
+        docs = self.library.documents()
+        try:
+            cap, source = _library.effective_cap()
+            cap_info = {"usd": cap, "source": source}
+        except _library.LibraryError as e:
+            cap_info = {"usd": None, "source": None,
+                        "error": e.message}
+        return {
+            "folder": str(self.library.root),
+            "pack": self.rebuilder.pack,
+            "documents": docs,
+            "totals": {"documents": len(docs),
+                       "words": sum(d["words"] for d in docs)},
+            "cap": cap_info,
+            "served_batch": self.served_batch,
+            "build": self.rebuilder.status(),
+        }
+
+    def add(self, body: dict) -> dict:
+        return self.library.add(body.get("name", ""),
+                                body.get("text", ""))
+
+    def remove(self, params: dict) -> dict:
+        return self.library.remove(_required(params, "name"))
+
+    def rebuild(self) -> dict:
+        return self.rebuilder.start()
+
+
+def _host_name(host_header: str | None) -> str:
+    """The host part of a Host header ("[::1]:8765" →
+    "::1", "localhost:8765" → "localhost")."""
+    h = (host_header or "").strip()
+    if h.startswith("["):
+        return h[1:h.find("]")] if "]" in h else ""
+    return h.rsplit(":", 1)[0] if ":" in h else h
+
+
+# ----------------------------------------------------------------------
 # Demo app — static assets, served by the same shell
 # ----------------------------------------------------------------------
 APP_CONTENT_TYPES = {
@@ -283,8 +359,9 @@ def app_asset(name: str) -> tuple[bytes, str] | None:
 # ----------------------------------------------------------------------
 class _Handler(BaseHTTPRequestHandler):
     """Routes GETs: ``/`` and ``/app/<file>`` serve the
-    demo app; the API routes answer JSON. No other
-    verbs: the sample API is read-only."""
+    demo app; the API routes answer JSON. POST and DELETE
+    exist only for the opt-in library routes; without
+    ``--library`` the sample API is read-only."""
 
     service: SearchService  # set by build_server
     protocol_version = "HTTP/1.1"
@@ -297,6 +374,13 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == "/" \
                 or parsed.path.startswith("/app/"):
             self._serve_app(parsed.path)
+            return
+        if parsed.path == "/documents":
+            self._serve_app("/app/library.html")
+            return
+        if parsed.path == "/library":
+            self._library(lambda lib: lib.status(),
+                          write=False)
             return
         params = {k: v[0] for k, v in
                   parse_qs(parsed.query).items()}
@@ -317,6 +401,102 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(500, {"error": {
                 "code": "internal",
                 "message": f"{type(e).__name__}: {e}"}})
+
+    def do_POST(self):
+        # A refused write may leave its body unread; never
+        # reuse the connection after one.
+        self.close_connection = True
+        path = urlparse(self.path).path
+        if path == "/library/documents":
+            self._library(lambda lib: lib.add(self._json_body()),
+                          write=True)
+        elif path == "/library/rebuild":
+            self._library(lambda lib: lib.rebuild(), write=True)
+        else:
+            self._send(404, {"error": {
+                "code": "not_found",
+                "message": f"no such endpoint: {path}"}})
+
+    def do_DELETE(self):
+        self.close_connection = True
+        parsed = urlparse(self.path)
+        if parsed.path != "/library/documents":
+            self._send(404, {"error": {
+                "code": "not_found",
+                "message": f"no such endpoint: {parsed.path}"}})
+            return
+        params = {k: v[0] for k, v in
+                  parse_qs(parsed.query).items()}
+        self._library(lambda lib: lib.remove(params), write=True)
+
+    # -- library plumbing --------------------------------------
+    def _library(self, call, write: bool) -> None:
+        """Run one library call behind its guards: the
+        library must be on, the request must come to a
+        loopback host name (a DNS-rebinding page cannot
+        reach it), and a write must carry JSON from this
+        origin (a cross-site form or no-CORS fetch cannot
+        add, remove or spend)."""
+        lib = self.service.library
+        if lib is None:
+            self._send(404, {"error": {
+                "code": "library_disabled",
+                "message": "the document library is off — "
+                           "start the server with "
+                           "`ontosmith serve --library DIR`"}})
+            return
+        host = self.headers.get("Host")
+        if _host_name(host) not in LOOPBACK_HOSTS:
+            self._send(403, {"error": {
+                "code": "forbidden_host",
+                "message": "the library answers only on a "
+                           "loopback host name"}})
+            return
+        if write:
+            origin = self.headers.get("Origin")
+            if origin is not None and origin != f"http://{host}":
+                self._send(403, {"error": {
+                    "code": "forbidden_origin",
+                    "message": f"cross-origin write refused "
+                               f"({origin})"}})
+                return
+            ctype = (self.headers.get("Content-Type") or "")
+            if self.command == "POST" and not ctype.startswith(
+                    "application/json"):
+                self._send(415, {"error": {
+                    "code": "json_required",
+                    "message": "send the request body as "
+                               "application/json"}})
+                return
+        try:
+            self._send(200, call(lib))
+        except (ApiError, _library.LibraryError) as e:
+            self._send(e.status, {"error": {
+                "code": e.code, "message": e.message}})
+        except Exception as e:  # named, never a traceback
+            self._send(500, {"error": {
+                "code": "internal",
+                "message": f"{type(e).__name__}: {e}"}})
+
+    def _json_body(self) -> dict:
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            length = -1
+        if length < 0 or length > MAX_BODY_BYTES:
+            raise ApiError(413, "body_too_large",
+                           f"request body over {MAX_BODY_BYTES:,} "
+                           f"bytes")
+        raw = self.rfile.read(length) if length else b""
+        try:
+            body = json.loads(raw.decode("utf-8") or "{}")
+        except (UnicodeDecodeError, ValueError):
+            raise ApiError(400, "bad_json",
+                           "the request body is not JSON") from None
+        if not isinstance(body, dict):
+            raise ApiError(400, "bad_json",
+                           "the request body must be a JSON object")
+        return body
 
     def _serve_app(self, path: str) -> None:
         """The demo app: ``/`` is its index page,
@@ -388,12 +568,27 @@ def main(argv=None) -> int:
                     help="bind host (default: 127.0.0.1)")
     ap.add_argument("--port", type=int, default=8765,
                     help="bind port (default: 8765)")
+    ap.add_argument("--library", default=None, metavar="DIR",
+                    help="manage a folder of .txt documents "
+                         "from the Documents page at "
+                         "/documents and rebuild the graph "
+                         "from it (localhost only; each "
+                         "rebuild spends, under a cap)")
+    ap.add_argument("--pack", default="open-domain",
+                    help="the pack library rebuilds use "
+                         "(default: open-domain)")
     ap.add_argument("--embed", action="store_true",
                     help="activate the search vector arm "
                          "via the connection layer's "
                          "default embedder (refuses if the "
                          "embedder seat's key is unset)")
     args = ap.parse_args(argv)
+    if args.library and args.host not in LOOPBACK_HOSTS:
+        print("serve refused: --library changes files and "
+              "spends on builds, so it binds a loopback host "
+              "only (127.0.0.1, localhost or ::1)",
+              file=sys.stderr)
+        return 1
 
     try:
         store = _search.open_store(source=args.source,
@@ -412,6 +607,22 @@ def main(argv=None) -> int:
         print(f"serve refused: {e}", file=sys.stderr)
         return 1
     service = SearchService(store, embedder=embedder)
+    if args.library:
+        from pipeline.batch_cli import state_root
+        lib_service = LibraryService(None, None, args.batch)
+
+        def serve_new_batch(batch_id: str) -> None:
+            # The rebuild reached VERIFIED: serve its graph.
+            service.store = _search.open_store(
+                batch=batch_id, store=args.store)
+            lib_service.served_batch = batch_id
+
+        lib_service.library = _library.DocumentLibrary(
+            Path(args.library))
+        lib_service.rebuilder = _library.Rebuilder(
+            lib_service.library, pack=args.pack,
+            state_root=state_root, on_verified=serve_new_batch)
+        service.library = lib_service
     server = build_server(args.host, args.port, service)
     host, port = server.server_address[:2]
     desc = store.describe()
@@ -420,6 +631,10 @@ def main(argv=None) -> int:
           f"{desc['documents']} documents) at "
           f"http://{host}:{port} — /search /entity "
           f"/neighborhood /triple /health")
+    if service.library is not None:
+        print(f"ontosmith serve: document library "
+              f"{service.library.library.root} — manage it at "
+              f"http://{host}:{port}/documents")
     if args.source is None and args.batch is None:
         print("ontosmith serve: this is the shipped demo "
               "graph — Pride and Prejudice, the full text, "

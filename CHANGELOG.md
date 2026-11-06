@@ -7,6 +7,18 @@ and the project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- **Documents page (`ontosmith serve --library DIR`)**:
+  a local page at `/documents` to add `.txt` documents
+  (drop, choose or paste), list and remove them, and
+  rebuild the graph from the whole library. A rebuild is
+  a new batch over every document (the store holds one
+  graph), runs under a spend cap (`ONTOSMITH_MAX_COST_USD`,
+  else $5 on a metered binding), streams its log, and is
+  served once VERIFIED. Opt-in and localhost-only;
+  without the flag the sample API stays read-only.
+
 ### Fixed
 
 - **Spend cap parsing** — `ONTOSMITH_MAX_COST_USD` now

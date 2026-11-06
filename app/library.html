@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OntoSmith — documents</title>
+<link rel="icon" href="/app/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/app/app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img class="brand-logo" src="/app/logo-mark.svg" alt="">
+    <span class="brand-mark">OntoSmith</span>
+    <span class="brand-sub">documents — what the graph is built from</span>
+  </div>
+  <nav class="topnav">
+    <a href="/">Ask the graph</a>
+    <a href="/documents" aria-current="page">Documents</a>
+  </nav>
+</header>
+
+<main class="layout">
+  <section class="column main-column">
+    <section class="panel">
+      <h2>Add documents</h2>
+      <div id="drop-zone" class="drop-zone" tabindex="0">
+        <p><strong>Drop .txt files here</strong> or
+          <label class="linkish file-pick">choose files
+            <input id="file-input" type="file" accept=".txt,text/plain" multiple hidden>
+          </label></p>
+        <p class="hint">Plain-text files only. Each file becomes one
+          document in the library.</p>
+      </div>
+      <details class="paste">
+        <summary>Or paste text</summary>
+        <form id="paste-form" class="paste-form">
+          <label for="paste-name">File name</label>
+          <input id="paste-name" type="text" placeholder="my-notes.txt" autocomplete="off">
+          <label for="paste-text">Text</label>
+          <textarea id="paste-text" rows="8"></textarea>
+          <button type="submit">Add to library</button>
+        </form>
+      </details>
+      <div id="add-results" class="add-results"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Library</h2>
+      <p id="library-meta" class="muted">Loading…</p>
+      <div id="doc-list"></div>
+    </section>
+  </section>
+
+  <aside class="column side-column">
+    <section class="panel">
+      <h2>Rebuild the graph</h2>
+      <p>Adding files doesn't change the graph until you rebuild.
+        A rebuild processes <strong>every</strong> document in the
+        library and then <strong>replaces</strong> the graph in
+        Neo4j, so its cost grows with the library.</p>
+      <dl id="rebuild-facts" class="facts"></dl>
+      <button id="rebuild-btn" class="primary" type="button" disabled>Rebuild graph</button>
+      <div id="build-body"></div>
+    </section>
+  </aside>
+</main>
+
+<footer class="foot">
+  <p>Served by <code>ontosmith serve --library</code>. Documents
+    are files in the library folder; every build is a batch
+    you can inspect with <code>ontosmith batch status</code>.</p>
+</footer>
+<script src="/app/library.js"></script>
+</body>
+</html>
