@@ -26,6 +26,28 @@ missing builder:
      a drafter callable in. This module names no model; with no
      drafter it seeds a deterministic skeleton from the brief,
      whose gaps validation then names one by one.
+     A draft after the first is a REVISION, not a fresh
+     composition: the caller may pass the previous pack
+     version's schema_front as a *seed*, and the draft then
+     carries the seed with it (see ``draft_schema``). The
+     drafting rules inherit the seed's types, relations and
+     signature pairs; removing one, shrinking a signature, or
+     rewriting an inherited definition is allowed only with a
+     structured decision point recording the reason, and
+     validation enforces that (stage 2). A revision may also
+     carry a *hole report* — named families that processing
+     reported holes for — which the revision must address as
+     one bundle (new relation, signature extension with its
+     definition revision, definition consistency fix) or
+     explicitly leave open with a decision point. That bundle
+     is the augmentation loop's revision path: holes drive
+     seeded revisions, never fresh recompositions. The CLI
+     makes revision the default path: drafting for a pack
+     id that already exists in the repo inherits the
+     published pack automatically (an explicit ``--seed``
+     wins; ``--fresh`` composes from scratch) — revision
+     steered by the hole report is the standard loop,
+     fresh composition the exception.
   2. VALIDATE. Deterministic, fail-closed checks over the
      draft: every type carries a definition and boundary
      examples; no duplicate or colliding type names; no
@@ -135,6 +157,40 @@ Rules:
   test separating a declared pair — an extra condition is
   over-narrowing, and every instance it excludes becomes
   a silent extraction hole.
+- Do not declare a new relation that merely reverses an
+  existing one (a "parent of" beside an existing "child
+  of"): declare "inverse_of" on one side instead, so the
+  pair is extracted once and read in both directions.
+- SEED INHERITANCE. When the context carries a
+  "seed_schema_front", this draft is a revision of that
+  schema, not a fresh composition. Inherit every seed
+  entity type, relation type and endpoint-signature pair.
+  Additions are free. A removal or shrinkage is allowed
+  only with a structured decision point recording the
+  reason — an object of the form {"action": "remove_type",
+  "kind": "entity"|"relation", "type": <name>, "reason":
+  <why>} for a dropped type, {"action": "remove_signature",
+  "kind": "relation", "type": <relation>, "detail":
+  <the dropped signature entry>, "reason": <why>} for a
+  dropped signature pair, or {"action": "revise_definition"
+  (or "narrow_definition"), "kind": ..., "type": <name>,
+  "reason": <why>} for any rewrite of an inherited
+  definition. Validation rejects an unjustified removal,
+  shrinkage or silent definition rewrite. A signature pair
+  ADDITION must ride with the definition revision that
+  keeps the definition consistent with the widened
+  signature; if the existing definition already covers
+  the added pair, say so in an {"action":
+  "extend_signature", "kind": "relation", "type": <name>,
+  "reason": <why the definition already covers it>}
+  decision point instead.
+- HOLE REPORT. When the context carries a "hole_report",
+  it names families that processing reported holes for.
+  Address each family in this revision as one bundle —
+  a new relation, a signature extension with its
+  definition revision, or a definition consistency fix —
+  or record in "decision_points" why that family stays
+  open. A named family left silent is an unmade decision.
 - Definitions live ONLY in the schema_front entries — nowhere
   else in your output.
 - Be specific to THIS corpus and brief. No generic advice, no
@@ -275,7 +331,116 @@ def _brief_parts(brief) -> tuple[str, list[str], list[str], str]:
                      f"({type(brief).__name__})")
 
 
-def build_draft_context(profile: dict, brief) -> dict:
+# ------------------------------------------------------------------
+# seed lineage (inheritance revisions)
+
+#: Structured decision-point actions that justify changing an
+#: inherited (seed) schema: a seed type dropped, a seed
+#: signature pair dropped, an inherited definition rewritten,
+#: a signature pair added on the strength of the existing
+#: definition. Validation matches removals and rewrites
+#: against these records; free-text points never justify.
+SEED_CHANGE_ACTIONS = ("remove_type", "remove_signature",
+                       "revise_definition", "narrow_definition",
+                       "extend_signature")
+
+
+def _published_pack_seed(pack_id: str):
+    """The published pack this id names, as a revision
+    seed — the CLI's default inheritance source.
+
+    Looks for packs/<pack_id>/profile/setup_config.json
+    under the repo root, the layout emit writes, and
+    returns (document, path); returns None when no such
+    pack exists — a genuinely new pack id composes
+    fresh. An id that is not a slug never resolves: the
+    draft's own validation reports the id, and a
+    malformed id must not become a path."""
+    if not _SLUG_RE.match(pack_id or ""):
+        return None
+    root = Path(__file__).resolve().parent.parent
+    published = (root / "packs" / pack_id / "profile"
+                 / "setup_config.json")
+    if not published.exists():
+        return None
+    return _load_json(str(published)), published
+
+
+def _front_hash(front: dict) -> str:
+    """Content hash over one schema_front — the value a
+    seeded draft records for the seed it inherited, so the
+    lineage stays checkable after the seed pack moves on."""
+    blob = json.dumps(front, sort_keys=True, ensure_ascii=False)
+    return "sha256:" + hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def _seed_parts(seed) -> tuple[dict, dict]:
+    """Normalize a revision seed to (schema_front, source).
+
+    A seed is the previous pack version's schema: a schema
+    draft document, an emitted pack payload, or a bare
+    schema_front — each carries the front under
+    ``schema_front`` except the bare form, which IS the
+    front. Anything else is refused by name: inheriting
+    from a document that carries no schema would silently
+    degrade the revision to a fresh composition."""
+    if not isinstance(seed, dict):
+        raise ValueError(f"seed must be a schema document "
+                         f"(draft, pack payload, or schema_front), "
+                         f"got {type(seed).__name__}")
+    if isinstance(seed.get("schema_front"), dict):
+        front = seed["schema_front"]
+        source = {"pack_id": seed.get("pack_id"),
+                  "pack_version": seed.get("pack_version"),
+                  "kind": seed.get("kind") or "pack_payload"}
+    elif isinstance(seed.get("entity_inventory"), list) or \
+            isinstance(seed.get("relation_inventory"), list):
+        front = seed
+        source = {"pack_id": None, "pack_version": None,
+                  "kind": "schema_front"}
+    else:
+        raise ValueError("seed carries no schema_front — a "
+                         "revision inherits a schema, not a "
+                         "document without one")
+    if not isinstance(front.get("entity_inventory"), list) or \
+            not isinstance(front.get("relation_inventory"), list):
+        raise ValueError("seed schema_front inventories must "
+                         "be lists")
+    return copy.deepcopy(front), source
+
+
+def _hole_report_entries(hole_report) -> list[dict]:
+    """Normalize a hole report to a list of family records.
+
+    A hole report names the families processing reported
+    holes for (the augmentation loop's input). Entries are
+    objects ({"family": ..., "kind": ..., "detail": ...});
+    a bare string names a family with no further detail.
+    Anything else is refused by name rather than silently
+    dropped — a dropped family is a hole nobody decided
+    about."""
+    if hole_report is None:
+        return []
+    if not isinstance(hole_report, list):
+        raise ValueError("hole report must be a list of "
+                         "family records")
+    out = []
+    for entry in hole_report:
+        if isinstance(entry, str):
+            out.append({"family": entry})
+        elif isinstance(entry, dict) and \
+                _nonempty_str(entry.get("family")):
+            out.append(dict(entry))
+        else:
+            raise ValueError(
+                "hole report entries must be family name "
+                f"strings or objects with a 'family', got "
+                f"{entry!r}")
+    return out
+
+
+def build_draft_context(profile: dict, brief, *, seed=None,
+                        hole_report=None) -> dict:
     """The deterministic context a drafting tier works from:
     the corpus profile's inventory + claim statements and the
     brief. Claims carry their measured detail with them — the
@@ -284,7 +449,10 @@ def build_draft_context(profile: dict, brief) -> dict:
     drafter as lists, not as the counts the profile statements
     summarize — and the profile's document survey (head AND
     tail of each sampled document, with its heading
-    candidates) rides along as its own field. No model is
+    candidates) rides along as its own field. A revision
+    additionally carries its seed schema_front (the schema
+    being revised — the drafting rules inherit it) and the
+    hole report the revision must address. No model is
     consulted to build it."""
     text, seed_e, seed_r, purpose = _brief_parts(brief)
     claims = []
@@ -302,6 +470,9 @@ def build_draft_context(profile: dict, brief) -> dict:
                     "semantic_census":
                 census = measured.get("detail")
         claims.append(entry)
+    seed_front = None
+    if seed is not None:
+        seed_front, _source = _seed_parts(seed)
     return {
         "family": profile.get("family"),
         "inventory": profile.get("inventory") or {},
@@ -312,6 +483,8 @@ def build_draft_context(profile: dict, brief) -> dict:
         "brief_purpose": purpose,
         "seed_entity_types": seed_e,
         "seed_relation_types": seed_r,
+        "seed_schema_front": seed_front,
+        "hole_report": _hole_report_entries(hole_report),
     }
 
 
@@ -384,11 +557,24 @@ def _normalize_drafted(raw: dict) -> tuple[dict, list, list]:
     points = raw.get("decision_points") or []
     if not isinstance(points, list):
         raise ValueError("drafted decision_points is not a list")
-    return sf, pairs, [str(p) for p in points]
+    # Decision points are free text (strings) or structured
+    # records (objects — the seed-change records validation
+    # matches on). Both ride as authored; anything else is
+    # not a decision point.
+    normalized_points = []
+    for p in points:
+        if isinstance(p, (str, dict)):
+            normalized_points.append(p)
+        else:
+            raise ValueError(
+                "drafted decision_points entries must be "
+                f"strings or objects, got {type(p).__name__}")
+    return sf, pairs, normalized_points
 
 
 def draft_schema(profile: dict, brief, *, family: str, pack_id: str,
-                 display_name: str, drafter=None) -> dict:
+                 display_name: str, drafter=None, seed=None,
+                 hole_report=None) -> dict:
     """Stage 1 — produce a draft schema document.
 
     ``profile`` is a stage-0 corpus profile (setup_service's
@@ -397,12 +583,48 @@ def draft_schema(profile: dict, brief, *, family: str, pack_id: str,
     drafted document. Without one, the draft is the
     deterministic brief-seeded skeleton. Either way the result
     is a working document with status DRAFT_NOT_APPROVED —
-    approval is a separate, human step."""
+    approval is a separate, human step.
+
+    ``seed`` makes the draft a revision: the previous pack
+    version's schema (a draft, a pack payload, or a bare
+    schema_front). The draft then carries the seed front with
+    it (``draft["seed"]``), validation holds the revision to
+    the inheritance rules (no unjustified removal, signature
+    shrinkage, or silent definition rewrite), and the
+    deterministic no-drafter path starts from the seed front
+    itself — inheritance is what a skeleton can honestly
+    offer for a revision — with any brief-named types the
+    seed lacks appended as empty entries for validation to
+    name. ``hole_report`` names the families the revision
+    must address (see ``_hole_report_entries``); it rides
+    the draft context only."""
     text, seed_e, seed_r, purpose = _brief_parts(brief)
+    seed_front = seed_source = None
+    if seed is not None:
+        seed_front, seed_source = _seed_parts(seed)
     if drafter is not None:
-        raw = drafter(build_draft_context(profile, brief))
+        raw = drafter(build_draft_context(
+            profile, brief, seed=seed, hole_report=hole_report))
         sf, pairs, points = _normalize_drafted(raw)
         source = "llm"
+    elif seed_front is not None:
+        sf = copy.deepcopy(seed_front)
+        have_e = set(_inventory_names(sf.get("entity_inventory")))
+        for name in seed_e:
+            if name not in have_e:
+                sf["entity_inventory"].append(
+                    {"type": name, "role": "entity",
+                     "definition": "", "form_examples": [],
+                     "not_entities": {}})
+        have_r = set(_inventory_names(sf.get("relation_inventory")))
+        for name in seed_r:
+            if name not in have_r:
+                sf["relation_inventory"].append(
+                    {"type": name, "definition": "",
+                     "endpoint_signature": [],
+                     "boundary_examples": []})
+        pairs, points = [], []
+        source = "deterministic"
     else:
         sf = _seed_schema_front(purpose, seed_e, seed_r)
         pairs, points = [], []
@@ -428,6 +650,16 @@ def draft_schema(profile: dict, brief, *, family: str, pack_id: str,
         "merge_prohibited_type_pairs": pairs,
         "decision_points": points,
     }
+    if seed_front is not None:
+        draft["seed"] = {
+            "source": seed_source,
+            "schema_hash": _front_hash(seed_front),
+            "schema_front": seed_front,
+        }
+        draft["provenance"]["seed"] = {
+            "pack_id": (seed_source or {}).get("pack_id"),
+            "schema_hash": draft["seed"]["schema_hash"],
+        }
     return draft
 
 
@@ -532,6 +764,174 @@ def _payload_for(draft: dict, pack_version: str) -> dict:
     return payload
 
 
+def _signature_atoms(entry: dict) -> set[str]:
+    """A relation's endpoint-signature entries as a set of
+    surface atoms (type names and "TypeA~TypeB" pair strings,
+    whitespace-trimmed) — the unit a revision may drop or add."""
+    signature = entry.get("endpoint_signature")
+    if not isinstance(signature, list):
+        return set()
+    return {str(e).strip() for e in signature
+            if _nonempty_str(str(e))}
+
+
+def _seed_change_index(draft: dict,
+                       findings: list[dict]) -> dict:
+    """Index a draft's structured seed-change decision points
+    by (action, kind, type). A point carrying an "action" key
+    claims to be a seed-change record and is held to the
+    record's shape (a known action, a kind, a type, a
+    non-empty reason) — a malformed record justifies nothing
+    and is itself a finding. Free-text points and records
+    without an action are ordinary decision points and never
+    justify a seed change."""
+    index: dict[tuple, list[dict]] = {}
+    for i, point in enumerate(draft.get("decision_points") or []):
+        if not isinstance(point, dict) or "action" not in point:
+            continue
+        path = f"decision_points[{i}]"
+        action = point.get("action")
+        kind = point.get("kind")
+        type_name = point.get("type")
+        reason = point.get("reason")
+        if action not in SEED_CHANGE_ACTIONS or \
+                kind not in ("entity", "relation") or \
+                not _nonempty_str(type_name) or \
+                not _nonempty_str(reason):
+            findings.append(_finding(
+                "BAD_SEED_CHANGE", path,
+                f"seed-change record {point!r} is malformed — "
+                f"it needs an action in {SEED_CHANGE_ACTIONS}, "
+                f"a kind ('entity' or 'relation'), a type name "
+                f"and a non-empty reason; a malformed record "
+                f"justifies nothing"))
+            continue
+        index.setdefault((action, kind, str(type_name)),
+                         []).append(point)
+    return index
+
+
+def _check_seed_lineage(draft: dict, entities: dict,
+                        relations: dict,
+                        findings: list[dict]) -> None:
+    """Inheritance discipline for seeded drafts: the revision
+    may add freely, but what the seed declared cannot quietly
+    disappear or shrink. A dropped seed type, a dropped
+    signature pair, or a rewritten inherited definition each
+    need the matching structured decision point (see
+    SEED_CHANGE_ACTIONS); a signature pair ADDITION needs the
+    definition revision that keeps the definition consistent
+    with the widened signature, or an extend_signature record
+    stating the definition already covers it. Boundary
+    material (examples) is drafting surface, not contract —
+    revisions may rework it unrecorded."""
+    seed = draft.get("seed")
+    if not isinstance(seed, dict):
+        return
+    front = seed.get("schema_front")
+    if not isinstance(front, dict):
+        findings.append(_finding(
+            "BAD_SEED", "seed",
+            "the draft declares a seed but carries no seed "
+            "schema_front — lineage cannot be checked"))
+        return
+    index = _seed_change_index(draft, findings)
+
+    def justified(actions, kind, name, detail=None) -> bool:
+        for action in actions:
+            for point in index.get((action, kind, name), []):
+                if detail is None:
+                    return True
+                recorded = point.get("detail")
+                if recorded == detail:
+                    return True
+                if isinstance(recorded, list) and \
+                        detail in [str(d) for d in recorded]:
+                    return True
+        return False
+
+    seed_entities = {str(e["type"]): e
+                     for e in front.get("entity_inventory") or []
+                     if isinstance(e, dict)
+                     and _nonempty_str(e.get("type"))}
+    seed_relations = {str(r["type"]): r
+                      for r in front.get("relation_inventory") or []
+                      if isinstance(r, dict)
+                      and _nonempty_str(r.get("type"))}
+    for kind, seed_map, new_map in (
+            ("entity", seed_entities, entities),
+            ("relation", seed_relations, relations)):
+        for name, seed_entry in seed_map.items():
+            new_entry = new_map.get(name)
+            if new_entry is None:
+                if not justified(("remove_type",), kind, name):
+                    findings.append(_finding(
+                        "SEED_REMOVAL_UNJUSTIFIED",
+                        f"{kind}_inventory.{name}",
+                        f"seed {kind} type {name!r} is dropped "
+                        f"by this revision with no remove_type "
+                        f"decision point recording why — an "
+                        f"inherited type disappears only on a "
+                        f"recorded reason"))
+                continue
+            seed_def = _norm_text(str(seed_entry.get(
+                "definition") or ""))
+            new_def = _norm_text(str(new_entry.get(
+                "definition") or ""))
+            if seed_def != new_def and not justified(
+                    ("revise_definition", "narrow_definition"),
+                    kind, name):
+                findings.append(_finding(
+                    "SEED_DEFINITION_UNDECLARED",
+                    f"{kind}_inventory.{name}.definition",
+                    f"the definition of inherited {kind} type "
+                    f"{name!r} is rewritten with no "
+                    f"revise_definition decision point "
+                    f"recording why — a silent rewrite can "
+                    f"narrow the type and strand the facts "
+                    f"the old breadth covered"))
+        if kind != "relation":
+            continue
+        for name, seed_entry in seed_map.items():
+            new_entry = new_map.get(name)
+            if new_entry is None:
+                continue  # the drop itself is reported above
+            dropped = _signature_atoms(seed_entry) - \
+                _signature_atoms(new_entry)
+            for atom in sorted(dropped):
+                if not justified(("remove_signature",),
+                                 "relation", name, detail=atom):
+                    findings.append(_finding(
+                        "SEED_SIGNATURE_UNJUSTIFIED",
+                        f"relation_inventory.{name}."
+                        f"endpoint_signature",
+                        f"signature pair {atom!r} of inherited "
+                        f"relation {name!r} is dropped with no "
+                        f"remove_signature decision point "
+                        f"recording why"))
+            added = _signature_atoms(new_entry) - \
+                _signature_atoms(seed_entry)
+            if added:
+                seed_def = _norm_text(str(seed_entry.get(
+                    "definition") or ""))
+                new_def = _norm_text(str(new_entry.get(
+                    "definition") or ""))
+                if seed_def == new_def and not justified(
+                        ("extend_signature",), "relation", name):
+                    findings.append(_finding(
+                        "SEED_SIGNATURE_UNDECLARED",
+                        f"relation_inventory.{name}."
+                        f"endpoint_signature",
+                        f"relation {name!r} gains signature "
+                        f"pair(s) {sorted(added)} while its "
+                        f"definition stands unchanged and no "
+                        f"extend_signature decision point "
+                        f"states the definition already covers "
+                        f"them — a pair addition rides with "
+                        f"its definition revision, or with "
+                        f"that declaration"))
+
+
 def validate_schema_draft(draft: dict) -> list[dict]:
     """Stage 2 — deterministic, fail-closed validation.
 
@@ -543,8 +943,11 @@ def validate_schema_draft(draft: dict) -> list[dict]:
     definitions in a single source (a competing definitions
     carrier, or per-type definitions disagreeing with the
     schema_front, is a fork); merge prohibitions naming real
-    types; and full pack-contract conformance of the would-be
-    payload via profile_config.setup_config_errors."""
+    types; seed lineage for seeded drafts (no unjustified
+    removal, signature shrinkage, or silent definition
+    rewrite — see _check_seed_lineage); and full pack-contract
+    conformance of the would-be payload via
+    profile_config.setup_config_errors."""
     findings: list[dict] = []
     if not isinstance(draft, dict):
         return [_finding("DRAFT_NOT_OBJECT", "",
@@ -712,6 +1115,7 @@ def validate_schema_draft(draft: dict) -> list[dict]:
             f"theme_attest_chunk {tac!r} is not a boolean — "
             f"the declaration is true (chunk-level theme "
             f"attestation) or absent (the quote-only test)"))
+    _check_seed_lineage(draft, entities, relations, findings)
     # Pack-contract conformance: the payload emission would
     # ship must pass the same fail-closed validation as any
     # profile config.
@@ -722,6 +1126,161 @@ def validate_schema_draft(draft: dict) -> list[dict]:
             f"the emitted payload would fail setup_config "
             f"validation: {err}"))
     return findings
+
+
+# ------------------------------------------------------------------
+# 2b. drift diff (anchoring check: report only, never a merge)
+
+def _front_maps(front: dict) -> tuple[dict, dict]:
+    entities = {str(e["type"]): e
+                for e in front.get("entity_inventory") or []
+                if isinstance(e, dict)
+                and _nonempty_str(e.get("type"))}
+    relations = {str(r["type"]): r
+                 for r in front.get("relation_inventory") or []
+                 if isinstance(r, dict)
+                 and _nonempty_str(r.get("type"))}
+    return entities, relations
+
+
+def _pair_sides(atom: str) -> tuple[str, str] | None:
+    sides = [s.strip() for s in atom.split("~")]
+    if len(sides) == 2 and sides[0] != sides[1]:
+        return sides[0], sides[1]
+    return None
+
+
+def schema_front_diff(a_front: dict, b_front: dict) -> dict:
+    """The structural difference between two schema fronts —
+    the drift report's substance. Compares inventories by
+    type name, definitions by normalized text, and relation
+    signatures by atom set. Also names *inverse candidates*:
+    two relations (one from each front, or both in B) whose
+    pair atoms are exact swaps of each other with no
+    inverse_of declared between them — the duplicated-
+    inverse waste a reviewer should settle by declaring the
+    inverse, reported here as review material, never as a
+    validation finding and never merged automatically."""
+    a_e, a_r = _front_maps(a_front)
+    b_e, b_r = _front_maps(b_front)
+    definitions_changed = []
+    for kind, a_map, b_map in (("entity", a_e, b_e),
+                               ("relation", a_r, b_r)):
+        for name in sorted(set(a_map) & set(b_map)):
+            if _norm_text(str(a_map[name].get("definition")
+                              or "")) != \
+                    _norm_text(str(b_map[name].get("definition")
+                                   or "")):
+                definitions_changed.append(
+                    {"kind": kind, "type": name})
+    signature_changes = []
+    for name in sorted(set(a_r) & set(b_r)):
+        added = _signature_atoms(b_r[name]) - \
+            _signature_atoms(a_r[name])
+        removed = _signature_atoms(a_r[name]) - \
+            _signature_atoms(b_r[name])
+        if added or removed:
+            signature_changes.append({
+                "type": name,
+                "added": sorted(added),
+                "removed": sorted(removed)})
+    # Inverse candidates are a property of the compared
+    # schemas together: index every relation's pair atoms by
+    # name across both fronts (a name in both fronts is one
+    # relation), then look for two distinct relations holding
+    # exact swaps of one pair with no inverse_of declared
+    # between them on either side.
+    pair_index: dict[tuple, set] = {}
+    declared_inverse: set[tuple] = set()
+    for front_relations in (a_r, b_r):
+        for name, entry in front_relations.items():
+            for atom in _signature_atoms(entry):
+                sides = _pair_sides(atom)
+                if sides:
+                    pair_index.setdefault(sides, set()).add(name)
+            inverse = entry.get("inverse_of")
+            if _nonempty_str(inverse):
+                declared_inverse.add((name, str(inverse)))
+                declared_inverse.add((str(inverse), name))
+    inverse_candidates = []
+    seen_pairs = set()
+    for (x, y), names in sorted(pair_index.items()):
+        for other in sorted(pair_index.get((y, x), set())):
+            for name in sorted(names):
+                if other == name:
+                    continue
+                key = tuple(sorted((name, other)))
+                if key in seen_pairs or \
+                        (name, other) in declared_inverse:
+                    continue
+                seen_pairs.add(key)
+                inverse_candidates.append(
+                    {"a_relation": name, "b_relation": other,
+                     "pair": f"{x}~{y}"})
+    return {
+        "entities_added": sorted(set(b_e) - set(a_e)),
+        "entities_removed": sorted(set(a_e) - set(b_e)),
+        "relations_added": sorted(set(b_r) - set(a_r)),
+        "relations_removed": sorted(set(a_r) - set(b_r)),
+        "definitions_changed": definitions_changed,
+        "signature_changes": signature_changes,
+        "inverse_candidates": inverse_candidates,
+    }
+
+
+def render_schema_diff(diff: dict, a_label: str = "A",
+                       b_label: str = "B") -> str:
+    """The drift report as a human document. A diff is a
+    report, never a merge: nothing in this module applies
+    one front's content to the other."""
+    lines = [
+        f"# Schema drift report — {a_label} → {b_label}",
+        "",
+        "Structural difference only — a report, never a "
+        "merge; nothing here is applied. Removals and "
+        "signature losses on the "
+        "B side are the anchoring check's subject: what a "
+        "fresh composition (or a revision) dropped that A "
+        "carried.",
+        "",
+        f"Entity types: +{len(diff['entities_added'])} "
+        f"-{len(diff['entities_removed'])}",
+    ]
+    for name in diff["entities_added"]:
+        lines.append(f"- added entity: {name}")
+    for name in diff["entities_removed"]:
+        lines.append(f"- REMOVED entity: {name}")
+    lines.append(f"Relation types: "
+                 f"+{len(diff['relations_added'])} "
+                 f"-{len(diff['relations_removed'])}")
+    for name in diff["relations_added"]:
+        lines.append(f"- added relation: {name}")
+    for name in diff["relations_removed"]:
+        lines.append(f"- REMOVED relation: {name}")
+    lines.append(f"Definitions rewritten: "
+                 f"{len(diff['definitions_changed'])}")
+    for change in diff["definitions_changed"]:
+        lines.append(f"- definition changed: "
+                     f"{change['kind']} {change['type']!r}")
+    lines.append(f"Signature changes: "
+                 f"{len(diff['signature_changes'])}")
+    for change in diff["signature_changes"]:
+        for atom in change["added"]:
+            lines.append(f"- signature + {change['type']}: "
+                         f"{atom}")
+        for atom in change["removed"]:
+            lines.append(f"- signature - {change['type']}: "
+                         f"{atom}")
+    lines.append(f"Inverse candidates (review — declare "
+                 f"inverse_of instead of duplicating): "
+                 f"{len(diff['inverse_candidates'])}")
+    for cand in diff["inverse_candidates"]:
+        lines.append(f"- {cand['a_relation']!r} "
+                     f"({cand['pair']}) reverses "
+                     f"{cand['b_relation']!r} with no "
+                     f"inverse_of declared")
+    lines.append("")
+    return "\n".join(lines)
 
 
 # ------------------------------------------------------------------
@@ -749,6 +1308,15 @@ def render_approval_brief(draft: dict,
         f"tier: {(draft.get('provenance') or {}).get('drafting_tier')}"
         f" (source: "
         f"{(draft.get('provenance') or {}).get('drafting_source')})",
+    ]
+    seed = draft.get("seed")
+    if isinstance(seed, dict) and isinstance(
+            seed.get("schema_front"), dict):
+        lines.append(
+            f"Lineage: revision inheriting seed pack "
+            f"`{(seed.get('source') or {}).get('pack_id')}` · "
+            f"seed schema hash `{seed.get('schema_hash')}`")
+    lines += [
         "",
         "## Inventory",
         "",
@@ -778,7 +1346,23 @@ def render_approval_brief(draft: dict,
     declared = draft.get("decision_points") or []
     if declared:
         for point in declared:
-            lines.append(f"- {point}")
+            if isinstance(point, dict):
+                action = point.get("action")
+                if action:
+                    detail = point.get("detail")
+                    detail_txt = (f" [{detail}]"
+                                  if detail is not None else "")
+                    lines.append(
+                        f"- [seed change: {action}] "
+                        f"{point.get('kind')} "
+                        f"{point.get('type')!r}{detail_txt} — "
+                        f"{point.get('reason')}")
+                else:
+                    lines.append(
+                        "- " + json.dumps(point,
+                                          ensure_ascii=False))
+            else:
+                lines.append(f"- {point}")
         lines.append("")
     if not findings and not declared:
         lines.append("- none outstanding — validation is clean; "
@@ -1032,8 +1616,8 @@ def _print_findings(findings: list[dict]) -> None:
 
 def main(argv=None) -> int:
     """``python -m pipeline ontology <draft|import|validate|
-    brief|approve|emit|check> ...`` — the builder's command
-    surface."""
+    brief|approve|emit|check|diff> ...`` — the builder's
+    command surface."""
     ap = argparse.ArgumentParser(
         prog="ontosmith ontology",
         description="Ontology builder: draft -> validate -> "
@@ -1063,6 +1647,22 @@ def main(argv=None) -> int:
                         "layer); default: the drafting seat's "
                         "bound model (ONTOSMITH_DRAFTING_MODEL) "
                         "— the seat ships unbound")
+    p.add_argument("--seed", default=None,
+                   help="revision seed: a schema draft or pack "
+                        "payload JSON whose schema_front this "
+                        "draft inherits (removals and shrinks "
+                        "then need recorded reasons); default: "
+                        "the published pack with this --pack-id, "
+                        "when one exists")
+    p.add_argument("--fresh", action="store_true",
+                   help="compose from scratch, ignoring any "
+                        "published pack with this --pack-id "
+                        "(default: revise the existing pack)")
+    p.add_argument("--holes", default=None,
+                   help="hole report JSON (a list of family "
+                        "records, or an object with a "
+                        "'families' list) the revision must "
+                        "address")
 
     p = sub.add_parser("import", help="Import an external "
                                       "ontology as a draft "
@@ -1117,6 +1717,21 @@ def main(argv=None) -> int:
     p.add_argument("pack_dir",
                    help="the pack directory (packs/<pack_id>)")
 
+    p = sub.add_parser("diff", help="Report the structural "
+                                    "difference between two "
+                                    "schemas (drafts or pack "
+                                    "payloads) — the anchoring "
+                                    "check; a report, never a "
+                                    "merge")
+    p.add_argument("a", help="base schema JSON (draft or "
+                             "pack payload)")
+    p.add_argument("b", help="compared schema JSON (draft "
+                             "or pack payload)")
+    p.add_argument("--a-label", default=None)
+    p.add_argument("--b-label", default=None)
+    p.add_argument("--out", default=None,
+                   help="report path (default: stdout)")
+
     args = ap.parse_args(argv)
 
     if args.cmd == "draft":
@@ -1148,6 +1763,37 @@ def main(argv=None) -> int:
                       "skeleton)", file=sys.stderr)
                 return 2
             drafter = make_chat_drafter(draft_model, draft_key)
+        seed = None
+        seed_from = args.seed
+        if args.seed:
+            try:
+                seed = _load_json(args.seed)
+            except ValueError as e:
+                print(str(e), file=sys.stderr)
+                return 1
+        elif not args.fresh:
+            # The standard path: a draft for a pack id that
+            # already exists revises the published pack.
+            try:
+                found = _published_pack_seed(args.pack_id)
+            except ValueError as e:
+                print(str(e), file=sys.stderr)
+                return 1
+            if found is not None:
+                seed, published = found
+                seed_from = str(published)
+        hole_report = None
+        if args.holes:
+            try:
+                holes_doc = _load_json(args.holes)
+            except ValueError as e:
+                print(str(e), file=sys.stderr)
+                return 1
+            if isinstance(holes_doc, dict):
+                hole_report = holes_doc.get("families") or \
+                    holes_doc.get("hole_report")
+            else:
+                hole_report = holes_doc
         try:
             draft = draft_schema(
                 profile, brief,
@@ -1155,10 +1801,15 @@ def main(argv=None) -> int:
                 pack_id=args.pack_id,
                 display_name=args.display_name
                 or args.pack_id.replace("-", " ").title(),
-                drafter=drafter)
+                drafter=drafter, seed=seed,
+                hole_report=hole_report)
         except ValueError as e:
             print(str(e), file=sys.stderr)
             return 1
+        if seed is not None:
+            print(f"seeded revision: inherits "
+                  f"{(draft.get('seed') or {}).get('schema_hash')} "
+                  f"from {seed_from}")
         _write_json(args.out, draft)
         findings = validate_schema_draft(draft)
         print(f"draft written: {args.out} "
@@ -1304,6 +1955,27 @@ def main(argv=None) -> int:
               f"{manifest['pack_version']} (manifest + "
               f"conformance record satisfy the pack schemas; "
               f"payload pin verifies)")
+        return 0
+
+    if args.cmd == "diff":
+        try:
+            a_doc = _load_json(args.a)
+            b_doc = _load_json(args.b)
+            a_front, _ = _seed_parts(a_doc)
+            b_front, _ = _seed_parts(b_doc)
+        except ValueError as e:
+            print(str(e), file=sys.stderr)
+            return 1
+        report = render_schema_diff(
+            schema_front_diff(a_front, b_front),
+            args.a_label or args.a, args.b_label or args.b)
+        if args.out:
+            Path(args.out).parent.mkdir(parents=True,
+                                        exist_ok=True)
+            Path(args.out).write_text(report)
+            print(f"drift report written: {args.out}")
+        else:
+            print(report)
         return 0
 
     return 1
